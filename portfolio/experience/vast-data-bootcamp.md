@@ -8,7 +8,7 @@ aliases: ["VAST", "VAST Data", "bootcamp", "internship", "smart agriculture", "d
 employer: "VAST Data"
 role: "Data / ML Engineering Bootcamp (internship)"
 period: "2025"
-projects: [weed-detection-pipeline]
+projects: [weed-detection-pipeline, clip-embeddings-kafka]
 tags: [ml, computer-vision, data-pipeline]
 answers:
   - "Has she worked with machine learning outside her studies?"
@@ -23,7 +23,7 @@ review:
 
 ## Context
 
-A Data / ML Engineering Bootcamp at VAST Data in 2025, as an internship. The team built a smart agriculture system. Sarah built the weed detection component entirely on her own, as one part of that system.
+A Data / ML Engineering Bootcamp at VAST Data in 2025, as an internship. The team built a smart agriculture system. Sarah built two components of it entirely on her own: weed detection, and image embeddings with similarity search.
 
 ## Responsibilities
 
@@ -34,3 +34,4 @@ A Data / ML Engineering Bootcamp at VAST Data in 2025, as an internship. The tea
 ## Projects
 
 - `weed-detection-pipeline`: weed detection on CPU with MobileNetV3, after UNet proved impractical without a GPU.
+- `clip-embeddings-kafka`: image embeddings with CLIP / ViT-mini, through Kafka into pgvector, with similarity search on request.

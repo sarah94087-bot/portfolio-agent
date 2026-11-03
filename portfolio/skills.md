@@ -7,7 +7,7 @@ title: { en: "Technical skills", he: "כישורים טכניים" }
 skills:
   - name: PostgreSQL
     level: used
-    evidence: [claims-trust-model, postgres-rls-backbone, api-latency-582-to-40, human-gated-translation, weed-detection-pipeline]
+    evidence: [claims-trust-model, postgres-rls-backbone, api-latency-582-to-40, human-gated-translation, weed-detection-pipeline, clip-embeddings-kafka]
   - name: Supabase
     level: used
     evidence: [claims-trust-model, postgres-rls-backbone]
@@ -52,7 +52,7 @@ skills:
     evidence: [governance-center-pwa]
   - name: Python
     level: used
-    evidence: [weed-detection-pipeline]
+    evidence: [weed-detection-pipeline, clip-embeddings-kafka]
   - name: PyTorch
     level: used
     evidence: [weed-detection-pipeline]
@@ -65,6 +65,18 @@ skills:
   - name: Docker
     level: used
     evidence: [weed-detection-pipeline]
+  - name: CLIP
+    level: used
+    evidence: [clip-embeddings-kafka]
+  - name: ViT-mini
+    level: used
+    evidence: [clip-embeddings-kafka]
+  - name: Kafka
+    level: used
+    evidence: [clip-embeddings-kafka]
+  - name: pgvector
+    level: used
+    evidence: [clip-embeddings-kafka]
 review:
   approved: true
   approved_on: 2026-11-03
