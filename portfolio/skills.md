@@ -7,7 +7,7 @@ title: { en: "Technical skills", he: "כישורים טכניים" }
 skills:
   - name: PostgreSQL
     level: used
-    evidence: [claims-trust-model, postgres-rls-backbone, api-latency-582-to-40]
+    evidence: [claims-trust-model, postgres-rls-backbone, api-latency-582-to-40, human-gated-translation]
   - name: Supabase
     level: used
     evidence: [claims-trust-model, postgres-rls-backbone]
@@ -26,6 +26,12 @@ skills:
   - name: TypeScript
     level: used
     evidence: [claims-trust-model]
+  - name: Claude API
+    level: used
+    evidence: [human-gated-translation]
+  - name: GitHub Actions
+    level: used
+    evidence: [human-gated-translation]
 review:
   approved: true
   approved_on: 2026-11-03
