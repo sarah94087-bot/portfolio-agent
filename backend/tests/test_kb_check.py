@@ -100,3 +100,42 @@ def test_skill_evidence_must_exist(tmp_path):
 
 def test_real_portfolio_passes():
     assert check(PORTFOLIO_DIR) == {}
+
+
+EXPERIENCE = """---
+id: job
+type: experience
+title: { en: "Engineer", he: "מהנדסת" }
+aliases: ["job"]
+employer: "Acme"
+role: "Engineer"
+period: "2026"
+projects: [demo]
+answers: ["Where did she work?"]
+review: { approved: true, approved_on: 2026-11-03, publication_check: employer-ok }
+---
+
+## Context
+c
+## Responsibilities
+r
+## Projects
+p
+"""
+
+
+def test_experience_and_project_link_both_ways(tmp_path):
+    write(tmp_path, "demo.md", project().replace('role: "Sole engineer"',
+                                                 'experience: job\nrole: "Sole engineer"'))
+    write(tmp_path, "job.md", EXPERIENCE)
+    assert check(tmp_path) == {}
+
+
+def test_broken_experience_links_fail(tmp_path):
+    write(tmp_path, "demo.md", project().replace('role: "Sole engineer"',
+                                                 'experience: elsewhere\nrole: "Sole engineer"'))
+    write(tmp_path, "job.md", EXPERIENCE.replace("## Projects\np\n", ""))
+    results = check(tmp_path)
+    assert results["demo.md"] == ["experience 'elsewhere' has no record"]
+    assert "missing required heading '## Projects'" in results["job.md"]
+    assert "project 'demo' does not point back at 'job'" in results["job.md"]

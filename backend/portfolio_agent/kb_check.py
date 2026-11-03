@@ -36,6 +36,8 @@ REQUIRED_SECTIONS = {
              "Decisions and alternatives", "Results"},
     "overview": {"Problem", "My role", "Architecture", "Results"},
 }
+# Section 2: an experience record gives the context, the responsibility, and links to projects.
+EXPERIENCE_SECTIONS = ["Context", "Responsibilities", "Projects"]
 
 
 class Strict(BaseModel):
@@ -94,6 +96,12 @@ class Architecture(Strict):
         return self
 
 
+def require_publication_check(v: Review) -> Review:
+    if v.publication_check is None:
+        raise ValueError("review.publication_check is required")
+    return v
+
+
 class Project(Strict):
     id: str = Field(pattern=SLUG)
     type: Literal["project"]
@@ -112,12 +120,24 @@ class Project(Strict):
     answers: list[str] = Field(min_length=1)
     review: Review
 
-    @field_validator("review")
-    @classmethod
-    def publication_checked(cls, v: Review) -> Review:
-        if v.publication_check is None:
-            raise ValueError("review.publication_check is required for a project")
-        return v
+    _publication = field_validator("review")(require_publication_check)
+
+
+class Experience(Strict):
+    id: str = Field(pattern=SLUG)
+    type: Literal["experience"]
+    title: Title
+    aliases: list[str] = Field(min_length=1)
+    employer: Text
+    role: Text
+    period: Text
+    location: str | None = None
+    projects: list[str] = []
+    tags: list[str] = []
+    answers: list[str] = Field(min_length=1)
+    review: Review
+
+    _publication = field_validator("review")(require_publication_check)
 
 
 class Skill(Strict):
@@ -143,7 +163,7 @@ class Skills(Strict):
     review: Review
 
 
-SCHEMAS = {"project": Project, "skills": Skills}
+SCHEMAS = {"project": Project, "experience": Experience, "skills": Skills}
 
 
 def split(text: str) -> tuple[dict, str]:
@@ -156,18 +176,18 @@ def split(text: str) -> tuple[dict, str]:
     return meta, m.group(2)
 
 
-def body_errors(body: str, depth: str) -> list[str]:
+def body_errors(body: str, sections: list[str], required: set[str]) -> list[str]:
     errors = []
     found = re.findall(r"^## (.+?)\s*$", body, re.MULTILINE)
     for name in found:
-        if name not in SECTIONS:
+        if name not in sections:
             errors.append(f"unknown heading '## {name}'")
     if len(found) != len(set(found)):
         errors.append("a heading appears twice")
-    known = [n for n in found if n in SECTIONS]
-    if known != sorted(known, key=SECTIONS.index):
+    known = [n for n in found if n in sections]
+    if known != sorted(known, key=sections.index):
         errors.append("headings are out of order")
-    for name in sorted(REQUIRED_SECTIONS[depth] - set(found), key=SECTIONS.index):
+    for name in sorted(required - set(found), key=sections.index):
         errors.append(f"missing required heading '## {name}'")
     parts = re.split(r"^## .+$", body, flags=re.MULTILINE)[1:]
     for name, text in zip(found, parts, strict=True):
@@ -197,7 +217,9 @@ def check_file(path: Path) -> tuple[BaseModel | None, list[str]]:
     if record.id != path.stem:
         errors.append(f"id '{record.id}' does not match the file name '{path.stem}'")
     if isinstance(record, Project):
-        errors += body_errors(body, record.depth)
+        errors += body_errors(body, SECTIONS, REQUIRED_SECTIONS[record.depth])
+    elif isinstance(record, Experience):
+        errors += body_errors(body, EXPERIENCE_SECTIONS, set(EXPERIENCE_SECTIONS))
     return record, errors
 
 
@@ -205,6 +227,7 @@ def check(portfolio_dir: Path) -> dict[str, list[str]]:
     """Returns {relative path: errors} for every file with at least one error."""
     results: dict[str, list[str]] = {}
     records: dict[str, BaseModel] = {}
+    paths: dict[str, str] = {}
     for path in sorted(portfolio_dir.rglob("*.md")):
         rel = path.relative_to(portfolio_dir).as_posix()
         record, errors = check_file(path)
@@ -212,6 +235,7 @@ def check(portfolio_dir: Path) -> dict[str, list[str]]:
             if record.id in records:
                 errors.append(f"duplicate id '{record.id}'")
             records[record.id] = record
+            paths[record.id] = rel
         if errors:
             results[rel] = errors
     # Skill evidence must point at records that exist (section 6).
@@ -223,6 +247,24 @@ def check(portfolio_dir: Path) -> dict[str, list[str]]:
         ]
         if missing:
             results.setdefault("skills.md", []).extend(missing)
+    # A project and its experience record must point at each other.
+    for rid, record in records.items():
+        errors = []
+        if isinstance(record, Project) and record.experience:
+            exp = records.get(record.experience)
+            if not isinstance(exp, Experience):
+                errors.append(f"experience '{record.experience}' has no record")
+            elif rid not in exp.projects:
+                errors.append(f"'{record.experience}' does not list this project")
+        if isinstance(record, Experience):
+            for pid in record.projects:
+                project = records.get(pid)
+                if not isinstance(project, Project):
+                    errors.append(f"project '{pid}' has no record")
+                elif project.experience != rid:
+                    errors.append(f"project '{pid}' does not point back at '{rid}'")
+        if errors:
+            results.setdefault(paths[rid], []).extend(errors)
     return results
 
 
