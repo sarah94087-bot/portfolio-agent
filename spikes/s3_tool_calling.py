@@ -7,6 +7,7 @@ The tool returns a fixed snippet taken from the public CV, so only model behavio
 """
 
 import json
+import os
 import sys
 import time
 
@@ -74,7 +75,16 @@ PROVIDERS = {
 }
 
 
+MAX_TOOL_ROUNDS = 3  # the agent may search again, like the real loop (docs/06-agent-design.md)
+# Seconds between requests. Free tiers count every call, and some models allow 5 per minute.
+MIN_INTERVAL = float(os.environ.get("S3_MIN_INTERVAL", "4"))
+_last_call = 0.0
+
+
 def chat(client: httpx.Client, base: str, key: str, model: str, messages: list) -> tuple[dict, int]:
+    global _last_call
+    time.sleep(max(0.0, _last_call + MIN_INTERVAL - time.perf_counter()))
+    _last_call = time.perf_counter()
     started = time.perf_counter()
     r = client.post(
         f"{base}/chat/completions",
@@ -91,22 +101,25 @@ def run_one(client: httpx.Client, base: str, key: str, model: str, question: str
     messages = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": question}]
     row: dict = {"question": question}
     try:
-        first, row["ms_first"] = chat(client, base, key, model, messages)
-        calls = first.get("tool_calls") or []
-        row["tool_called"] = bool(calls)
-        if calls:
-            call = calls[0]
-            args = json.loads(call["function"]["arguments"] or "{}")
-            row["query"] = args.get("query", "")
-            row["query_in_english"] = bool(row["query"]) and not HEBREW.search(row["query"])
-            messages += [
-                first,
-                {"role": "tool", "tool_call_id": call["id"], "content": json.dumps(SNIPPET)},
-            ]
-            final, row["ms_final"] = chat(client, base, key, model, messages)
-        else:
-            final = first
-        answer = final.get("content") or ""
+        row["queries"], row["ms"] = [], []
+        for _ in range(MAX_TOOL_ROUNDS + 1):
+            message, ms = chat(client, base, key, model, messages)
+            row["ms"].append(ms)
+            calls = message.get("tool_calls") or []
+            if not calls or len(row["queries"]) >= MAX_TOOL_ROUNDS:
+                break
+            messages.append(message)
+            for call in calls:
+                args = json.loads(call["function"]["arguments"] or "{}")
+                row["queries"].append(args.get("query", ""))
+                messages.append(
+                    {"role": "tool", "tool_call_id": call["id"], "content": json.dumps(SNIPPET)}
+                )
+        row["tool_called"] = bool(row["queries"])
+        row["query"] = row["queries"][0] if row["queries"] else ""
+        row["query_in_english"] = bool(row["queries"]) and not any(
+            HEBREW.search(q) for q in row["queries"])
+        answer = message.get("content") or ""
         row["answer"] = answer
         row["answer_hebrew_ratio"] = round(hebrew_ratio(answer), 2)
         row["cites_chunk"] = f"[[{SNIPPET['chunk_id']}]]" in answer
@@ -127,7 +140,6 @@ def main() -> None:
             rows = []
             for q in QUESTIONS:
                 rows.append(run_one(client, base, env[key_var], env[model_var], q))
-                time.sleep(4)  # stay under free-tier requests per minute
             report[name] = {"model": env[model_var], "rows": rows}
             ok = [r for r in rows if "error" not in r]
             print(f"\n{name} ({env[model_var]}): {len(ok)}/{len(rows)} without errors")
@@ -135,6 +147,8 @@ def main() -> None:
             print(f"  query in English:   {sum(r.get('query_in_english', False) for r in ok)}/"
                   f"{sum(r['tool_called'] for r in ok)}")
             print(f"  cites the chunk:    {sum(r['cites_chunk'] for r in ok)}/{len(ok)}")
+            print(f"  searches per turn:  {[len(r['queries']) for r in ok]}")
+            print(f"  empty answers:      {sum(not r['answer'] for r in ok)}")
     print(f"\nsaved {save('s3', report)}")
     print("Read the answers by hand too: Hebrew quality is judged by Sarah, not by a ratio.")
 

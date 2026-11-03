@@ -11,6 +11,7 @@ import base64
 import os
 import secrets
 import time
+from urllib.parse import urlparse
 
 import httpx
 from common import load_env, require
@@ -36,7 +37,9 @@ def span(trace_id: str, span_id: str, parent: str | None, name: str,
 def main() -> None:
     load_env()
     env = require("LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY")
-    host = os.environ.get("LANGFUSE_HOST", "https://cloud.langfuse.com").rstrip("/")
+    # Only the origin counts: a URL copied from the Langfuse UI carries a /project/... path.
+    url = urlparse(os.environ.get("LANGFUSE_HOST") or "https://cloud.langfuse.com")
+    host = f"{url.scheme}://{url.netloc}"
     auth = base64.b64encode(
         f"{env['LANGFUSE_PUBLIC_KEY']}:{env['LANGFUSE_SECRET_KEY']}".encode()
     ).decode()

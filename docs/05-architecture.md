@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **סטטוס** | מאושר |
-| **גרסה** | 1.0 |
+| **גרסה** | 1.1 |
 | **תאריך** | 2026-11-03 |
 | **בעלים** | שרה הלוי |
 | **נשען על** | פרקים 1 עד 5 |
@@ -30,8 +30,8 @@ flowchart TB
   end
 
   subgraph Providers["ספקים חיצוניים"]
-    GEM["Gemini<br/>מודל ראשי + embeddings"]
-    GROQ["Groq<br/>גיבוי + שופט"]
+    GEM["Gemini<br/>embeddings + חירום"]
+    GROQ["Groq<br/>מודל ראשי, גיבויים ושופט"]
     LF["Langfuse<br/>traces"]
     RS["Resend<br/>מיילים לשרה"]
   end
@@ -93,7 +93,7 @@ sequenceDiagram
   participant B as דפדפן
   participant A as FastAPI
   participant D as Neon
-  participant L as Gemini / Groq
+  participant L as Groq (או גיבוי)
 
   B->>A: POST /api/chat (message, conversation_id, idempotency_key)
   A->>A: guards: אורך קלט, visitor id, rate limit
@@ -239,7 +239,7 @@ Makefile                  dev, test, eval, ingest
 | 0002 | סוכן אחד עם כלים, בלי multi-agent |
 | 0003 | Neon כמסד יחיד, בלי Redis ובלי שירות חיפוש |
 | 0004 | Python ו-FastAPI ב-Vercel לצד Next.js |
-| 0005 | לקוח אחד תואם OpenAI לשני הספקים |
+| 0005 | לקוח אחד תואם OpenAI לכל הספקים, Groq ראשי ו-Gemini לחירום. **נכתב** (`adr/0005-llm-providers.md`) |
 | 0006 | אכיפת ציטוטים בזמן הזרמה |
 | 0007 | registry אחד לכלים, והרצה בתוך התהליך במקום דרך MCP |
 | 0008 | פריסה דרך GitHub Actions אחרי evals, ולא פריסה אוטומטית |

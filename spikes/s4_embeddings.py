@@ -13,14 +13,14 @@ import httpx
 from common import GEMINI_BASE, load_env, require, save
 
 PASSAGES = [
-    "Built a human-gated AI translation pipeline using the Claude API; machine output never "
-    "overwrites human edits.",
-    "Improved API latency from 582ms to 40ms through SQL optimization and better data access "
-    "patterns.",
-    "Built an image embedding system using CLIP, publishing vectors to Kafka and loading them "
-    "into pgvector for similarity search.",
-    "Developed an MCP server that lets AI agents analyze Git history, with a human-in-the-loop "
-    "approval flow.",
+    ("Built a human-gated AI translation pipeline using the Claude API; machine output never "
+    "overwrites human edits."),
+    ("Improved API latency from 582ms to 40ms through SQL optimization and better data access "
+    "patterns."),
+    ("Built an image embedding system using CLIP, publishing vectors to Kafka and loading them "
+    "into pgvector for similarity search."),
+    ("Developed an MCP server that lets AI agents analyze Git history, with a human-in-the-loop "
+    "approval flow."),
 ]
 QUESTIONS_HE = [
     "איך היא מנעה מתרגום אוטומטי לדרוס עריכה של אדם?",
