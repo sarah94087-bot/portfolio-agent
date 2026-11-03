@@ -7,7 +7,7 @@ title: { en: "Technical skills", he: "כישורים טכניים" }
 skills:
   - name: PostgreSQL
     level: used
-    evidence: [claims-trust-model, postgres-rls-backbone, api-latency-582-to-40, human-gated-translation]
+    evidence: [claims-trust-model, postgres-rls-backbone, api-latency-582-to-40, human-gated-translation, weed-detection-pipeline]
   - name: Supabase
     level: used
     evidence: [claims-trust-model, postgres-rls-backbone]
@@ -50,6 +50,21 @@ skills:
   - name: Vercel
     level: used
     evidence: [governance-center-pwa]
+  - name: Python
+    level: used
+    evidence: [weed-detection-pipeline]
+  - name: PyTorch
+    level: used
+    evidence: [weed-detection-pipeline]
+  - name: MobileNetV3
+    level: used
+    evidence: [weed-detection-pipeline]
+  - name: MinIO
+    level: used
+    evidence: [weed-detection-pipeline]
+  - name: Docker
+    level: used
+    evidence: [weed-detection-pipeline]
 review:
   approved: true
   approved_on: 2026-11-03
