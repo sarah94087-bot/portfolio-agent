@@ -176,9 +176,17 @@ def split(text: str) -> tuple[dict, str]:
     return meta, m.group(2)
 
 
+def body_sections(body: str) -> list[tuple[str, str]]:
+    """(heading, text) for every '## ' heading, in file order. Ingestion chunks the same split."""
+    names = re.findall(r"^## (.+?)\s*$", body, re.MULTILINE)
+    parts = re.split(r"^## .+$", body, flags=re.MULTILINE)[1:]
+    return list(zip(names, parts, strict=True))
+
+
 def body_errors(body: str, sections: list[str], required: set[str]) -> list[str]:
     errors = []
-    found = re.findall(r"^## (.+?)\s*$", body, re.MULTILINE)
+    parsed = body_sections(body)
+    found = [name for name, _ in parsed]
     for name in found:
         if name not in sections:
             errors.append(f"unknown heading '## {name}'")
@@ -189,8 +197,7 @@ def body_errors(body: str, sections: list[str], required: set[str]) -> list[str]
         errors.append("headings are out of order")
     for name in sorted(required - set(found), key=sections.index):
         errors.append(f"missing required heading '## {name}'")
-    parts = re.split(r"^## .+$", body, flags=re.MULTILINE)[1:]
-    for name, text in zip(found, parts, strict=True):
+    for name, text in parsed:
         if not re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL).strip():
             errors.append(f"heading '## {name}' is empty")
     if "<!-- GAP" in body:

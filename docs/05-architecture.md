@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **סטטוס** | מאושר |
-| **גרסה** | 1.1 |
+| **גרסה** | 1.2 |
 | **תאריך** | 2026-11-03 |
 | **בעלים** | שרה הלוי |
 | **נשען על** | פרקים 1 עד 5 |
@@ -198,12 +198,14 @@ backend/                  שירות ה-API ב-Vercel. התלויות ב-pyproje
     guards/               קצב, מכסות, אורך, הסתרת מידע מזהה
     mcp/                  שרת MCP מעל ה-registry
     db/                   חיבור ושאילתות
+    kb_check.py           בדיקת הסכמה של בסיס הידע
+    ingest.py             קליטה: חיתוך, embeddings ו-upsert. רץ ב-CI, ולכן נבדק כמו שאר הקוד
   migrations/             SQL ממוספר
   tests/                  pytest
 vercel.json               שני השירותים והניתוב ביניהם
 spikes/                   הניסויים של M1
 portfolio/                בסיס הידע (פרק 3)
-scripts/                  ingest.py, company_links.py (מקומי בלבד)
+scripts/                  company_links.py (מקומי בלבד)
 evals/                    D1–D4, Promptfoo, retrieval, calibration, results
 docs/                     האפיון, ADRs, ניסויים
 .github/workflows/        ci.yml, nightly.yml, deploy.yml, retention.yml
