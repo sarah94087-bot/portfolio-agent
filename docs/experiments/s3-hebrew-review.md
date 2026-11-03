@@ -2,6 +2,8 @@
 
 לכל שאלה יש שלוש תשובות, מאותו קטע מקור. **המודלים מוסתרים בכוונה** (א, ב, ג) כדי שהדירוג לא יושפע מהשם. המפתח נמצא בסוף העמוד.
 
+**דורג על ידי שרה (3.11.2026):** בכל שאלה נבחרה התשובה הטובה ביותר. 1 א, 4 א, 5 א, 12 א, 13 ג, 17 א, 19 ב. הסיכום ב-`m1-spikes.md`, ניסוי S3.
+
 **מה לדרג:** כמה העברית טבעית ונכונה, מ-1 עד 5. לא את התוכן. אפשר לכתוב את הציון ליד כל תשובה, או לשלוח לי רק ממוצע לכל אות.
 
 **הקטע שכל המודלים קיבלו:** Built a human-gated AI translation pipeline using the Claude API, ensuring machine output never overwrites human edits. Part of a live data-governance platform where Sarah was the sole engineer, with PostgreSQL row-level security and audit trails.
