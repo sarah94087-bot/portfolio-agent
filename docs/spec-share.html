@@ -1,0 +1,498 @@
+<title>אפיון הסוכן של שרה</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Secular+One&display=swap" rel="stylesheet">
+<style>
+/* Layout: one reading column with a label rail; the trace panel is the recurring signature element */
+:root {
+  --bg: #eef3f6;
+  --paper: #ffffff;
+  --ink: #14263a;
+  --muted: #526475;
+  --line: #c9d5de;
+  --cobalt: #2346c7;
+  --signal: #ffd84d;
+  --signal-ink: #14263a;
+  --panel: #14263a;
+  --panel-ink: #edf3f8;
+  --panel-muted: #a8bacb;
+  --panel-line: #38506a;
+  --ok: #1f7a4d;
+  --font-display: "Secular One", "Assistant", "Segoe UI", Arial, sans-serif;
+  --font-body: "Assistant", "Segoe UI", Arial, sans-serif;
+  --font-code: Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101c2a; --paper: #182737; --ink: #edf3f8; --muted: #a8bacb; --line: #38506a;
+    --cobalt: #9db2ff; --panel: #0c1622; --ok: #6fd3a0; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101c2a; --paper: #182737; --ink: #edf3f8; --muted: #a8bacb; --line: #38506a;
+  --cobalt: #9db2ff; --panel: #0c1622; --ok: #6fd3a0; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  line-height: 1.7;
+}
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; line-height: 1.2; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2.3rem, 6.5vw, 4rem); }
+h2 { font-size: clamp(1.55rem, 3.8vw, 2.1rem); }
+h3 { font-size: 1.15rem; margin-bottom: .2rem; }
+p { margin: 0 0 1rem; }
+p:last-child { margin-bottom: 0; }
+ul, ol { margin: 0; padding-inline-start: 1.25rem; }
+li { margin-bottom: .4rem; }
+a { color: var(--cobalt); }
+:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 3px; }
+code { font-family: var(--font-code); font-size: .88em; unicode-bidi: isolate; }
+.wrap {
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* hero */
+.hero { padding-block: clamp(2.5rem, 7vw, 4.5rem) clamp(2rem, 5vw, 3rem); }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4rem); align-items: center; }
+.lead { font-size: 1.28rem; line-height: 1.55; margin-top: 1.1rem; max-width: 34em; }
+.status { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.25rem; }
+.chip {
+  font-size: .92rem; font-weight: 600; color: var(--ink);
+  border: 1px solid var(--line); border-radius: 999px; padding: .15rem .7rem; background: var(--paper);
+}
+.chip.ok { border-color: var(--ok); color: var(--ok); }
+
+/* trace panel */
+.trace { background: var(--panel); color: var(--panel-ink); border-radius: 6px; padding: 1.3rem; min-width: 0; }
+.trace-q { background: var(--signal); color: var(--signal-ink); font-weight: 700; padding: .65rem .9rem; border-radius: 4px; margin: 0 0 1.1rem; }
+.trace ol { list-style: none; margin: 0; padding: 0; }
+.trace li { position: relative; margin: 0; padding: 0 1.45rem 1rem 0; border-inline-start: 2px solid var(--panel-line); font-size: 1rem; line-height: 1.45; }
+.trace li:last-child { border-color: transparent; padding-bottom: 0; }
+.trace li::before { content: ""; position: absolute; inset-inline-start: -7px; top: .35rem; width: 12px; height: 12px; border-radius: 50%; background: var(--signal); }
+.trace strong { display: block; }
+.trace span { color: var(--panel-muted); }
+.trace .meta { display: flex; flex-wrap: wrap; gap: .35rem .9rem; margin-top: 1rem; padding-top: .8rem; border-top: 1px solid var(--panel-line); color: var(--panel-muted); font-size: .9rem; font-variant-numeric: tabular-nums; }
+
+/* nav */
+.toc { border-block: 1px solid var(--line); padding-block: .8rem; margin-bottom: .5rem; }
+.toc ol { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .35rem 1.1rem; font-size: .98rem; }
+.toc li { margin: 0; }
+.toc a { text-decoration: none; color: var(--muted); }
+.toc a:hover { color: var(--cobalt); text-decoration: underline; }
+
+/* sections */
+main section { padding-block: clamp(2rem, 5vw, 3rem); border-top: 1px solid var(--line); scroll-margin-top: 1rem; }
+main section:first-child { border-top: 0; }
+.two { display: grid; grid-template-columns: minmax(180px, .38fr) minmax(0, 1fr); gap: 1rem clamp(1.5rem, 4vw, 3.5rem); }
+.rail { min-width: 0; }
+.rail .ch { display: block; color: var(--muted); font-size: .9rem; font-weight: 600; letter-spacing: .03em; margin-bottom: .35rem; }
+.body { min-width: 0; max-width: 48rem; }
+.body > * + * { margin-top: 1.1rem; }
+.groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.4rem 2.2rem; }
+.groups > div { min-width: 0; }
+.groups p { color: var(--muted); }
+.note { color: var(--muted); font-size: 1rem; }
+blockquote {
+  margin: 0; padding: .9rem 1.1rem; border-inline-start: 4px solid var(--signal);
+  background: var(--paper); border-radius: 0 4px 4px 0; font-size: 1.15rem; font-weight: 600;
+}
+
+/* tables */
+.table-scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 1rem; }
+th, td { text-align: start; vertical-align: top; padding: .6rem .7rem; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 700; font-size: .95rem; }
+td:first-child, th:first-child { padding-inline-start: 0; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pass { color: var(--ok); font-weight: 700; }
+
+/* pillars */
+.pillars { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .9rem; }
+.pillar { background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 1rem; min-width: 0; }
+.pillar h3 { font-family: var(--font-body); font-weight: 700; font-size: 1.05rem; }
+.pillar .claim { color: var(--cobalt); font-weight: 600; font-size: .98rem; margin: .2rem 0 .5rem; }
+.pillar p { color: var(--muted); font-size: .98rem; line-height: 1.5; }
+
+/* pipeline */
+.steps { list-style: none; padding: 0; margin: 0; counter-reset: s; display: grid; gap: .6rem; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 2rem minmax(0, 1fr); gap: .6rem; margin: 0; }
+.steps li::before { content: counter(s); font-family: var(--font-display); color: var(--cobalt); font-size: 1.25rem; line-height: 1.4; }
+.steps .who { display: inline-block; font-size: .82rem; font-weight: 700; border-radius: 3px; padding: 0 .4rem; margin-inline-start: .35rem; vertical-align: middle; }
+.who.llm { background: var(--signal); color: var(--signal-ink); }
+.who.code { border: 1px solid var(--cobalt); color: var(--cobalt); }
+
+/* diagram */
+.diagram { background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 1rem; overflow-x: auto; }
+.diagram pre { margin: 0; }
+
+/* roadmap */
+.milestones { list-style: none; padding: 0; margin: 0; display: grid; gap: .1rem; }
+.milestones li { display: grid; grid-template-columns: 3.4rem minmax(0, 1fr); gap: .8rem; padding-block: .75rem; border-bottom: 1px solid var(--line); margin: 0; }
+.milestones .id { font-family: var(--font-display); color: var(--cobalt); font-size: 1.2rem; line-height: 1.4; }
+.milestones .exit { color: var(--muted); font-size: 1rem; }
+.milestones .exit b { color: var(--ink); }
+
+footer { border-top: 1px solid var(--line); color: var(--muted); padding-block: 1.5rem 2.5rem; font-size: 1rem; }
+
+@media (max-width: 900px) {
+  .pillars { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 820px) {
+  .hero-grid, .two, .groups { grid-template-columns: minmax(0, 1fr); }
+  body { font-size: 1.0625rem; }
+}
+@media (max-width: 520px) {
+  .pillars { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+
+<div dir="rtl" lang="he">
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <h1>סוכן AI שמציג את שרה הלוי</h1>
+      <p class="lead">קישור אחד שבו כל אחד יכול לשאול על הניסיון של שרה, לקבל תשובה עם מקורות, ולראות בזמן אמת את ההנדסה שמאחוריה.</p>
+      <div class="status">
+        <span class="chip ok">אפיון מאושר</span>
+        <span class="chip">12 פרקים</span>
+        <span class="chip">גרסה 1.0</span>
+        <span class="chip">נובמבר 2026</span>
+      </div>
+    </div>
+    <aside class="trace" aria-label="דוגמה לחלון המעקב">
+      <p class="trace-q">איך היא מנעה מתרגום אוטומטי לדרוס עריכה של אדם?</p>
+      <ol>
+        <li><strong>המודל מנסח שאילתה באנגלית</strong><span><code dir="ltr">search_portfolio("human review before machine translation overwrites")</code></span></li>
+        <li><strong>20 מועמדים, 5 נבחרו</strong><span>ציון מילים, ציון וקטורי ו-RRF לכל קטע</span></li>
+        <li><strong>תשובה עם ציטוטים</strong><span><code dir="ltr">[[human-gated-translation#decisions]]</code> נבדק בשרת לפני שהוצג</span></li>
+      </ol>
+      <div class="meta" dir="rtl"><span>2 צעדים</span><span>1.4 שנ'</span><span>1,820 טוקנים</span><span>Gemini</span></div>
+    </aside>
+  </div>
+</header>
+
+<nav class="wrap toc" aria-label="תוכן העניינים">
+  <ol>
+    <li><a href="#vision">חזון</a></li>
+    <li><a href="#product">דרישות</a></li>
+    <li><a href="#knowledge">בסיס הידע</a></li>
+    <li><a href="#evals">בדיקות</a></li>
+    <li><a href="#retrieval">שליפה</a></li>
+    <li><a href="#architecture">ארכיטקטורה</a></li>
+    <li><a href="#agent">הסוכן</a></li>
+    <li><a href="#capabilities">יכולות</a></li>
+    <li><a href="#transparency">שקיפות</a></li>
+    <li><a href="#security">אבטחה ופרטיות</a></li>
+    <li><a href="#ops">תפעול</a></li>
+    <li><a href="#roadmap">מפת דרכים</a></li>
+  </ol>
+</nav>
+
+<main class="wrap">
+
+  <section id="vision">
+    <div class="two">
+      <div class="rail"><span class="ch">פרק 1</span><h2>הבעיה והחזון</h2></div>
+      <div class="body">
+        <p>קורות חיים דוחסים שנים של עבודה לכמה שורות. אי אפשר לאמת אותם, הפרויקטים הטובים ביותר של שרה נבנו אצל מעסיקים ואין להם קישור ציבורי, ומגייסת שיש לה שאלה צריכה לקבוע שיחה כדי לקבל תשובה.</p>
+        <p>הפרויקט הוא גם התוכן וגם ההוכחה. המבקר לומד על שרה מתוך מערכת שהיא בנתה, ויכול לבדוק כל שכבה בה: את המקורות, את מדדי האיכות ואת הקוד.</p>
+        <blockquote>מבחן הראיון: כל רכיב צריך להחזיק מעמד מול השאלה "למה בחרת בזה ולא בחלופה?", עם מספר, אילוץ או ניסוי.</blockquote>
+      </div>
+    </div>
+    <div style="margin-top:1.75rem">
+      <div class="pillars">
+        <div class="pillar"><h3>RAG מוכח במספרים</h3><p class="claim">היא מודדת לפני שהיא מחליטה</p><p>ניסויים שמשווים שיטות חיפוש, ומדדים מכל הרצה ב-CI.</p></div>
+        <div class="pillar"><h3>שקיפות מלאה</h3><p class="claim">המערכת לא קופסה שחורה</p><p>לכל תשובה: צעדים, מקורות עם ציונים, זמנים, טוקנים והמודל שענה.</p></div>
+        <div class="pillar"><h3>יכולות סוכן מתקדמות</h3><p class="claim">היא בונה מוצר, לא הדגמה</p><p>דוח התאמה למשרה עם פערים, כרטיסים, דיאגרמות ויצירת קשר באישור.</p></div>
+        <div class="pillar"><h3>תיעוד הנדסי</h3><p class="claim">עבודה ברמה של צוות גדול</p><p>ADRs, מודל איומים, מתודולוגיית בדיקות ו-postmortems ב-repo ציבורי.</p></div>
+      </div>
+    </div>
+    <div class="two" style="margin-top:2rem">
+      <div class="rail"><h3>קהלים</h3></div>
+      <div class="body groups">
+        <div><h3>מגייסים</h3><p>להבין תוך דקות אם יש התאמה. מקבלים שאלות פתיחה ודוח התאמה מובנה.</p></div>
+        <div><h3>מנהלים טכניים</h3><p>לראות שיקול דעת הנדסי. מקבלים חלון מעקב, עמוד איכות וקוד פתוח.</p></div>
+        <div><h3>מהנדסים בכירים</h3><p>לבדוק לעומק אם ההנדסה אמיתית. מקבלים מסלול בדיקה של 10 דקות והרצה מקומית.</p></div>
+        <div><h3>לקוחות פרילנס (משני)</h3><p>לדעת אם היא יכולה לבנות את מה שהם צריכים. מקבלים העמקה בפרויקטים דומים.</p></div>
+      </div>
+    </div>
+    <div class="two" style="margin-top:2rem">
+      <div class="rail"><h3>עקרונות, לפי סדר עדיפות</h3></div>
+      <div class="body">
+        <ol>
+          <li><b>יושרה לפני רושם.</b> הסוכן מציג את עצמו כ-AI, לא ממציא, ומציג פערים.</li>
+          <li><b>כל טענה עם מקור.</b></li>
+          <li><b>מודדים לפני שמחליטים.</b></li>
+          <li><b>ההנדסה גלויה.</b></li>
+          <li><b>פשטות מוצדקת.</b> בלי multi-agent ובלי Kubernetes, כי אין להם צורך.</li>
+          <li><b>פרטיות כברירת מחדל.</b></li>
+          <li><b>עלות אפס.</b> אין אמצעי תשלום באף שירות.</li>
+          <li><b>עברית ואנגלית שוות.</b></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section id="product" class="two">
+    <div class="rail"><span class="ch">פרק 2</span><h2>דרישות מוצר</h2></div>
+    <div class="body">
+      <p>13 מסכים ומצבים, ו-12 נושאים של user stories. לכל story יש מזהה קבוע, עדיפות, וקריטריוני קבלה שאפשר לבדוק בפורמט בהינתן / כאשר / אז.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>נושא</th><th>דוגמה לקריטריון קבלה</th></tr></thead>
+          <tbody>
+            <tr><td>תשובות עם מקורות</td><td>ציטוט שלא נשלף באותה שיחה מוסר בשרת ונרשם בניטור</td></tr>
+            <tr><td>"אין לי מידע"</td><td>בשאלה בלי מענה בתיק, הסוכן אומר זאת ומפנה לשרה</td></tr>
+            <tr><td>התאמה למשרה</td><td>דרישה בלי הוכחה מסומנת כפער ולא מוצגת כהתאמה</td></tr>
+            <tr><td>תיאור משרה כנתונים</td><td>הוראות בתוך תיאור משרה לא מבוצעות</td></tr>
+            <tr><td>יצירת קשר</td><td>הודעה נשלחת רק אחרי לחיצה על כפתור אישור</td></tr>
+            <tr><td>קישורי חברות</td><td>שרה מקבלת התראה במייל, עד 3 ביום לכל חברה</td></tr>
+            <tr><td>שקיפות</td><td><code>/stats</code> מציג רק מדדי ביצועים ואיכות, בלי מספרי שיחות</td></tr>
+            <tr><td>פרטיות</td><td>מבקר יכול למחוק את השיחה שלו מיד</td></tr>
+            <tr><td>נגישות</td><td>WCAG 2.2 AA, ועובד ב-375px</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="knowledge" class="two">
+    <div class="rail"><span class="ch">פרק 3</span><h2>בסיס הידע</h2></div>
+    <div class="body">
+      <p>מקור האמת היחיד לכל טענה. הוא יושב ב-repo הציבורי, ולכן המבחן לכל משפט הוא "האם אני בסדר שזה יופיע ב-GitHub?". הערך שלו הוא העומק: למה היה קשה, מה נשקל ונדחה, ומה נשבר.</p>
+      <p>15 רשומות ראשונות לפי קורות החיים. העבודה ב-Ainsof Capital מפוצלת לחמש רשומות, כי כל חלק בה הוא סיפור הנדסי שלם. כל מספר נכנס רק עם הסבר איך נמדד, וכל רשומה נכנסת רק אחרי אישור של שרה.</p>
+      <h3>כישורים מקושרים להוכחות</h3>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>רמה</th><th>איך הסוכן עונה</th><th>בהתאמה למשרה</th></tr></thead>
+          <tbody>
+            <tr><td><code>used</code></td><td>מתאר את השימוש ומצטט את הרשומה</td><td>עד התאמה חזקה</td></tr>
+            <tr><td><code>studied</code></td><td>"היא למדה את זה במסגרת..."</td><td>עד התאמה חלקית</td></tr>
+            <tr><td><code>listed</code></td><td>"מופיע בקורות החיים, אין לי פרטים נוספים"</td><td>עד התאמה חלקית, עם סימון</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="evals" class="two">
+    <div class="rail"><span class="ch">פרק 4</span><h2>מתודולוגיית בדיקות</h2><p class="note" style="margin-top:.6rem">נכתב לפני הארכיטקטורה, כדי להגדיר הצלחה לפני שבונים.</p></div>
+    <div class="body">
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>סט</th><th>בודק</th><th>גודל</th></tr></thead>
+          <tbody>
+            <tr><td>D1 Golden</td><td>שליפה ותשובות, ב-8 קטגוריות</td><td class="num">85 שאלות</td></tr>
+            <tr><td>D2 Adversarial</td><td>מתקפות והתנהגות בטוחה</td><td class="num">30–40</td></tr>
+            <tr><td>D3 Job match</td><td>התאמה למשרה, מתויג על ידי שרה</td><td class="num">10–15 משרות</td></tr>
+            <tr><td>D4 Conversations</td><td>שיחות של כמה תורות</td><td class="num">10–12</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul>
+        <li><b>שאלות מנוסחות שונה מהרשומות,</b> וזה נבדק בקוד. אחרת חיפוש מילים נראה טוב יותר ממה שהוא.</li>
+        <li><b>30% מהשאלות שמורות בצד</b> ומשמשות רק להרצה רשמית. רק התוצאות שלהן מתפרסמות.</li>
+        <li><b>שופט שונה מהמחולל,</b> שמתקבל רק עם kappa ≥ 0.7 מול תיוג ידני של שרה.</li>
+        <li><b>ספירות ורווחי סמך,</b> ושיפור מוכרז רק כשההבדל גדול מהרעש.</li>
+      </ul>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>שער עיקרי</th><th>סף</th></tr></thead>
+          <tbody>
+            <tr><td>Recall@5</td><td class="num">≥ 0.90 (עברית ≥ 0.85)</td></tr>
+            <tr><td>נאמנות למקורות, ברמת טענה</td><td class="num">≥ 0.98</td></tr>
+            <tr><td>המצאות מאומתות</td><td class="num">0</td></tr>
+            <tr><td>דליפות והזרקות מוצלחות</td><td class="num">0</td></tr>
+            <tr><td>התאמה חזקה שגויה למשרה</td><td class="num">0</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="retrieval" class="two">
+    <div class="rail"><span class="ch">פרק 5</span><h2>תכנון השליפה</h2></div>
+    <div class="body">
+      <p>הפרק לא בוחר שיטה. הוא מגדיר מה נבדק, באיזה סדר, ואיך מכריעים. הבחירה מתקבלת ב-M3, לפי המספרים.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>ציר</th><th>אפשרויות</th></tr></thead>
+          <tbody>
+            <tr><td>חיתוך</td><td>לפי כותרת · כותרת עם הקשר · חלונות קבועים · רשומה שלמה</td></tr>
+            <tr><td>שליפה</td><td>מילים · וקטורים · היברידי (RRF) · היברידי עם reranking</td></tr>
+            <tr><td>שאילתה</td><td>כמו שהיא · הסוכן מנסח באנגלית · ניסוחים חלופיים</td></tr>
+            <tr><td>מודלים</td><td>embeddings ו-reranking שזמינים בחינם גם בזמן שאילתה</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><b>הפתרון לעברית:</b> הסוכן ממילא מנסח את שאילתת החיפוש. כשהסכמה מבקשת שאילתה באנגלית, התרגום מגיע בלי קריאה נוספת ובלי זמן נוסף.</p>
+      <blockquote>בוחרים בתצורה הפשוטה ביותר שאינה גרועה באופן מובהק מהטובה ביותר.</blockquote>
+    </div>
+  </section>
+
+  <section id="architecture">
+    <div class="two">
+      <div class="rail"><span class="ch">פרק 6</span><h2>ארכיטקטורה</h2></div>
+      <div class="body">
+        <p>שירות אחד שמחליט, מסד אחד, ומקור אחד לכלים. אין Redis ואין שירות חיפוש, כי בגודל הזה אין להם הצדקה. השרת והמסד יושבים בפרנקפורט, האזור הקרוב ביותר לישראל.</p>
+      </div>
+    </div>
+    <div class="diagram" dir="ltr" style="margin-top:1.25rem" aria-label="תרשים רכיבי המערכת">
+<pre class="mermaid">
+flowchart LR
+  UI["Next.js UI"] -- "POST /api/chat → SSE" --> API["FastAPI<br/>guards · agent loop · tools"]
+  API --> NEON[("Neon Postgres<br/>pgvector · pg_trgm")]
+  API --> GEM["Gemini<br/>primary"]
+  API -. fallback .-> GROQ["Groq<br/>fallback + judge"]
+  API -- OTel --> LF["Langfuse"]
+  API --> RS["Resend<br/>email to Sarah"]
+  MCP["/mcp<br/>read-only"] --> NEON
+  CI["GitHub Actions<br/>evals → deploy"] --> NEON
+</pre>
+    </div>
+    <div class="two" style="margin-top:1.5rem">
+      <div class="rail"><h3>שלוש החלטות בולטות</h3></div>
+      <div class="body">
+        <ul>
+          <li><b>ציטוטים נבדקים בזמן ההזרמה.</b> השרת מעכב רק את הטקסט של הציטוט, בודק שהקטע נשלף, ומוחק ציטוט לא תקין לפני שהוא מגיע לדפדפן.</li>
+          <li><b>ניתוק באמצע תשובה</b> לא קורא שוב למודל ולא צורך מכסה, בזכות idempotency key.</li>
+          <li><b>Cold start הוא הסיכון הגדול</b> ליעד של שתי שניות. נמדד כבר ב-M1, לפני שבונים עליו.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="agent" class="two">
+    <div class="rail"><span class="ch">פרק 7</span><h2>הסוכן</h2></div>
+    <div class="body">
+      <p>לולאה שנכתבת בעצמנו, עד 4 סבבים, וגלויה למי שבודק את הקוד. ההנחיה ציבורית, ולכן ההגנה נשענת על אכיפה בקוד ולא על סודיות.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>כלי</th><th>פעולה</th><th>השפעה חיצונית</th></tr></thead>
+          <tbody>
+            <tr><td><code>search_portfolio</code></td><td>קריאה</td><td>אין</td></tr>
+            <tr><td><code>get_project</code></td><td>קריאה, מזהה מתוך <code>enum</code></td><td>אין</td></tr>
+            <tr><td><code>match_job</code></td><td>קריאה וחישוב</td><td>אין</td></tr>
+            <tr><td><code>render_card</code></td><td>קריאה, התוכן מהרשומה</td><td>אין</td></tr>
+            <tr><td><code>request_contact</code></td><td>טיוטה בלבד</td><td>אין. השליחה רק אחרי אישור בממשק</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><b>ניתוב:</b> Gemini ראשי ו-Groq גיבוי. אחרי שגיאת מכסה, הספק מסומן כלא זמין עד האיפוס, ולא מבזבזים עליו קריאות. מעבר באמצע תשובה גלוי למבקר בכוונה.</p>
+    </div>
+  </section>
+
+  <section id="capabilities" class="two">
+    <div class="rail"><span class="ch">פרק 8</span><h2>יכולות מתקדמות</h2></div>
+    <div class="body">
+      <blockquote>המודל מציע, הקוד אוכף.</blockquote>
+      <h3>התאמה למשרה</h3>
+      <ol class="steps">
+        <li><div>חילוץ עד 15 דרישות במבנה קבוע <span class="who llm">מודל</span></div></li>
+        <li><div>חיפוש ראיות לכל דרישה <span class="who code">קוד</span></div></li>
+        <li><div>דירוג כל דרישה עם ציטוט <span class="who llm">מודל</span></div></li>
+        <li><div>תקרות לפי רמת הוכחה, ופסילת ציטוטים לא תקינים <span class="who code">קוד</span></div></li>
+        <li><div>ציון כולל כקטגוריה ולא כאחוז, ופערים בראש <span class="who code">קוד</span></div></li>
+      </ol>
+      <p class="note">רק השלב הראשון רואה את תיאור המשרה המקורי. הוראה שהוזרקה לתוכו מגיעה לשאר הצנרת רק כ"דרישה" מוזרה, ומקבלת "אין התאמה".</p>
+      <ul>
+        <li><b>קישורי חברות</b> עם סיומת אקראית, כמו <code>/c/acme-7f3k2q</code>, כדי שאי אפשר יהיה לנחש לאילו חברות שרה פונה.</li>
+        <li><b>יצירת קשר:</b> המערכת לא שולחת שום מייל למבקר, כדי שלא תשמש ממסר לספאם.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="transparency" class="two">
+    <div class="rail"><span class="ch">פרק 9</span><h2>שקיפות</h2></div>
+    <div class="body">
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>שכבה</th><th>השאלה</th><th>איפה</th></tr></thead>
+          <tbody>
+            <tr><td>תשובה</td><td>איך נבנתה התשובה הזאת?</td><td>חלון המעקב</td></tr>
+            <tr><td>גרסה</td><td>כמה טובה המערכת, ואיך זה נמדד?</td><td><code>/quality</code></td></tr>
+            <tr><td>פרודקשן</td><td>איך היא מתנהגת מול מבקרים?</td><td><code>/stats</code></td></tr>
+            <tr><td>תהליך</td><td>איך נבנתה, ומה קורה כשהיא נכשלת?</td><td><code>/how-it-works</code>, אתגר פתוח, repo</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>גם המגבלות מוצגות: רווחי סמך, ההסכמה של השופט עם שרה, ונקודות חולשה ידועות. בדשבורד, מדד מוצג רק מעל 30 תצפיות ומעוגל ל-5%, כדי שגם אחוז לא יחשוף כמה שיחות היו.</p>
+    </div>
+  </section>
+
+  <section id="security" class="two">
+    <div class="rail"><span class="ch">פרק 10</span><h2>אבטחה ופרטיות</h2></div>
+    <div class="body">
+      <p>14 איומים, ולכל אחד הגנה ובדיקה. הנכס החשוב ביותר הוא המוניטין של שרה.</p>
+      <ul>
+        <li><b>מה לא קיים בכוונה:</b> כלי שקורא URL, כלי שכותב, וחשבונות משתמש.</li>
+        <li><b>PR עוין ל-repo</b> לא נכנס, כי רק שרה מאשרת merge, ו-CI על forks רץ בלי סודות.</li>
+        <li><b>מגבלות:</b> 30 הודעות למבקר ביום, 1,000 תווים להודעה, ומכסה כוללת של 80% ממכסת הספק.</li>
+        <li><b>שמירה:</b> שיחות 30 יום, hash של IP יומיים. עוגייה אחת, פונקציונלית בלבד.</li>
+        <li><b>מתג כיבוי</b> שעוצר את הסוכן מיד, בלי פריסה.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="ops" class="two">
+    <div class="rail"><span class="ch">פרק 11</span><h2>תפעול ועלויות</h2></div>
+    <div class="body">
+      <p>אין אמצעי תשלום באף שירות, ולכן מכסה שנגמרת עוצרת את השירות ולא מחייבת. לבדיקות יש מפתחות נפרדים, כדי שלילה של בדיקות לא ישאיר את המבקרים בלי מכסה.</p>
+      <h3>סולם ירידה הדרגתית</h3>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>מצב</th><th>מה המבקר רואה</th></tr></thead>
+          <tbody>
+            <tr><td>הכול תקין</td><td>הסוכן המלא</td></tr>
+            <tr><td>מכסת Gemini נגמרה</td><td>אותו דבר, עם תווית "מודל גיבוי"</td></tr>
+            <tr><td>גם מכסת Groq נגמרה</td><td>שאלות הפתיחה עובדות מהמטמון, כולל חלון המעקב</td></tr>
+            <tr><td>המסד או השרת לא זמינים</td><td>עמוד סטטי עם קורות החיים ודרכי הקשר</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="roadmap" class="two">
+    <div class="rail"><span class="ch">פרק 12</span><h2>מפת דרכים</h2><p class="note" style="margin-top:.6rem">בלי תאריכים. כל אבן דרך נגמרת רק כשקריטריון היציאה שלה מתקיים, ובהדגמה לשרה.</p></div>
+    <div class="body">
+      <ol class="milestones">
+        <li><span class="id">M1</span><div><b>תשתית וניסויים</b><div class="exit"><b>יציאה:</b> שישה ניסויים קצרים עברו, והמגבלות של הספקים אומתו</div></div></li>
+        <li><span class="id">M2</span><div><b>בסיס הידע וסטי הבדיקה</b><div class="exit"><b>יציאה:</b> כל הרשומות ותיוג D1 ו-D3 אושרו על ידי שרה</div></div></li>
+        <li><span class="id">M3</span><div><b>ניסויי שליפה</b><div class="exit"><b>יציאה:</b> דוח ניסויים, ותצורה שנבחרה לפי המספרים</div></div></li>
+        <li><span class="id">M4</span><div><b>ליבת הסוכן</b><div class="exit"><b>יציאה:</b> ספי D1 מתקיימים, והשופט מכויל</div></div></li>
+        <li><span class="id">עיצוב</span><div><b>Claude Design, במקביל</b><div class="exit"><b>יציאה:</b> העיצוב אושר לפני M5</div></div></li>
+        <li><span class="id">M5</span><div><b>הממשק</b><div class="exit"><b>יציאה:</b> עובד ב-375px ובדסקטופ, ועומד ב-WCAG 2.2 AA</div></div></li>
+        <li><span class="id">M6</span><div><b>הקשחה</b><div class="exit"><b>יציאה:</b> אפס דליפות ב-D2, וכל השערים חוסמים פריסה</div></div></li>
+        <li><span class="id">M7</span><div><b>יכולות מתקדמות</b><div class="exit"><b>יציאה:</b> ספי D3 מתקיימים, ומייל אמיתי הגיע לשרה</div></div></li>
+        <li><span class="id">M8</span><div><b>שקיפות ותיעוד</b><div class="exit"><b>יציאה:</b> מהנדס חיצוני מבין את המערכת מה-repo בלבד, תוך 10 דקות</div></div></li>
+        <li><span class="id">M9</span><div><b>בטא והשקה</b><div class="exit"><b>יציאה:</b> רשימת ההשקה מסומנת, והמשוב מהבטא טופל</div></div></li>
+        <li><span class="id">M10</span><div><b>מצב קולי, אופציונלי</b><div class="exit"><b>יציאה:</b> ממשיכים רק אם העברית והעיכוב טובים מספיק</div></div></li>
+      </ol>
+      <h3 style="margin-top:1.5rem">החלטות שעדיין פתוחות</h3>
+      <ul>
+        <li>שם הסוכן, עד M9.</li>
+        <li>איך הסוכן פונה למבקר בעברית, עד M4.</li>
+        <li>רמות הכישורים, עד M2.</li>
+        <li>מהנדס למבחן הקורא החיצוני ואנשי הבטא, עד M8 ו-M9.</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">העמוד מסכם את האפיון המלא, שנמצא בתיקייה <code>docs/</code> בפרויקט: 12 פרקים עם קריטריוני קבלה, ספים, סכמות ונימוקים.</div>
+</footer>
+</div>

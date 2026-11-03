@@ -1,0 +1,34 @@
+# secrets
+.env
+.env.*
+!.env.example
+
+# raw portfolio materials stay local (docs/02-knowledge-base.md, section 11)
+raw/
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# node
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# vercel
+.vercel/
+
+# spike outputs (summaries go to docs/experiments/)
+spikes/results/
+
+# os / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
