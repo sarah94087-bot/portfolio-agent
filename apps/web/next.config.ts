@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 // In local development the FastAPI server runs separately on :8000. On Vercel, /api/* is
-// served by api/index.py in the same project (docs/05-architecture.md, section 3).
+// routed to the FastAPI service by vercel.json (docs/05-architecture.md, section 3).
 const apiOrigin = process.env.API_ORIGIN ?? "http://127.0.0.1:8000";
 
 const nextConfig: NextConfig = {

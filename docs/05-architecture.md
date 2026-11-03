@@ -21,7 +21,7 @@ flowchart TB
 
   subgraph Vercel["Vercel Hobby · אזור fra1"]
     WEB["Next.js<br/>עמודים ונכסים"]
-    API["FastAPI · api/index.py<br/>guards · agent loop · tools · SSE"]
+    API["FastAPI · backend/ (Vercel Service)<br/>guards · agent loop · tools · SSE"]
     MCP["/mcp<br/>אותו tools registry, קריאה בלבד"]
   end
 
@@ -73,9 +73,9 @@ flowchart TB
 
 ## 3. פריסה
 
-**התצורה המועדפת:** פרויקט Vercel אחד. Next.js מגיש את העמודים, ו-`api/index.py` היא פונקציית Python אחת שמריצה את FastAPI. כל `/api/*` מופנה אליה.
+**התצורה המועדפת:** פרויקט Vercel אחד עם [Vercel Services](https://vercel.com/docs/services) (Beta, זמין גם ב-Hobby). `vercel.json` בשורש מגדיר שני שירותים: `web` מ-`apps/web/` ו-`api` מ-`backend/`. כל `/api/*` מופנה ל-`api`, והוא מקבל את הנתיב המקורי, כמו `/api/health`. כל השאר הולך ל-`web`. כך אין קובץ גישור, ולכל צד יש תיקייה ותלויות משלו. (שינוי ב-M1: התכנון המקורי היה `api/index.py` בשורש.)
 
-**חלופה, אם הניסוי ב-M1 ייכשל:** שני פרויקטי Vercel חינמיים, `web` ו-`api`, עם CORS שמאשר רק את הדומיין של `web`.
+**חלופה, אם Services ייכשל ב-S1 או ייצא מ-Beta לתשלום:** שני פרויקטי Vercel חינמיים, `web` ו-`api`, עם CORS שמאשר רק את הדומיין של `web`.
 
 **אזורים:** הפונקציות ב-`fra1` (פרנקפורט), ו-Neon ב-`eu-central-1`. זה הצירוף הקרוב ביותר לישראל, וגם השרת והמסד נמצאים באותו אזור, כך שכל שאילתה למסד חוסכת עשרות מילישניות.
 
@@ -189,10 +189,7 @@ apps/web/                 Next.js
   components/chat/        שיחה, הודעה, ציטוטים, משוב
   components/trace/       חלון המעקב
   lib/sse.ts              לקוח SSE עם טיפול בניתוק
-api/
-  index.py                נקודת הכניסה ל-Vercel בלבד. Vercel הופך כל קובץ .py תחת api/ לפונקציה,
-                          ולכן הקוד עצמו יושב ב-backend/ (שינוי ב-M1)
-backend/
+backend/                  שירות ה-API ב-Vercel. התלויות ב-pyproject.toml
   portfolio_agent/
     agent/                הלולאה, ההנחיות, אכיפת ציטוטים
     tools/                registry ומימוש הכלים
@@ -203,7 +200,7 @@ backend/
     db/                   חיבור ושאילתות
   migrations/             SQL ממוספר
   tests/                  pytest
-requirements.txt          התלויות של פונקציית Vercel, מינימליות בכוונה
+vercel.json               שני השירותים והניתוב ביניהם
 spikes/                   הניסויים של M1
 portfolio/                בסיס הידע (פרק 3)
 scripts/                  ingest.py, company_links.py (מקומי בלבד)
@@ -238,7 +235,7 @@ Makefile                  dev, test, eval, ingest
 | 0001 | לולאת סוכן עצמית במקום framework |
 | 0002 | סוכן אחד עם כלים, בלי multi-agent |
 | 0003 | Neon כמסד יחיד, בלי Redis ובלי שירות חיפוש |
-| 0004 | Python ו-FastAPI ב-Vercel לצד Next.js |
+| 0004 | Python ו-FastAPI ב-Vercel לצד Next.js, דרך Vercel Services |
 | 0005 | לקוח אחד תואם OpenAI לכל הספקים, Groq ראשי ו-Gemini לחירום. **נכתב** (`adr/0005-llm-providers.md`) |
 | 0006 | אכיפת ציטוטים בזמן הזרמה |
 | 0007 | registry אחד לכלים, והרצה בתוך התהליך במקום דרך MCP |

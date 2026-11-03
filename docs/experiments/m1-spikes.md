@@ -8,7 +8,7 @@
 הנתונים הגולמיים נשמרים ב-`spikes/results/` (לא ב-git). כאן נכנסים הסיכום וההחלטה.
 
 ## S1: Next.js ו-FastAPI באותו פרויקט Vercel
-**שאלה:** האם `api/index.py` מוגש כפונקציה לצד Next.js, ו-SSE מגיע בהדרגה ולא נאגר?
+**שאלה:** האם Vercel Services מריץ את FastAPI (`backend/`) לצד Next.js (`apps/web/`) בפרויקט אחד, ו-SSE מגיע בהדרגה ולא נאגר?
 **איך:** פריסה ל-Vercel, ואז `/spike` בדפדפן.
 
 | בדיקה | תוצאה |
