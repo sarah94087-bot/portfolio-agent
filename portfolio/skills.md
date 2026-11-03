@@ -7,7 +7,7 @@ title: { en: "Technical skills", he: "כישורים טכניים" }
 skills:
   - name: PostgreSQL
     level: used
-    evidence: [claims-trust-model, postgres-rls-backbone]
+    evidence: [claims-trust-model, postgres-rls-backbone, api-latency-582-to-40]
   - name: Supabase
     level: used
     evidence: [claims-trust-model, postgres-rls-backbone]
@@ -16,7 +16,13 @@ skills:
     evidence: [postgres-rls-backbone]
   - name: Next.js
     level: used
-    evidence: [claims-trust-model]
+    evidence: [claims-trust-model, api-latency-582-to-40]
+  - name: React
+    level: used
+    evidence: [api-latency-582-to-40]
+  - name: Edge Functions
+    level: used
+    evidence: [api-latency-582-to-40]
   - name: TypeScript
     level: used
     evidence: [claims-trust-model]
