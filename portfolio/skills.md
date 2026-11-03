@@ -16,22 +16,40 @@ skills:
     evidence: [postgres-rls-backbone]
   - name: Next.js
     level: used
-    evidence: [claims-trust-model, api-latency-582-to-40]
+    evidence: [claims-trust-model, api-latency-582-to-40, governance-center-pwa]
   - name: React
     level: used
-    evidence: [api-latency-582-to-40]
+    evidence: [api-latency-582-to-40, governance-center-pwa]
   - name: Edge Functions
     level: used
     evidence: [api-latency-582-to-40]
   - name: TypeScript
     level: used
-    evidence: [claims-trust-model]
+    evidence: [claims-trust-model, governance-center-pwa]
   - name: Claude API
     level: used
     evidence: [human-gated-translation]
   - name: GitHub Actions
     level: used
     evidence: [human-gated-translation]
+  - name: Tailwind CSS
+    level: used
+    evidence: [governance-center-pwa]
+  - name: PWA
+    level: used
+    evidence: [governance-center-pwa]
+  - name: RTL / i18n
+    level: used
+    evidence: [governance-center-pwa]
+  - name: Vitest
+    level: used
+    evidence: [governance-center-pwa]
+  - name: Playwright
+    level: used
+    evidence: [governance-center-pwa]
+  - name: Vercel
+    level: used
+    evidence: [governance-center-pwa]
 review:
   approved: true
   approved_on: 2026-11-03
