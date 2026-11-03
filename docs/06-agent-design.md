@@ -140,7 +140,7 @@ Groq gpt-oss-120b (ראשי) ──► תקין ──► ממשיכים
       ├─ 429 ליום ──► מסמנים "מכסה נגמרה עד <reset>" ב-quota_counters ──► המודל הבא
       ├─ 5xx / timeout (8 שניות עד טוקן ראשון) ──► המודל הבא
       └─ קריאת כלי לא תקינה פעמיים ──► המודל הבא
-Groq qwen3.8-27b ──► Groq gpt-oss-20b ──► Gemini gemini-3.6-flash (חירום בלבד)
+Groq qwen3.8-27b ──► Groq gpt-oss-20b   (בלי Gemini, ADR-0009)
 אם כולם נכשלו ──► error {quota_exhausted | provider_unavailable}
 ```
 
