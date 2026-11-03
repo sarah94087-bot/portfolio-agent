@@ -175,6 +175,12 @@ def test_c3_does_not_credit_a_few_words_at_the_edge_of_a_window(tmp_path):
     assert "architecture" not in w1.sections
 
 
+def test_every_chunk_of_a_record_carries_its_aliases(kb):
+    for strategy in STRATEGIES:
+        for c in chunk(load(kb), strategy):
+            assert c.aliases == ("demo, דמו" if c.record_id == "demo" else "")
+
+
 def test_content_hash_follows_what_is_indexed(kb):
     docs = load(kb)
     c1 = next(c for c in chunk(docs, "C1") if c.id == "demo#problem")

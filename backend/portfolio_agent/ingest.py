@@ -3,7 +3,8 @@
 Reads the knowledge base through kb_check, refuses to go on if any record fails it, and cuts
 the records into chunks with each of the four strategies in docs/04-retrieval-design.md,
 section 3 (C1 to C4). The CLI prints how many chunks each strategy makes and how long they are.
-Embeddings and the upsert to Neon (docs/02-knowledge-base.md, section 9) come later in M3.
+`upsert` writes one strategy's chunks to Postgres by content hash (docs/02-knowledge-base.md,
+section 9). Embeddings come once M3 picks the model.
 
 Every chunk lists the C1 sections it covers. D1 names its gold chunks by C1 id, so the same
 gold set can score a C3 window or a C4 record that contains the right section.
@@ -13,9 +14,11 @@ import hashlib
 import re
 import statistics
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
+import psycopg
+from psycopg import sql
 from pydantic import BaseModel
 
 from portfolio_agent.kb_check import (
@@ -28,6 +31,7 @@ from portfolio_agent.kb_check import (
     check_file,
     split,
 )
+from portfolio_agent.retrieval.normalize import normalize
 
 STRATEGIES = ("C1", "C2", "C3", "C4")
 
@@ -70,6 +74,7 @@ class Chunk:
     sections: tuple[str, ...]  # the C1 ids this chunk covers
     text: str
     header: str = ""  # C2 only: which record this is, for a section that does not say
+    aliases: str = ""  # the record's aliases in both languages, for trigram matching (R1)
 
     @property
     def content(self) -> str:
@@ -78,7 +83,8 @@ class Chunk:
 
     @property
     def content_hash(self) -> str:
-        return hashlib.sha256(self.content.encode("utf-8")).hexdigest()
+        indexed = f"{self.content}\n\n{self.aliases}"
+        return hashlib.sha256(indexed.encode("utf-8")).hexdigest()
 
 
 @dataclass(frozen=True)
@@ -125,6 +131,12 @@ def chunk(docs: list[Doc], strategy: str) -> list[Chunk]:
             text = "\n\n".join(text for _, text in doc.sections)
             sids = tuple(sid for sid, _ in doc.sections)
             chunks.append(Chunk(f"{doc.record.id}#all", doc.record.id, sids, text))
+    # R1 matches a record's aliases whatever the strategy, so every chunk carries them.
+    aliases = {
+        d.record.id: ", ".join(d.record.aliases)
+        for d in docs if isinstance(d.record, Project | Experience)
+    }
+    chunks = [replace(c, aliases=aliases.get(c.record_id, "")) for c in chunks]
     ids = [c.id for c in chunks]
     if len(ids) != len(set(ids)):
         raise IngestError(f"duplicate chunk ids in {strategy}")
@@ -187,6 +199,44 @@ def windows(doc: Doc) -> list[Chunk]:
         if end == len(tokens):
             return chunks
         start = end - OVERLAP
+
+
+def upsert(
+    conn: psycopg.Connection,
+    chunks: list[Chunk],
+    table: str = "chunks",
+    commit_sha: str | None = None,
+) -> dict[str, int]:
+    """Writes one strategy's chunks. A row is written only when its hash changed, and a row whose
+    chunk is gone (a renamed or removed section) is deleted, so the table matches the portfolio."""
+    t = sql.Identifier(table)
+    before = dict(conn.execute(sql.SQL("select id, content_hash from {}").format(t)).fetchall())
+    changed = [c for c in chunks if before.get(c.id) != c.content_hash]
+    gone = sorted(before.keys() - {c.id for c in chunks})
+    with conn.transaction():
+        for c in changed:
+            conn.execute(
+                sql.SQL(
+                    "insert into {} (id, record_id, sections, text, context_header, aliases,"
+                    " norm, content_hash, commit_sha)"
+                    " values (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                    " on conflict (id) do update set record_id = excluded.record_id,"
+                    " sections = excluded.sections, text = excluded.text,"
+                    " context_header = excluded.context_header, aliases = excluded.aliases,"
+                    " norm = excluded.norm, content_hash = excluded.content_hash,"
+                    " commit_sha = excluded.commit_sha, updated_at = now()"
+                ).format(t),
+                (c.id, c.record_id, list(c.sections), c.text, c.header,
+                 normalize(c.aliases), normalize(c.content), c.content_hash, commit_sha),
+            )
+        if gone:
+            conn.execute(sql.SQL("delete from {} where id = any(%s)").format(t), (gone,))
+    return {
+        "inserted": sum(1 for c in changed if c.id not in before),
+        "updated": sum(1 for c in changed if c.id in before),
+        "deleted": len(gone),
+        "unchanged": len(chunks) - len(changed),
+    }
 
 
 def count_tokens(text: str) -> int:
