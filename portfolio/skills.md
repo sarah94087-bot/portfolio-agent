@@ -7,10 +7,13 @@ title: { en: "Technical skills", he: "כישורים טכניים" }
 skills:
   - name: PostgreSQL
     level: used
-    evidence: [claims-trust-model]
+    evidence: [claims-trust-model, postgres-rls-backbone]
   - name: Supabase
     level: used
-    evidence: [claims-trust-model]
+    evidence: [claims-trust-model, postgres-rls-backbone]
+  - name: Row-Level Security
+    level: used
+    evidence: [postgres-rls-backbone]
   - name: Next.js
     level: used
     evidence: [claims-trust-model]
