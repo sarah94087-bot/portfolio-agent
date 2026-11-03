@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "portfolio-agent"
 version = "0.1.0"
@@ -13,8 +17,12 @@ dependencies = [
 dev = [
   "pytest>=8.3",
   "uvicorn>=0.32",
-  "ruff>=0.8",
+  "ruff==0.17.3",  # pinned so CI lints with the same rules as local
 ]
+
+[tool.setuptools]
+# Only the app package ships. migrations/ and tests/ sit next to it and are not packages.
+packages = ["portfolio_agent"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
