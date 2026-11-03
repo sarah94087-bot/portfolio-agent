@@ -66,10 +66,20 @@ def paired_bootstrap(
     if not a:
         raise ValueError("no items to compare")
     diffs = [y - x for x, y in zip(a, b, strict=True)]
-    n = len(diffs)
+    low, high = bootstrap_mean(diffs, resamples, confidence, seed)
+    return Difference(mean=fmean(diffs), low=low, high=high, n=len(diffs))
+
+
+def bootstrap_mean(
+    values: Sequence[float],
+    resamples: int = 10_000,
+    confidence: float = 0.95,
+    seed: int = 0,
+) -> tuple[float, float]:
+    """Percentile bootstrap interval for a mean, such as Recall@5 averaged over questions."""
+    if not values:
+        raise ValueError("no values")
     rng = random.Random(seed)
-    means = sorted(fmean(rng.choices(diffs, k=n)) for _ in range(resamples))
+    means = sorted(fmean(rng.choices(values, k=len(values))) for _ in range(resamples))
     tail = (1 - confidence) / 2
-    low = means[math.floor(tail * resamples)]
-    high = means[math.ceil((1 - tail) * resamples) - 1]
-    return Difference(mean=fmean(diffs), low=low, high=high, n=n)
+    return means[math.floor(tail * resamples)], means[math.ceil((1 - tail) * resamples) - 1]
