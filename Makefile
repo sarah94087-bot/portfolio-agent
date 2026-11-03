@@ -24,7 +24,8 @@ web:
 
 test: db
 	cd backend && TEST_DATABASE_URL=postgresql://agent:agent@localhost:5432/agent .venv/bin/python -m pytest -q
+	cd backend && .venv/bin/python -m pytest -q ../evals
 
 lint:
-	cd backend && .venv/bin/python -m ruff check .
+	cd backend && .venv/bin/python -m ruff check . ../evals
 	cd apps/web && npm run lint && npx tsc --noEmit

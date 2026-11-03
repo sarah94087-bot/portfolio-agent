@@ -1,0 +1,2 @@
+# Same lint rules as the backend.
+extend = "../backend/pyproject.toml"
