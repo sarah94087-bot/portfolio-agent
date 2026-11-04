@@ -73,6 +73,17 @@ def parse(message: dict, mode: str) -> dict:
     return {"query": query, "alternatives": alts[:2]}
 
 
+def messages(item: D1Item) -> list[dict]:
+    """The system prompt, the visitor's earlier turns (a follow-up's history), then the question.
+
+    D1 holds only the visitor's turns, not the agent's answers, so the turns follow each other.
+    That is enough for what Q1 needs: the earlier turn names what "there" means.
+    """
+    turns = [*item.history, item.question]
+    return [{"role": "system", "content": SYSTEM},
+            *({"role": "user", "content": t} for t in turns)]
+
+
 def path_for(mode: str, run: int, split: str = "dev") -> Path:
     return QUERIES_DIR / f"d1-{split}-{mode}-run{run}.json"
 
@@ -102,8 +113,7 @@ def generate(items: Sequence[D1Item], mode: str, run: int = 1, split: str = "dev
             body = {
                 "model": model, "tools": [tool(mode)],
                 "tool_choice": {"type": "function", "function": {"name": "search_portfolio"}},
-                "messages": [{"role": "system", "content": SYSTEM},
-                             {"role": "user", "content": item.question}],
+                "messages": messages(item),
             }
             data = post(client, GROQ_URL, headers=headers, json=body).json()
             used = data.get("usage", {}).get("total_tokens", 0)

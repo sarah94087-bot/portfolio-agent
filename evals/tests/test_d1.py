@@ -49,12 +49,21 @@ def overlap(question: str, gold: str) -> float:
 
 
 def test_size_and_categories(items):
-    assert len(items) == 85
+    assert len(items) == 96
     counts = Counter(i.category for i in items)
     assert counts == {
-        "single_hop": 20, "multi_hop": 12, "comparative": 6, "skill_level": 10,
-        "overview_limit": 5, "unanswerable": 12, "off_topic": 5, "cross_lingual": 15,
+        "single_hop": 23, "multi_hop": 18, "comparative": 6, "skill_level": 10,
+        "overview_limit": 5, "unanswerable": 12, "off_topic": 5, "cross_lingual": 17,
     }
+
+
+def test_follow_ups_have_history_in_both_languages_and_splits(items):
+    follow_ups = [i for i in items if i.history]
+    assert len(follow_ups) == 6
+    assert all(i.category == "multi_hop" and all(h.strip() for h in i.history)
+               for i in follow_ups)
+    assert {i.lang for i in follow_ups} == {"he", "en"}
+    assert {i.split for i in follow_ups} == {"dev", "test"}
 
 
 def test_every_category_has_test_questions(items):

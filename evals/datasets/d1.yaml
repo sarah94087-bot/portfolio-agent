@@ -1,8 +1,10 @@
-# D1 Golden set (docs/03-evaluation-methodology.md, section 2): 85 questions over the approved
+# D1 Golden set (docs/03-evaluation-methodology.md, section 2): 96 questions over the approved
 # knowledge base. Gold chunks are C1 ids (<record>#<section>). Questions are worded the way a
 # visitor would ask, not copied from the records; tests/test_d1.py checks the overlap.
 # split: about 70% dev, 30% test. Test questions are not used for tuning.
 # Labeled: every question, expected behavior and answer point approved by Sarah on 2026-11-04.
+# Added on 2026-11-04 (d1-086 to d1-096), approved by Sarah: 6 follow-ups with `history`, and
+# 5 questions on numbers that only a project's metrics gave (docs/experiments/retrieval-2026-11-04.md).
 
 # --- single_hop (20) ---
 - id: d1-001
@@ -686,4 +688,107 @@
   gold_chunks: [claims-trust-model#problem]
   answer_points: ["Sources contradict each other and wrong information must not reach the public", "Every fact needs a source, a trust score and a history"]
   must_not: ["Naming the product or its business domain"]
+  split: dev
+
+# --- follow-ups (6) ---
+- id: d1-086
+  history: ["Tell me about her translation pipeline."]
+  question: "What was the hardest part there?"
+  lang: en
+  category: multi_hop
+  expected_behavior: answer
+  gold_chunks: [human-gated-translation#why-hard]
+  answer_points: ["Running automatic translation without hurting the reliability of the content",
+                  "The model's output must never overwrite a person's edit"]
+  split: dev
+- id: d1-087
+  history: ["איך היא הורידה את זמן התגובה של ה-API?"]
+  question: "ומה השתבש בדרך?"
+  lang: he
+  category: multi_hop
+  expected_behavior: answer
+  gold_chunks: [api-latency-582-to-40#what-broke]
+  answer_points: ["Offset pagination stopped at 10,000 rows", "3.2% of the records were dropped without an error",
+                  "She moved to a keyset cursor"]
+  split: dev
+- id: d1-088
+  history: ["ספרי לי על מודל האמון בטענות."]
+  question: "ומה קורה כששני מקורות סותרים זה את זה?"
+  lang: he
+  category: multi_hop
+  expected_behavior: answer
+  gold_chunks: [claims-trust-model#architecture]
+  answer_points: ["A database trigger opens a conflict automatically", "Conflicts always go to a person",
+                  "An editor sees the versions side by side and decides"]
+  split: dev
+- id: d1-089
+  history: ["What is her Git MCP server?"]
+  question: "Why was that difficult to build?"
+  lang: en
+  category: multi_hop
+  expected_behavior: answer
+  gold_chunks: [git-mcp-server#why-hard]
+  answer_points: ["Agents need real access to the repository",
+                  "Nothing may change it without a person's explicit approval, on the state they reviewed",
+                  "A command that looks like a read can mutate state, and Git can hang on a prompt"]
+  split: dev
+- id: d1-090
+  history: ["ספרי על הפרויקט של זיהוי עשבים."]
+  question: "כמה זמן לוקח שם לעבד תמונה אחת?"
+  lang: he
+  category: multi_hop
+  expected_behavior: answer
+  gold_chunks: [weed-detection-pipeline#results]
+  answer_points: ["About 30 to 80 milliseconds per image", "On CPU"]
+  split: test
+- id: d1-091
+  history: ["What did she build with CLIP and Kafka?"]
+  question: "And where do the vectors end up?"
+  lang: en
+  category: multi_hop
+  expected_behavior: answer
+  gold_chunks: [clip-embeddings-kafka#architecture]
+  answer_points: ["Published to Kafka", "Loaded into PostgreSQL with pgvector"]
+  split: test
+
+# --- numbers from metrics (5) ---
+- id: d1-092
+  question: "How many database change scripts did she write for the governance platform?"
+  lang: en
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [postgres-rls-backbone#results]
+  answer_points: ["108 migrations", "About 9,800 lines"]
+  split: dev
+- id: d1-093
+  question: "כמה מדיניות RLS וטריגרים יש במסד הנתונים שהיא בנתה?"
+  lang: he
+  category: cross_lingual
+  expected_behavior: answer
+  gold_chunks: [postgres-rls-backbone#results]
+  answer_points: ["31 RLS policies", "44 triggers"]
+  split: dev
+- id: d1-094
+  question: "How many commits did the governance platform take, and over how long?"
+  lang: en
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [governance-center-pwa#results]
+  answer_points: ["782 commits", "From 20.5.2026 to 19.7.2026"]
+  split: dev
+- id: d1-095
+  question: "כמה דפים ציבוריים יש באתר של פלטפורמת הממשל?"
+  lang: he
+  category: cross_lingual
+  expected_behavior: answer
+  gold_chunks: [governance-center-pwa#results]
+  answer_points: ["About 20 public pages and routes"]
+  split: test
+- id: d1-096
+  question: "How many database schemas does her Postgres backbone use?"
+  lang: en
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [postgres-rls-backbone#results]
+  answer_points: ["3 schemas"]
   split: dev

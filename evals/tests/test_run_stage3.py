@@ -5,7 +5,7 @@ import pytest
 from portfolio_agent.retrieval.lexical import Hit
 
 from retrieval.harness import D1Item
-from retrieval.rewrite import parse, tool
+from retrieval.rewrite import messages, parse, tool
 from retrieval.run_stage3 import SIMPLEST_FIRST, TABLE, mean_of_runs, multi_query, stage3
 from tests.test_embedders import Fake
 
@@ -34,6 +34,15 @@ def test_parse_reads_the_tool_arguments_and_refuses_a_missing_call():
         parse({"content": "hi"}, "q1")
     with pytest.raises(ValueError):
         parse(call('{"query": "a", "alternative_queries": ["b"]}'), "q2")
+
+
+def test_messages_put_a_follow_ups_history_before_the_question():
+    base = {"id": "d1-001", "lang": "en", "category": "multi_hop",
+            "expected_behavior": "answer", "gold_chunks": ["r#s"], "split": "dev"}
+    alone = messages(D1Item(question="q?", **base))
+    assert [m["role"] for m in alone] == ["system", "user"]
+    follow = messages(D1Item(question="And there?", history=["Tell me about X."], **base))
+    assert [m["content"] for m in follow[1:]] == ["Tell me about X.", "And there?"]
 
 
 def hit(cid: str) -> Hit:

@@ -45,6 +45,9 @@ class D1Item(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     id: str = Field(pattern=r"^d1-\d{3}$")
+    # A follow-up question: the visitor's earlier turns, oldest first. The question alone does
+    # not name what it asks about, so retrieval needs the agent to read these (Q1, ADR-0013).
+    history: list[str] = []
     question: str = Field(min_length=1)
     lang: Literal["he", "en"]
     category: Literal[
