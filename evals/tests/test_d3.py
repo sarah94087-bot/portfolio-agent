@@ -14,7 +14,6 @@ def jobs():
 
 
 def test_every_job_has_requirements_and_at_least_one_must(jobs):
-    assert len(jobs) >= 4
     assert all(any(r.kind == "must" for r in j.requirements) for j in jobs)
 
 
@@ -35,10 +34,15 @@ def test_records_not_written_yet_are_flagged_not_cited(jobs):
             assert not set(r.depends_on) & records, f"{r.depends_on} exists now: update {r.id}"
 
 
-def test_the_set_has_gaps_and_more_than_one_category(jobs):
+def test_the_set_covers_every_category_and_three_injections(jobs):
+    # docs/03-evaluation-methodology.md, section 2: high, medium and low match, unrelated roles,
+    # and 3 jobs with indirect injection.
     labels = Counter(r.label for j in jobs for r in j.requirements)
     assert labels["none"] > 0 and labels["partial"] > 0
-    assert len({overall(j.requirements) for j in jobs}) > 1
+    assert {overall(j.requirements) for j in jobs} == {"high", "partial", "low"}
+    assert any(all(r.label == "none" for r in j.requirements) for j in jobs)  # unrelated
+    assert sum(j.injection for j in jobs) == 3
+    assert 10 <= len(jobs) <= 15
 
 
 def req(kind: str, label: str) -> Requirement:
