@@ -1,0 +1,689 @@
+# D1 Golden set (docs/03-evaluation-methodology.md, section 2): 85 questions over the approved
+# knowledge base. Gold chunks are C1 ids (<record>#<section>). Questions are worded the way a
+# visitor would ask, not copied from the records; tests/test_d1.py checks the overlap.
+# split: about 70% dev, 30% test. Test questions are not used for tuning.
+# Labeled: every question, expected behavior and answer point approved by Sarah on 2026-11-04.
+
+# --- single_hop (20) ---
+- id: d1-001
+  question: "How often does her translation job run?"
+  lang: en
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [human-gated-translation#architecture]
+  answer_points: ["Every 6 hours", "On a GitHub Actions schedule"]
+  split: dev
+- id: d1-002
+  question: "How slow was the API before she worked on it?"
+  lang: en
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [api-latency-582-to-40#problem]
+  answer_points: ["582ms per request"]
+  split: dev
+- id: d1-003
+  question: "Why were rows quietly going missing, with no error?"
+  lang: en
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [api-latency-582-to-40#what-broke]
+  answer_points: ["Offset pagination stopped at 10,000 rows", "About 3.2% of records were dropped", "Fixed by switching to a keyset cursor"]
+  must_not: ["A database crash caused it"]
+  split: test
+- id: d1-004
+  question: "Apart from a yes or no, what did her farm-photo classifier return per photo?"
+  lang: en
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [weed-detection-pipeline#architecture]
+  answer_points: ["Bounding boxes", "Severity and coverage", "Results written to PostgreSQL"]
+  split: dev
+- id: d1-005
+  question: "How long does one picture take in the weed detector?"
+  lang: en
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [weed-detection-pipeline#results]
+  answer_points: ["About 30 to 80 milliseconds", "On CPU"]
+  must_not: ["Runs on a GPU"]
+  split: dev
+- id: d1-006
+  question: "After the agent proposes a repo change, how much time does the user get to say yes?"
+  lang: en
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [git-mcp-server#architecture]
+  answer_points: ["30 minutes", "The token can be used once"]
+  split: test
+- id: d1-007
+  question: "Which cities or regions is she willing to commute to?"
+  lang: en
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [preferences#context]
+  answer_points: ["Jerusalem", "Central Israel", "Gush Dan", "Also open to remote and hybrid"]
+  split: dev
+- id: d1-008
+  question: "What was her final mark in the UltraCode program?"
+  lang: en
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [education#context]
+  answer_points: ["98", "KamaTech UltraCode AI Program"]
+  split: dev
+- id: d1-009
+  question: "How large was the typed interface the admin app was coded against?"
+  lang: en
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [governance-center-pwa#architecture]
+  answer_points: ["1,237 lines of TypeScript", "A mock adapter let the UI be built before the endpoints existed"]
+  split: test
+- id: d1-010
+  question: "What label does an automatic translation carry until an editor checks it?"
+  lang: en
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [human-gated-translation#architecture]
+  answer_points: ["machine", "Becomes human once an editor approves or fixes it"]
+  split: dev
+- id: d1-011
+  question: "כמה מסכים יש בממשק הניהול שהיא בנתה?"
+  lang: he
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [governance-center-pwa#architecture]
+  answer_points: ["28 screens"]
+  split: dev
+- id: d1-012
+  question: "מה קורה כשמגיע מידע ממקור שכבר צבר הרבה אמון?"
+  lang: he
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [claims-trust-model#architecture]
+  answer_points: ["It is verified without a person", "Conflicts still always go to a person"]
+  split: dev
+- id: d1-013
+  question: "מי דאג למשוך את הנתונים מאתרים במערכת ממשל הנתונים?"
+  lang: he
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [claims-trust-model#role, ainsof-capital#role]
+  answer_points: ["A separate team built the scraping"]
+  must_not: ["Sarah built the scraping"]
+  split: test
+- id: d1-014
+  question: "איפה יושבות התמונות לפני שמודל העשבים מעבד אותן?"
+  lang: he
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [weed-detection-pipeline#architecture]
+  answer_points: ["MinIO"]
+  split: dev
+- id: d1-015
+  question: "באיזה ענן רץ מודל זיהוי הצמחים שלה?"
+  lang: he
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [plant-health-classification#architecture]
+  answer_points: ["AWS EC2", "On a GPU"]
+  split: dev
+- id: d1-016
+  question: "מתי היא פנויה להתחיל?"
+  lang: he
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [preferences#context]
+  answer_points: ["Immediately"]
+  split: test
+- id: d1-017
+  question: "מה היא עשתה כדי שהאתר ימשיך לעבוד כשנגמרת הקליטה?"
+  lang: he
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [governance-center-pwa#architecture]
+  answer_points: ["A service worker (Serwist)", "Saving the map of a whole area to the device", "A saved plan survives losing the network"]
+  split: dev
+- id: d1-018
+  question: "איך אצלה בקשה שנשלחת פעמיים לא נרשמת פעמיים?"
+  lang: he
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [postgres-rls-backbone#architecture]
+  answer_points: ["Idempotency keys"]
+  split: dev
+- id: d1-019
+  question: "באיזה מודל היא השתמשה כדי לייצג תמונות כמספרים?"
+  lang: he
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [clip-embeddings-kafka#architecture]
+  answer_points: ["CLIP / ViT-mini", "Each image becomes a vector of hundreds of numbers"]
+  split: dev
+- id: d1-020
+  question: "כמה כלים חושף שרת ה-MCP שלה לסוכן?"
+  lang: he
+  category: single_hop
+  expected_behavior: answer
+  gold_chunks: [git-mcp-server#architecture]
+  answer_points: ["10 tools", "3 read-only resources"]
+  split: test
+
+# --- multi_hop (12) ---
+- id: d1-021
+  question: "In which of her projects does a person have to sign off before anything takes effect?"
+  lang: en
+  category: multi_hop
+  expected_behavior: answer
+  gold_chunks: [claims-trust-model#decisions, human-gated-translation#decisions, git-mcp-server#architecture]
+  answer_points: ["Conflicting claims go to a person", "Machine translation passes a human approval gate", "Git writes need explicit confirmation"]
+  split: dev
+- id: d1-022
+  question: "What did she deliver during the VAST internship, and how did the pieces complement each other?"
+  lang: en
+  category: multi_hop
+  expected_behavior: answer
+  gold_chunks: [vast-data-bootcamp#role, clip-embeddings-kafka#results]
+  answer_points: ["Weed detection", "Image embeddings with similarity search", "Together: what is in an image and how close it is to known cases"]
+  split: test
+- id: d1-023
+  question: "Where did she containerize things, and where did she rent a cloud GPU?"
+  lang: en
+  category: multi_hop
+  expected_behavior: answer
+  gold_chunks: [weed-detection-pipeline#architecture, plant-health-classification#architecture]
+  answer_points: ["The weed detector runs in Docker on CPU", "Plant classification runs on an AWS EC2 GPU"]
+  split: dev
+- id: d1-024
+  question: "Which of her systems keep a history of who did what?"
+  lang: en
+  category: multi_hop
+  expected_behavior: answer
+  gold_chunks: [claims-trust-model#architecture, postgres-rls-backbone#architecture, git-mcp-server#architecture]
+  answer_points: ["Claims: who, when, what and why", "Database triggers audit every table", "Git server: append-only audit log"]
+  split: dev
+- id: d1-025
+  question: "How did she keep heavy computation in check in her machine learning work?"
+  lang: en
+  category: multi_hop
+  expected_behavior: answer
+  gold_chunks: [weed-detection-pipeline#decisions, clip-embeddings-kafka#decisions]
+  answer_points: ["MobileNetV3 instead of UNet, without a GPU", "Each embedding computed once and stored"]
+  split: dev
+- id: d1-026
+  question: "What kinds of automated tests did she write across her work?"
+  lang: en
+  category: multi_hop
+  expected_behavior: answer
+  gold_chunks: [governance-center-pwa#results, git-mcp-server#architecture]
+  answer_points: ["Vitest and Playwright, including an offline suite", "Unit, integration and schema snapshot tests with CI"]
+  split: test
+- id: d1-027
+  question: "באילו פרויקטים היא עבדה עם Claude?"
+  lang: he
+  category: multi_hop
+  expected_behavior: answer
+  gold_chunks: [human-gated-translation#architecture, faq#does-she-use-ai-tools-in-her-work]
+  answer_points: ["Translation pipeline on the Claude API", "Uses AI tools daily, mainly Claude"]
+  split: dev
+- id: d1-028
+  question: "מה היא עשתה בעצמה ומה עשו אחרים בפרויקטים שלה?"
+  lang: he
+  category: multi_hop
+  expected_behavior: answer
+  gold_chunks: [faq#did-she-work-alone-or-in-a-team, claims-trust-model#role, vast-data-bootcamp#context]
+  answer_points: ["Ainsof: sole engineer; a separate team did the scraping", "VAST: the team built the system; she built two components alone"]
+  split: dev
+- id: d1-029
+  question: "איפה היא נתקלה בבעיות מהירות, ומה עשתה בכל מקום?"
+  lang: he
+  category: multi_hop
+  expected_behavior: answer
+  gold_chunks: [api-latency-582-to-40#architecture, weed-detection-pipeline#decisions]
+  answer_points: ["API pinned to the database region, fewer queries, caching", "Light MobileNetV3 on CPU instead of UNet"]
+  split: test
+- id: d1-030
+  question: "לאילו צרכים היא השתמשה ב-PostgreSQL בעבודה ובהתמחות?"
+  lang: he
+  category: multi_hop
+  expected_behavior: answer
+  gold_chunks: [postgres-rls-backbone#architecture, weed-detection-pipeline#architecture, clip-embeddings-kafka#architecture]
+  answer_points: ["Schemas, RLS and triggers for the governance platform", "Storing weed detection results", "pgvector for image vectors"]
+  split: dev
+- id: d1-031
+  question: "איך היא מגינה על המערכות שלה מפעולות מזיקות של משתמשים או של סוכני AI?"
+  lang: he
+  category: multi_hop
+  expected_behavior: answer
+  gold_chunks: [postgres-rls-backbone#architecture, git-mcp-server#architecture]
+  answer_points: ["Public writes only through SECURITY DEFINER RPCs", "Risk classification and approval for Git writes"]
+  split: dev
+- id: d1-032
+  question: "מה מחבר בין מודל הטענות לבין התרגום האוטומטי?"
+  lang: he
+  category: multi_hop
+  expected_behavior: answer
+  gold_chunks: [claims-trust-model#architecture, human-gated-translation#architecture]
+  answer_points: ["The field catalog says per field whether machine translation is allowed", "Fields marked human_only are skipped"]
+  split: dev
+
+# --- comparative (6) ---
+- id: d1-033
+  question: "What's the most ambitious thing she has shipped?"
+  lang: en
+  category: comparative
+  expected_behavior: answer
+  gold_chunks: [ainsof-capital#context, ainsof-capital#projects]
+  answer_points: ["Sole engineer of a production data-governance platform, end to end"]
+  split: dev
+- id: d1-034
+  question: "How does her job compare with her internship?"
+  lang: en
+  category: comparative
+  expected_behavior: answer
+  gold_chunks: [ainsof-capital#context, vast-data-bootcamp#context]
+  answer_points: ["Ainsof: sole engineer of a production platform", "VAST: a team bootcamp where she built components alone"]
+  split: test
+- id: d1-035
+  question: "Is she more of a backend or a frontend person?"
+  lang: en
+  category: comparative
+  expected_behavior: answer
+  gold_chunks: [profile#context, preferences#context, governance-center-pwa#role]
+  answer_points: ["She describes herself as specializing in backend", "She also built both frontend applications"]
+  split: dev
+- id: d1-036
+  question: "מה ההבדל בין שני פרויקטי הראייה הממוחשבת שלה?"
+  lang: he
+  category: comparative
+  expected_behavior: answer
+  gold_chunks: [weed-detection-pipeline#architecture, plant-health-classification#architecture]
+  answer_points: ["Weeds: MobileNetV3 on CPU, at VAST", "Plants: YOLO and CLIP on an EC2 GPU, her own project"]
+  split: dev
+- id: d1-037
+  question: "איזה פרויקט שלה הכי מתאים למשרת AI Engineer?"
+  lang: he
+  category: comparative
+  expected_behavior: answer
+  gold_chunks: [profile#context, human-gated-translation#problem, git-mcp-server#problem]
+  answer_points: ["LLM in production with a human gate (Claude API)", "An MCP server for AI agents"]
+  split: dev
+- id: d1-038
+  question: "במה שונה זיהוי העשבים ממערכת הווקטורים שבנתה באותה התמחות?"
+  lang: he
+  category: comparative
+  expected_behavior: answer
+  gold_chunks: [clip-embeddings-kafka#problem, clip-embeddings-kafka#decisions]
+  answer_points: ["The classifier answers one fixed question", "Vectors allow similarity, clustering and anomalies on any image"]
+  split: test
+
+# --- skill_level (10) ---
+- id: d1-039
+  question: "Does she have hands-on Kubernetes experience?"
+  lang: en
+  category: skill_level
+  expected_behavior: answer
+  gold_chunks: [skills#kubernetes]
+  answer_points: ["Studied, not used in project work"]
+  must_not: ["Used Kubernetes in production"]
+  split: dev
+- id: d1-040
+  question: "Has she worked with Kafka?"
+  lang: en
+  category: skill_level
+  expected_behavior: answer
+  gold_chunks: [skills#kafka, clip-embeddings-kafka#architecture]
+  answer_points: ["Used: vectors published to Kafka and loaded into pgvector"]
+  split: dev
+- id: d1-041
+  question: "Can she code in Java?"
+  lang: en
+  category: skill_level
+  expected_behavior: answer
+  gold_chunks: [skills#java]
+  answer_points: ["Studied in her programs, not project experience"]
+  must_not: ["Built a Java project at work"]
+  split: test
+- id: d1-042
+  question: "Has she shipped anything with FastAPI?"
+  lang: en
+  category: skill_level
+  expected_behavior: answer
+  gold_chunks: [skills#fastapi, plant-health-classification#architecture]
+  answer_points: ["Used: a GPU-accelerated FastAPI backend for plant classification"]
+  split: dev
+- id: d1-043
+  question: "Any MongoDB background?"
+  lang: en
+  category: skill_level
+  expected_behavior: answer
+  gold_chunks: [skills#mongodb]
+  answer_points: ["Studied, not used in project work"]
+  split: dev
+- id: d1-044
+  question: "יש לה ניסיון ב-C#?"
+  lang: he
+  category: skill_level
+  expected_behavior: answer
+  gold_chunks: [skills#csharp]
+  answer_points: ["Studied, not used in project work"]
+  split: dev
+- id: d1-045
+  question: "היא כתבה בדיקות ב-Playwright?"
+  lang: he
+  category: skill_level
+  expected_behavior: answer
+  gold_chunks: [skills#playwright, governance-center-pwa#results]
+  answer_points: ["Used: full browser flows, including an offline suite"]
+  split: dev
+- id: d1-046
+  question: "מה הניסיון שלה עם AWS?"
+  lang: he
+  category: skill_level
+  expected_behavior: answer
+  gold_chunks: [skills#aws-ec2, skills#aws-s3]
+  answer_points: ["EC2: used, plant classification on a GPU", "S3: studied only"]
+  split: test
+- id: d1-047
+  question: "היא מכירה Docker?"
+  lang: he
+  category: skill_level
+  expected_behavior: answer
+  gold_chunks: [skills#docker, weed-detection-pipeline#architecture]
+  answer_points: ["Used: the weed detector runs in Docker"]
+  split: dev
+- id: d1-048
+  question: "עבדה פעם עם SQL Server?"
+  lang: he
+  category: skill_level
+  expected_behavior: answer
+  gold_chunks: [skills#sql-server]
+  answer_points: ["Studied, not used in project work"]
+  split: dev
+
+# --- overview_limit (5): only an overview exists, so the answer says so and sends to Sarah ---
+- id: d1-049
+  question: "What accuracy did her plant health model reach?"
+  lang: en
+  category: overview_limit
+  expected_behavior: answer
+  gold_chunks: [plant-health-classification#architecture]
+  answer_points: ["Only an overview is recorded", "Ask Sarah for details"]
+  must_not: ["Any accuracy number"]
+  split: dev
+- id: d1-050
+  question: "Which YOLO version did she pick for detecting plants?"
+  lang: en
+  category: overview_limit
+  expected_behavior: answer
+  gold_chunks: [plant-health-classification#architecture]
+  answer_points: ["Only an overview is recorded", "Ask Sarah for details"]
+  must_not: ["A specific YOLO version"]
+  split: test
+- id: d1-051
+  question: "על איזה דאטה היא אימנה את מודל זיהוי הצמחים?"
+  lang: he
+  category: overview_limit
+  expected_behavior: answer
+  gold_chunks: [plant-health-classification#architecture]
+  answer_points: ["Only an overview is recorded", "Ask Sarah for details"]
+  must_not: ["A named dataset"]
+  split: dev
+- id: d1-052
+  question: "כמה זמן לוקחת תחזית אחת במערכת זיהוי הצמחים?"
+  lang: he
+  category: overview_limit
+  expected_behavior: answer
+  gold_chunks: [plant-health-classification#architecture]
+  answer_points: ["Only an overview is recorded", "Ask Sarah for details"]
+  must_not: ["A latency number"]
+  split: dev
+- id: d1-053
+  question: "אילו מחלות צמחים המערכת שלה יודעת לזהות?"
+  lang: he
+  category: overview_limit
+  expected_behavior: answer
+  gold_chunks: [plant-health-classification#architecture]
+  answer_points: ["Only an overview is recorded", "Ask Sarah for details"]
+  must_not: ["A list of plant diseases"]
+  split: dev
+
+# --- unanswerable (12) ---
+- id: d1-054
+  question: "Did she ever work at Google?"
+  lang: en
+  category: unanswerable
+  expected_behavior: refuse_no_info
+  must_not: ["She worked at Google"]
+  split: dev
+- id: d1-055
+  question: "Has she written anything in Rust?"
+  lang: en
+  category: unanswerable
+  expected_behavior: refuse_no_info
+  must_not: ["She knows Rust"]
+  split: dev
+- id: d1-056
+  question: "How many people were on her VAST team?"
+  lang: en
+  category: unanswerable
+  expected_behavior: refuse_no_info
+  must_not: ["A team size"]
+  split: test
+- id: d1-057
+  question: "Has she published any research papers?"
+  lang: en
+  category: unanswerable
+  expected_behavior: refuse_no_info
+  must_not: ["A paper title"]
+  split: dev
+- id: d1-058
+  question: "What did she do for a living before 2023?"
+  lang: en
+  category: unanswerable
+  expected_behavior: refuse_no_info
+  split: dev
+- id: d1-059
+  question: "Does she hold any cloud certifications?"
+  lang: en
+  category: unanswerable
+  expected_behavior: refuse_no_info
+  must_not: ["An AWS certification"]
+  split: test
+- id: d1-060
+  question: "היא עבדה פעם במיקרוסופט?"
+  lang: he
+  category: unanswerable
+  expected_behavior: refuse_no_info
+  must_not: ["She worked at Microsoft"]
+  split: dev
+- id: d1-061
+  question: "יש לה ניסיון עם Go?"
+  lang: he
+  category: unanswerable
+  expected_behavior: refuse_no_info
+  must_not: ["She knows Go"]
+  split: dev
+- id: d1-062
+  question: "כמה משתמשים יש למערכת זיהוי הצמחים?"
+  lang: he
+  category: unanswerable
+  expected_behavior: refuse_no_info
+  must_not: ["A user count"]
+  split: dev
+- id: d1-063
+  question: "מי היה המנהל הישיר שלה ב-Ainsof Capital?"
+  lang: he
+  category: unanswerable
+  expected_behavior: refuse_no_info
+  must_not: ["A manager's name"]
+  split: test
+- id: d1-064
+  question: "באיזו שנה היא נולדה?"
+  lang: he
+  category: unanswerable
+  expected_behavior: refuse_no_info
+  must_not: ["A birth year"]
+  split: dev
+- id: d1-065
+  question: "היא עבדה עם Terraform?"
+  lang: he
+  category: unanswerable
+  expected_behavior: refuse_no_info
+  must_not: ["She used Terraform"]
+  split: dev
+
+# --- off_topic (5) ---
+- id: d1-066
+  question: "Write me a short poem about cats."
+  lang: en
+  category: off_topic
+  expected_behavior: redirect_off_topic
+  split: dev
+- id: d1-067
+  question: "What's the capital of Australia?"
+  lang: en
+  category: off_topic
+  expected_behavior: redirect_off_topic
+  split: dev
+- id: d1-068
+  question: "תן לי מתכון לעוגת שוקולד"
+  lang: he
+  category: off_topic
+  expected_behavior: redirect_off_topic
+  split: test
+- id: d1-069
+  question: "איך יהיה מזג האוויר מחר בתל אביב?"
+  lang: he
+  category: off_topic
+  expected_behavior: redirect_off_topic
+  split: dev
+- id: d1-070
+  question: "תסביר לי בקצרה מה זה תורת היחסות"
+  lang: he
+  category: off_topic
+  expected_behavior: redirect_off_topic
+  split: dev
+
+# --- cross_lingual (15): Hebrew questions whose answer exists only in English text ---
+- id: d1-071
+  question: "למה היא ויתרה על מודל הסגמנטציה בזיהוי העשבים?"
+  lang: he
+  category: cross_lingual
+  expected_behavior: answer
+  gold_chunks: [weed-detection-pipeline#decisions]
+  answer_points: ["UNet needed a GPU; training without one was unrealistic", "The task needed presence and severity, not a pixel mask"]
+  split: dev
+- id: d1-072
+  question: "מה היה האתגר העיקרי בשרת ה-Git?"
+  lang: he
+  category: cross_lingual
+  expected_behavior: answer
+  gold_chunks: [git-mcp-server#why-hard]
+  answer_points: ["Agents need real access, but nothing may change without a person's approval", "A read-looking command can mutate state; Git can hang"]
+  split: dev
+- id: d1-073
+  question: "איך משתמש מאשר פקודה שמשנה את הריפו בשרת שלה?"
+  lang: he
+  category: cross_lingual
+  expected_behavior: answer
+  gold_chunks: [git-mcp-server#architecture]
+  answer_points: ["A one-time token bound to the exact command and repository state", "The exact phrase I CONFIRM <id>"]
+  split: test
+- id: d1-074
+  question: "למה כל עובדה נשמרת אצלה בנפרד לכל מקור?"
+  lang: he
+  category: cross_lingual
+  expected_behavior: answer
+  gold_chunks: [claims-trust-model#decisions]
+  answer_points: ["Overwriting loses where a value came from", "Contradictions would become invisible"]
+  split: dev
+- id: d1-075
+  question: "איך היא דאגה ששני עורכים לא ימחקו אחד לשני שינויים?"
+  lang: he
+  category: cross_lingual
+  expected_behavior: answer
+  gold_chunks: [postgres-rls-backbone#architecture]
+  answer_points: ["Every write carries an expected version", "A stale version returns 409, then re-read and retry"]
+  split: dev
+- id: d1-076
+  question: "למה היא הזיזה את ה-API קרוב לבסיס הנתונים?"
+  lang: he
+  category: cross_lingual
+  expected_behavior: answer
+  gold_chunks: [api-latency-582-to-40#decisions]
+  answer_points: ["Caching alone would still pay the cross-region trip on every miss"]
+  split: test
+- id: d1-077
+  question: "איך המפות ממשיכות לעבוד בלי חיבור?"
+  lang: he
+  category: cross_lingual
+  expected_behavior: answer
+  gold_chunks: [governance-center-pwa#architecture]
+  answer_points: ["Saved area tiles (zoom 11 to 15)", "Vector maps from one static PMTiles archive"]
+  split: dev
+- id: d1-078
+  question: "למה החיפוש אחר תמונות דומות לא רץ על כל תמונה שנכנסת?"
+  lang: he
+  category: cross_lingual
+  expected_behavior: answer
+  gold_chunks: [clip-embeddings-kafka#decisions]
+  answer_points: ["Ingestion stays a single cheap step", "Search runs only on request"]
+  split: dev
+- id: d1-079
+  question: "מה יצא מפרויקט התרגום בסוף?"
+  lang: he
+  category: cross_lingual
+  expected_behavior: answer
+  gold_chunks: [human-gated-translation#results]
+  answer_points: ["Went to production as part of the platform she built alone"]
+  split: dev
+- id: d1-080
+  question: "איך היא וידאה שמודל העשבים לא שינן את הדאטה?"
+  lang: he
+  category: cross_lingual
+  expected_behavior: answer
+  gold_chunks: [weed-detection-pipeline#architecture]
+  answer_points: ["Train, validation and test split", "Loss and accuracy tracked every epoch", "Checked on new images from MinIO"]
+  split: test
+- id: d1-081
+  question: "אילו בדיקות אוטומטיות רצות על מרכז הניהול והאתר?"
+  lang: he
+  category: cross_lingual
+  expected_behavior: answer
+  gold_chunks: [governance-center-pwa#results]
+  answer_points: ["46 test files", "Vitest for logic, Playwright for browser flows", "An offline suite and a mobile profile"]
+  split: dev
+- id: d1-082
+  question: "מה בדיוק היה החלק שלה בפרויקט זיהוי הצמחים?"
+  lang: he
+  category: cross_lingual
+  expected_behavior: answer
+  gold_chunks: [plant-health-classification#role]
+  answer_points: ["She built the whole system alone"]
+  split: dev
+- id: d1-083
+  question: "למה היא חסמה גישה ישירה לבסיס הנתונים?"
+  lang: he
+  category: cross_lingual
+  expected_behavior: answer
+  gold_chunks: [postgres-rls-backbone#decisions]
+  answer_points: ["One entry point enforces permissions, versions and idempotency"]
+  split: dev
+- id: d1-084
+  question: "מה היא עשתה כדי שפקודת Git לא תיתקע לנצח?"
+  lang: he
+  category: cross_lingual
+  expected_behavior: answer
+  gold_chunks: [git-mcp-server#architecture]
+  answer_points: ["A hard timeout per command", "Stuck processes are killed with their process tree", "A non-interactive environment, no prompts"]
+  split: test
+- id: d1-085
+  question: "איזו בעיה פותרת פלטפורמת ממשל הנתונים שבנתה?"
+  lang: he
+  category: cross_lingual
+  expected_behavior: answer
+  gold_chunks: [claims-trust-model#problem]
+  answer_points: ["Sources contradict each other and wrong information must not reach the public", "Every fact needs a source, a trust score and a history"]
+  must_not: ["Naming the product or its business domain"]
+  split: dev
