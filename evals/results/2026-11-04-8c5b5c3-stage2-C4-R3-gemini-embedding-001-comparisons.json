@@ -1,0 +1,171 @@
+{
+  "config": "stage2-C4-R3-gemini-embedding-001-comparisons",
+  "commit": "8c5b5c3",
+  "date": "2026-11-04",
+  "comparisons": [
+    {
+      "a": "R1",
+      "b": "R2",
+      "group": "all",
+      "metric": "recall@5",
+      "mean": 0.13333333333333333,
+      "low": 0.02333333333333333,
+      "high": 0.25,
+      "n": 50,
+      "significant": true
+    },
+    {
+      "a": "R1",
+      "b": "R2",
+      "group": "he",
+      "metric": "recall@5",
+      "mean": 0.1875,
+      "low": 0.046875,
+      "high": 0.34375,
+      "n": 32,
+      "significant": true
+    },
+    {
+      "a": "R1",
+      "b": "R2",
+      "group": "en",
+      "metric": "recall@5",
+      "mean": 0.03703703703703704,
+      "low": -0.12037037037037039,
+      "high": 0.21296296296296297,
+      "n": 18,
+      "significant": false
+    },
+    {
+      "a": "R1",
+      "b": "R2",
+      "group": "cross_lingual",
+      "metric": "recall@5",
+      "mean": 0.2727272727272727,
+      "low": 0.0,
+      "high": 0.5454545454545454,
+      "n": 11,
+      "significant": false
+    },
+    {
+      "a": "R1",
+      "b": "R3",
+      "group": "all",
+      "metric": "recall@5",
+      "mean": 0.1733333333333333,
+      "low": 0.07666666666666667,
+      "high": 0.28,
+      "n": 50,
+      "significant": true
+    },
+    {
+      "a": "R1",
+      "b": "R3",
+      "group": "he",
+      "metric": "recall@5",
+      "mean": 0.21354166666666666,
+      "low": 0.08854166666666667,
+      "high": 0.359375,
+      "n": 32,
+      "significant": true
+    },
+    {
+      "a": "R1",
+      "b": "R3",
+      "group": "en",
+      "metric": "recall@5",
+      "mean": 0.10185185185185186,
+      "low": -0.01851851851851852,
+      "high": 0.25,
+      "n": 18,
+      "significant": false
+    },
+    {
+      "a": "R1",
+      "b": "R3",
+      "group": "cross_lingual",
+      "metric": "recall@5",
+      "mean": 0.2727272727272727,
+      "low": 0.0,
+      "high": 0.5454545454545454,
+      "n": 11,
+      "significant": false
+    },
+    {
+      "a": "R2",
+      "b": "R3",
+      "group": "all",
+      "metric": "recall@5",
+      "mean": 0.04,
+      "low": -0.0033333333333333335,
+      "high": 0.08666666666666666,
+      "n": 50,
+      "significant": false
+    },
+    {
+      "a": "R2",
+      "b": "R3",
+      "group": "he",
+      "metric": "recall@5",
+      "mean": 0.026041666666666664,
+      "low": -0.03125,
+      "high": 0.08333333333333333,
+      "n": 32,
+      "significant": false
+    },
+    {
+      "a": "R2",
+      "b": "R3",
+      "group": "en",
+      "metric": "recall@5",
+      "mean": 0.06481481481481481,
+      "low": 0.0,
+      "high": 0.1388888888888889,
+      "n": 18,
+      "significant": false
+    },
+    {
+      "a": "R2",
+      "b": "R3",
+      "group": "cross_lingual",
+      "metric": "recall@5",
+      "mean": 0.0,
+      "low": 0.0,
+      "high": 0.0,
+      "n": 11,
+      "significant": false
+    }
+  ],
+  "decision": {
+    "best": "R3",
+    "best_passes_hebrew": true,
+    "chosen": "R2",
+    "versus_best": {
+      "R1": {
+        "mean": -0.1733333333333333,
+        "low": -0.28,
+        "high": -0.07666666666666667,
+        "n": 50,
+        "worse": true
+      },
+      "R2": {
+        "mean": -0.04,
+        "low": -0.08666666666666666,
+        "high": 0.0033333333333333335,
+        "n": 50,
+        "worse": false
+      },
+      "R3": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "worse": false
+      }
+    },
+    "simplest_first": [
+      "R1",
+      "R2",
+      "R3"
+    ]
+  }
+}
