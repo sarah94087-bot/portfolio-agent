@@ -12,9 +12,50 @@ from portfolio_agent.ingest import (
     IngestError,
     chunk,
     count_tokens,
+    doc_sections,
     load,
-    skill_slug,
+    slug,
 )
+
+EDUCATION = """---
+id: education
+type: education
+title: {{ en: "Education", he: "השכלה" }}
+aliases: ["education", "השכלה"]
+programs:
+  - {{ institution: "A", program: "B", field: "C", start: "2023-09", end: "2025-07" }}
+answers: ["Where did she study?"]
+review: {{ approved: true, approved_on: 2026-11-04 }}
+---
+{body}"""
+
+
+def test_text_before_the_first_heading_is_kept_as_body():
+    assert doc_sections("Intro.\n\n## Context\nMore.") == [("body", "Intro."), ("context", "More.")]
+    assert doc_sections("Only text, no headings.") == [("body", "Only text, no headings.")]
+
+
+def test_free_headings_get_a_slug_and_empty_sections_are_dropped():
+    body = "<!-- note -->\n## Courses & grades\nx\n## Empty\n<!-- only a note -->\n"
+    assert doc_sections(body) == [("courses-grades", "x")]
+
+
+@pytest.mark.parametrize("body", ["Studied in two programs.\n", "## Programs\nTwo programs.\n"])
+def test_education_chunks_in_every_strategy_with_its_aliases(tmp_path, body):
+    (tmp_path / "education.md").write_text(EDUCATION.format(body=body), encoding="utf-8")
+    docs = load(tmp_path)
+    for strategy in STRATEGIES:
+        (c,) = chunk(docs, strategy)
+        assert c.record_id == "education"
+        assert c.aliases == "education, השכלה"
+    c2 = chunk(docs, "C2")[0]
+    assert c2.header == "Education (השכלה)\nAliases: education, השכלה"
+
+
+def test_a_record_with_no_body_makes_no_chunks(tmp_path):
+    (tmp_path / "education.md").write_text(EDUCATION.format(body=""), encoding="utf-8")
+    docs = load(tmp_path)
+    assert all(chunk(docs, s) == [] for s in STRATEGIES)
 
 PROJECT = """---
 id: demo
@@ -120,10 +161,10 @@ def test_skills_are_one_chunk_each_in_every_strategy_and_say_the_level(kb):
     assert "Evidence" not in listed
 
 
-def test_skill_slugs():
-    assert skill_slug("RTL / i18n") == "rtl-i18n"
-    assert skill_slug(".NET Core") == "net-core"
-    assert skill_slug("C#") != skill_slug("C++")
+def test_slugs():
+    assert slug("RTL / i18n") == "rtl-i18n"
+    assert slug(".NET Core") == "net-core"
+    assert slug("C#") != slug("C++")
 
 
 def test_c3_windows_have_a_fixed_size_and_overlap(tmp_path):

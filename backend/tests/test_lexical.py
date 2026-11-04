@@ -97,6 +97,8 @@ def test_r1_works_on_every_strategy(conn):
     for strategy in ("C1", "C2", "C3", "C4"):
         conn.execute("truncate t")
         upsert(conn, chunk(docs, strategy), "t")
-        hits = search(conn, "weed detection on CPU", k=3, table="t")
-        # The VAST experience record also says 'weed detection on CPU', so it may come first.
+        # k = 5, what search_portfolio returns (docs/04-retrieval-design.md, section 8). The
+        # VAST record also says 'weed detection on CPU', and skill chunks name their evidence
+        # records by id, so 'skills#minio' matches too. Whether that costs recall is for D1.
+        hits = search(conn, "weed detection on CPU", k=5, table="t")
         assert "weed-detection-pipeline" in [h.record_id for h in hits], strategy

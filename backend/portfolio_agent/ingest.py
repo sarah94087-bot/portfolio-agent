@@ -23,6 +23,7 @@ from pydantic import BaseModel
 
 from portfolio_agent.kb_check import (
     PORTFOLIO_DIR,
+    Education,
     Experience,
     Project,
     Skills,
@@ -103,12 +104,22 @@ def load(portfolio_dir: Path = PORTFOLIO_DIR) -> list[Doc]:
     for path in sorted(portfolio_dir.rglob("*.md")):
         record, _ = check_file(path)
         _, body = split(path.read_text(encoding="utf-8"))
-        sections = [
-            (SECTION_IDS[name], re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL).strip())
-            for name, text in body_sections(body)
-        ]
-        docs.append(Doc(record, sections))
+        docs.append(Doc(record, doc_sections(body)))
     return docs
+
+
+def doc_sections(body: str) -> list[tuple[str, str]]:
+    """(C1 section id, text) for the body, comments removed and empty sections dropped.
+
+    kb_check fixes the headings of projects and experience only. Other types (education, and
+    later profile and faq) may use any heading, which gets a slug as its id, and may put text
+    before the first heading, which becomes the section 'body', so no text is silently lost.
+    """
+    first = re.search(r"^## ", body, re.MULTILINE)
+    parts = [("body", body[: first.start()] if first else body)]
+    parts += [(SECTION_IDS.get(name) or slug(name), text) for name, text in body_sections(body)]
+    cleaned = [(sid, re.sub(r"<!--.*?-->", "", t, flags=re.DOTALL).strip()) for sid, t in parts]
+    return [(sid, text) for sid, text in cleaned if text]
 
 
 def chunk(docs: list[Doc], strategy: str) -> list[Chunk]:
@@ -127,14 +138,14 @@ def chunk(docs: list[Doc], strategy: str) -> list[Chunk]:
             ]
         elif strategy == "C3":
             chunks += windows(doc)
-        else:
+        elif doc.sections:
             text = "\n\n".join(text for _, text in doc.sections)
             sids = tuple(sid for sid, _ in doc.sections)
             chunks.append(Chunk(f"{doc.record.id}#all", doc.record.id, sids, text))
     # R1 matches a record's aliases whatever the strategy, so every chunk carries them.
     aliases = {
         d.record.id: ", ".join(d.record.aliases)
-        for d in docs if isinstance(d.record, Project | Experience)
+        for d in docs if getattr(d.record, "aliases", None)
     }
     chunks = [replace(c, aliases=aliases.get(c.record_id, "")) for c in chunks]
     ids = [c.id for c in chunks]
@@ -143,14 +154,16 @@ def chunk(docs: list[Doc], strategy: str) -> list[Chunk]:
     return chunks
 
 
-def context_header(record: Project | Experience) -> str:
-    lines = [f"{record.title.en} ({record.title.he})", f"Aliases: {', '.join(record.aliases)}"]
+def context_header(record: Project | Experience | Education) -> str:
+    lines = [f"{record.title.en} ({record.title.he})"]
+    if getattr(record, "aliases", None):
+        lines.append(f"Aliases: {', '.join(record.aliases)}")
     if isinstance(record, Project):
         lines.append(f"Tech: {', '.join(record.tech)}")
     return "\n".join(lines)
 
 
-def skill_slug(name: str) -> str:
+def slug(name: str) -> str:
     # C# and C++ must not both become 'c'.
     name = name.lower().replace("#", "sharp").replace("+", "plus")
     return re.sub(r"[^a-z0-9]+", "-", name).strip("-")
@@ -165,7 +178,7 @@ def skill_chunks(skills: Skills, with_header: bool) -> list[Chunk]:
             text += f" Evidence: {', '.join(s.evidence)}."
         if s.note:
             text += f" {s.note}"
-        sid = skill_slug(s.name)
+        sid = slug(s.name)
         chunks.append(Chunk(f"skills#{sid}", "skills", (sid,), text, header))
     return chunks
 
@@ -186,6 +199,8 @@ def windows(doc: Doc) -> list[Chunk]:
                    (m.span() for m in TOKEN.finditer(part))]
         spans.append((sid, first, len(tokens)))
         text += part
+    if not tokens:
+        return []
     chunks, start = [], 0
     while True:
         end = min(start + WINDOW, len(tokens))
