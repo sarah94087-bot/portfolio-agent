@@ -37,6 +37,10 @@ jobs:
           python-version: "3.12"
       - run: pip install -e ".[dev]"
       - run: ruff check . ../evals
+      # docs/02-knowledge-base.md, section 9. The list is a secret because it is sensitive too.
+      - run: python -m portfolio_agent.publication_check --require
+        env:
+          PUBLICATION_TERMS: ${{ secrets.PUBLICATION_TERMS }}
       - run: pytest -q
       - run: pytest -q ../evals
 
