@@ -184,3 +184,22 @@ def test_preferences_pass_and_reject_unknown_work_mode(tmp_path):
     assert check(tmp_path) == {}
     write(tmp_path, "preferences.md", PREFERENCES.replace("{mode}", "moon"))
     assert any("work_mode" in e for e in check(tmp_path)["preferences.md"])
+
+
+FAQ = """---
+id: faq
+type: faq
+title: { en: "FAQ", he: "שאלות נפוצות" }
+aliases: ["faq"]
+review: { approved: true, approved_on: 2026-11-04 }
+---
+{body}"""
+
+
+def test_faq_needs_questions_with_answers(tmp_path):
+    write(tmp_path, "faq.md", FAQ.replace("{body}", "\n## What?\nThis.\n"))
+    assert check(tmp_path) == {}
+    write(tmp_path, "faq.md", FAQ.replace("{body}", "\n## What?\n"))
+    assert check(tmp_path)["faq.md"] == ["heading '## What?' is empty"]
+    write(tmp_path, "faq.md", FAQ.replace("{body}", "\n"))
+    assert check(tmp_path)["faq.md"] == ["no questions"]

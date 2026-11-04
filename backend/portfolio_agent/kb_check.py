@@ -188,6 +188,14 @@ class Preferences(Strict):
     review: Review
 
 
+class Faq(Strict):
+    id: Literal["faq"]
+    type: Literal["faq"]
+    title: Title
+    aliases: list[str] = Field(min_length=1)
+    review: Review
+
+
 class Skill(Strict):
     name: Text
     level: Literal["used", "studied", "listed"]
@@ -217,6 +225,7 @@ SCHEMAS = {
     "education": Education,
     "profile": Profile,
     "preferences": Preferences,
+    "faq": Faq,
     "skills": Skills,
 }
 
@@ -284,6 +293,10 @@ def check_file(path: Path) -> tuple[BaseModel | None, list[str]]:
         errors += body_errors(body, EXPERIENCE_SECTIONS, set(EXPERIENCE_SECTIONS))
     elif isinstance(record, Profile | Preferences):
         errors += body_errors(body, ["Context"], {"Context"})
+    elif isinstance(record, Faq):
+        # Every heading is one question, so headings are free text (section 3 does not apply).
+        questions = re.findall(r"^## (.+?)\s*$", body, re.MULTILINE)
+        errors += body_errors(body, questions, set()) if questions else ["no questions"]
     return record, errors
 
 
