@@ -1,0 +1,1300 @@
+{
+  "config": "stage1-C4-R2-paraphrase-multilingual-MiniLM-L12-v2-Q0",
+  "commit": "612b3b4",
+  "date": "2026-11-04",
+  "strategy": "C4",
+  "retriever": "R2-paraphrase-multilingual-MiniLM-L12-v2",
+  "chunks": 55,
+  "split": "dev",
+  "n": 50,
+  "skipped": {
+    "refuse_no_info": 9,
+    "redirect_off_topic": 4
+  },
+  "groups": {
+    "all": {
+      "recall@3": {
+        "mean": 0.5866666666666667,
+        "low": 0.4633333333333334,
+        "high": 0.71,
+        "n": 50
+      },
+      "recall@5": {
+        "mean": 0.6133333333333334,
+        "low": 0.49,
+        "high": 0.7333333333333333,
+        "n": 50
+      },
+      "recall@10": {
+        "mean": 0.6633333333333333,
+        "low": 0.5433333333333333,
+        "high": 0.7766666666666667,
+        "n": 50
+      },
+      "mrr": {
+        "mean": 0.5903333333333333,
+        "low": 0.47200000000000003,
+        "high": 0.7066666666666667,
+        "n": 50
+      },
+      "ndcg@5": {
+        "mean": 0.5541582020404335,
+        "low": 0.4408862926796137,
+        "high": 0.6663149872728807,
+        "n": 50
+      }
+    },
+    "he": {
+      "recall@3": {
+        "mean": 0.5833333333333334,
+        "low": 0.4270833333333333,
+        "high": 0.734375,
+        "n": 32
+      },
+      "recall@5": {
+        "mean": 0.625,
+        "low": 0.46875,
+        "high": 0.7708333333333334,
+        "n": 32
+      },
+      "recall@10": {
+        "mean": 0.65625,
+        "low": 0.5052083333333334,
+        "high": 0.796875,
+        "n": 32
+      },
+      "mrr": {
+        "mean": 0.5859375,
+        "low": 0.4375,
+        "high": 0.7291666666666666,
+        "n": 32
+      },
+      "ndcg@5": {
+        "mean": 0.5569833068371177,
+        "low": 0.4157025764985637,
+        "high": 0.695170933499999,
+        "n": 32
+      }
+    },
+    "en": {
+      "recall@3": {
+        "mean": 0.5925925925925926,
+        "low": 0.3888888888888889,
+        "high": 0.8055555555555556,
+        "n": 18
+      },
+      "recall@5": {
+        "mean": 0.5925925925925926,
+        "low": 0.3888888888888889,
+        "high": 0.8055555555555556,
+        "n": 18
+      },
+      "recall@10": {
+        "mean": 0.6759259259259259,
+        "low": 0.48148148148148145,
+        "high": 0.8611111111111112,
+        "n": 18
+      },
+      "mrr": {
+        "mean": 0.5981481481481482,
+        "low": 0.39444444444444443,
+        "high": 0.7925925925925926,
+        "n": 18
+      },
+      "ndcg@5": {
+        "mean": 0.549135793512995,
+        "low": 0.3535089218101225,
+        "high": 0.737818592988555,
+        "n": 18
+      }
+    },
+    "cross_lingual": {
+      "recall@3": {
+        "mean": 0.7272727272727273,
+        "low": 0.45454545454545453,
+        "high": 1.0,
+        "n": 11
+      },
+      "recall@5": {
+        "mean": 0.8181818181818182,
+        "low": 0.5454545454545454,
+        "high": 1.0,
+        "n": 11
+      },
+      "recall@10": {
+        "mean": 0.8181818181818182,
+        "low": 0.5454545454545454,
+        "high": 1.0,
+        "n": 11
+      },
+      "mrr": {
+        "mean": 0.5984848484848485,
+        "low": 0.36363636363636365,
+        "high": 0.8257575757575758,
+        "n": 11
+      },
+      "ndcg@5": {
+        "mean": 0.6538669150196644,
+        "low": 0.42659418774693714,
+        "high": 0.8636363636363636,
+        "n": 11
+      }
+    }
+  },
+  "latency_ms": {
+    "p50": 2.788500001770444,
+    "p95": 3.300174999822047
+  },
+  "items": [
+    {
+      "id": "d1-001",
+      "lang": "en",
+      "category": "single_hop",
+      "query": "How often does her translation job run?",
+      "retrieved": [
+        "profile#all",
+        "human-gated-translation#all",
+        "preferences#all",
+        "education#all",
+        "ainsof-capital#all",
+        "skills#vitest",
+        "skills#github-actions",
+        "skills#pgvector",
+        "skills#playwright",
+        "skills#git"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575
+    },
+    {
+      "id": "d1-002",
+      "lang": "en",
+      "category": "single_hop",
+      "query": "How slow was the API before she worked on it?",
+      "retrieved": [
+        "api-latency-582-to-40#all",
+        "skills#fastapi",
+        "skills#claude-api",
+        "skills#rtl-i18n",
+        "profile#all",
+        "ainsof-capital#all",
+        "skills#github-actions",
+        "skills#next-js",
+        "skills#minio",
+        "skills#net-core"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-004",
+      "lang": "en",
+      "category": "single_hop",
+      "query": "Apart from a yes or no, what did her farm-photo classifier return per photo?",
+      "retrieved": [
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "plant-health-classification#all",
+        "profile#all",
+        "skills#pwa",
+        "weed-detection-pipeline#all",
+        "skills#vitest",
+        "skills#docker",
+        "skills#kafka",
+        "skills#playwright"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 1.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0
+    },
+    {
+      "id": "d1-005",
+      "lang": "en",
+      "category": "single_hop",
+      "query": "How long does one picture take in the weed detector?",
+      "retrieved": [
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "plant-health-classification#all",
+        "vast-data-bootcamp#all",
+        "skills#clip",
+        "skills#docker",
+        "skills#vitest",
+        "skills#mongodb",
+        "skills#aws-s3",
+        "skills#vit-mini"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575
+    },
+    {
+      "id": "d1-007",
+      "lang": "en",
+      "category": "single_hop",
+      "query": "Which cities or regions is she willing to commute to?",
+      "retrieved": [
+        "preferences#all",
+        "profile#all",
+        "governance-center-pwa#all",
+        "skills#mobilenetv3",
+        "vast-data-bootcamp#all",
+        "education#all",
+        "ainsof-capital#all",
+        "skills#kafka",
+        "skills#row-level-security",
+        "skills#minio"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-008",
+      "lang": "en",
+      "category": "single_hop",
+      "query": "What was her final mark in the UltraCode program?",
+      "retrieved": [
+        "skills#claude-api",
+        "education#all",
+        "skills#vitest",
+        "skills#vit-mini",
+        "skills#git",
+        "skills#rtl-i18n",
+        "skills#aws-ec2",
+        "skills#playwright",
+        "skills#minio",
+        "skills#fastapi"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575
+    },
+    {
+      "id": "d1-010",
+      "lang": "en",
+      "category": "single_hop",
+      "query": "What label does an automatic translation carry until an editor checks it?",
+      "retrieved": [
+        "human-gated-translation#all",
+        "skills#typescript",
+        "faq#all",
+        "skills#rtl-i18n",
+        "skills#clip",
+        "skills#pgvector",
+        "skills#docker",
+        "skills#vitest",
+        "skills#playwright",
+        "git-mcp-server#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-011",
+      "lang": "he",
+      "category": "single_hop",
+      "query": "כמה מסכים יש בממשק הניהול שהיא בנתה?",
+      "retrieved": [
+        "ainsof-capital#all",
+        "skills#row-level-security",
+        "skills#kafka",
+        "profile#all",
+        "skills#mcp",
+        "skills#mobilenetv3",
+        "skills#pwa",
+        "faq#all",
+        "skills#rtl-i18n",
+        "skills#github-actions"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0
+    },
+    {
+      "id": "d1-012",
+      "lang": "he",
+      "category": "single_hop",
+      "query": "מה קורה כשמגיע מידע ממקור שכבר צבר הרבה אמון?",
+      "retrieved": [
+        "claims-trust-model#all",
+        "postgres-rls-backbone#all",
+        "faq#all",
+        "git-mcp-server#all",
+        "ainsof-capital#all",
+        "api-latency-582-to-40#all",
+        "weed-detection-pipeline#all",
+        "governance-center-pwa#all",
+        "skills#row-level-security",
+        "clip-embeddings-kafka#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-014",
+      "lang": "he",
+      "category": "single_hop",
+      "query": "איפה יושבות התמונות לפני שמודל העשבים מעבד אותן?",
+      "retrieved": [
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "plant-health-classification#all",
+        "skills#clip",
+        "skills#kubernetes",
+        "skills#edge-functions",
+        "skills#kafka",
+        "skills#docker",
+        "skills#postgresql"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-015",
+      "lang": "he",
+      "category": "single_hop",
+      "query": "באיזה ענן רץ מודל זיהוי הצמחים שלה?",
+      "retrieved": [
+        "weed-detection-pipeline#all",
+        "plant-health-classification#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "skills#net-core",
+        "skills#mongodb",
+        "skills#kubernetes",
+        "skills#mysql",
+        "skills#dynamodb",
+        "ainsof-capital#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575
+    },
+    {
+      "id": "d1-017",
+      "lang": "he",
+      "category": "single_hop",
+      "query": "מה היא עשתה כדי שהאתר ימשיך לעבוד כשנגמרת הקליטה?",
+      "retrieved": [
+        "ainsof-capital#all",
+        "skills#docker",
+        "skills#mobilenetv3",
+        "skills#row-level-security",
+        "skills#clip",
+        "skills#next-js",
+        "skills#playwright",
+        "skills#vitest",
+        "skills#pwa",
+        "skills#kafka"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0
+    },
+    {
+      "id": "d1-018",
+      "lang": "he",
+      "category": "single_hop",
+      "query": "איך אצלה בקשה שנשלחת פעמיים לא נרשמת פעמיים?",
+      "retrieved": [
+        "api-latency-582-to-40#all",
+        "profile#all",
+        "faq#all",
+        "skills#postgresql",
+        "skills#pytest",
+        "postgres-rls-backbone#all",
+        "skills#next-js",
+        "skills#react",
+        "skills#github-actions",
+        "skills#sql-server"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 1.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0
+    },
+    {
+      "id": "d1-019",
+      "lang": "he",
+      "category": "single_hop",
+      "query": "באיזה מודל היא השתמשה כדי לייצג תמונות כמספרים?",
+      "retrieved": [
+        "skills#kafka",
+        "skills#playwright",
+        "skills#supabase",
+        "skills#edge-functions",
+        "skills#pwa",
+        "skills#vitest",
+        "skills#vercel",
+        "skills#pytest",
+        "skills#clip",
+        "skills#docker"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0
+    },
+    {
+      "id": "d1-021",
+      "lang": "en",
+      "category": "multi_hop",
+      "query": "In which of her projects does a person have to sign off before anything takes effect?",
+      "retrieved": [
+        "ainsof-capital#all",
+        "skills#github-actions",
+        "skills#kafka",
+        "skills#next-js",
+        "skills#pwa",
+        "skills#pytest",
+        "skills#row-level-security",
+        "skills#supabase",
+        "skills#react",
+        "skills#playwright"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0
+    },
+    {
+      "id": "d1-023",
+      "lang": "en",
+      "category": "multi_hop",
+      "query": "Where did she containerize things, and where did she rent a cloud GPU?",
+      "retrieved": [
+        "ainsof-capital#all",
+        "vast-data-bootcamp#all",
+        "profile#all",
+        "skills#mobilenetv3",
+        "skills#kafka",
+        "skills#docker",
+        "skills#row-level-security",
+        "skills#pwa",
+        "education#all",
+        "plant-health-classification#all"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.5,
+      "mrr": 0.1,
+      "ndcg@5": 0.0
+    },
+    {
+      "id": "d1-024",
+      "lang": "en",
+      "category": "multi_hop",
+      "query": "Which of her systems keep a history of who did what?",
+      "retrieved": [
+        "skills#kafka",
+        "skills#row-level-security",
+        "ainsof-capital#all",
+        "skills#pytorch",
+        "profile#all",
+        "skills#pwa",
+        "skills#vercel",
+        "skills#vitest",
+        "skills#supabase",
+        "skills#playwright"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0
+    },
+    {
+      "id": "d1-025",
+      "lang": "en",
+      "category": "multi_hop",
+      "query": "How did she keep heavy computation in check in her machine learning work?",
+      "retrieved": [
+        "skills#fastapi",
+        "skills#kafka",
+        "skills#mysql",
+        "skills#pytest",
+        "skills#docker",
+        "skills#kubernetes",
+        "skills#mongodb",
+        "skills#vitest",
+        "skills#claude-api",
+        "skills#pytorch"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0
+    },
+    {
+      "id": "d1-027",
+      "lang": "he",
+      "category": "multi_hop",
+      "query": "באילו פרויקטים היא עבדה עם Claude?",
+      "retrieved": [
+        "skills#claude-api",
+        "skills#kafka",
+        "skills#playwright",
+        "skills#vitest",
+        "skills#pgvector",
+        "skills#github-actions",
+        "skills#vercel",
+        "skills#kubernetes",
+        "skills#pytorch",
+        "skills#docker"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0
+    },
+    {
+      "id": "d1-028",
+      "lang": "he",
+      "category": "multi_hop",
+      "query": "מה היא עשתה בעצמה ומה עשו אחרים בפרויקטים שלה?",
+      "retrieved": [
+        "skills#kafka",
+        "skills#playwright",
+        "skills#github-actions",
+        "ainsof-capital#all",
+        "skills#vitest",
+        "skills#supabase",
+        "skills#claude-api",
+        "skills#docker",
+        "skills#pytorch",
+        "skills#pgvector"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0
+    },
+    {
+      "id": "d1-030",
+      "lang": "he",
+      "category": "multi_hop",
+      "query": "לאילו צרכים היא השתמשה ב-PostgreSQL בעבודה ובהתמחות?",
+      "retrieved": [
+        "skills#postgresql",
+        "postgres-rls-backbone#all",
+        "skills#sql-server",
+        "skills#supabase",
+        "skills#mysql",
+        "skills#pgvector",
+        "skills#vitest",
+        "skills#row-level-security",
+        "skills#claude-api",
+        "skills#vercel"
+      ],
+      "recall@3": 0.3333333333333333,
+      "recall@5": 0.3333333333333333,
+      "recall@10": 0.3333333333333333,
+      "mrr": 0.5,
+      "ndcg@5": 0.2960819109658652
+    },
+    {
+      "id": "d1-031",
+      "lang": "he",
+      "category": "multi_hop",
+      "query": "איך היא מגינה על המערכות שלה מפעולות מזיקות של משתמשים או של סוכני AI?",
+      "retrieved": [
+        "ainsof-capital#all",
+        "git-mcp-server#all",
+        "skills#row-level-security",
+        "weed-detection-pipeline#all",
+        "plant-health-classification#all",
+        "skills#fastapi",
+        "skills#react",
+        "faq#all",
+        "profile#all",
+        "skills#mobilenetv3"
+      ],
+      "recall@3": 0.5,
+      "recall@5": 0.5,
+      "recall@10": 0.5,
+      "mrr": 0.5,
+      "ndcg@5": 0.38685280723454163
+    },
+    {
+      "id": "d1-032",
+      "lang": "he",
+      "category": "multi_hop",
+      "query": "מה מחבר בין מודל הטענות לבין התרגום האוטומטי?",
+      "retrieved": [
+        "human-gated-translation#all",
+        "skills#react",
+        "skills#claude-api",
+        "skills#kubernetes",
+        "skills#vitest",
+        "skills#docker",
+        "skills#github-actions",
+        "skills#edge-functions",
+        "skills#typescript",
+        "skills#playwright"
+      ],
+      "recall@3": 0.5,
+      "recall@5": 0.5,
+      "recall@10": 0.5,
+      "mrr": 1.0,
+      "ndcg@5": 0.6131471927654584
+    },
+    {
+      "id": "d1-033",
+      "lang": "en",
+      "category": "comparative",
+      "query": "What's the most ambitious thing she has shipped?",
+      "retrieved": [
+        "profile#all",
+        "skills#kafka",
+        "skills#playwright",
+        "skills#supabase",
+        "vast-data-bootcamp#all",
+        "skills#vitest",
+        "skills#fastapi",
+        "skills#docker",
+        "skills#github-actions",
+        "skills#claude-api"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0
+    },
+    {
+      "id": "d1-035",
+      "lang": "en",
+      "category": "comparative",
+      "query": "Is she more of a backend or a frontend person?",
+      "retrieved": [
+        "profile#all",
+        "preferences#all",
+        "skills#row-level-security",
+        "skills#kubernetes",
+        "skills#sql-server",
+        "ainsof-capital#all",
+        "skills#docker",
+        "skills#playwright",
+        "skills#dynamodb",
+        "skills#yolo"
+      ],
+      "recall@3": 0.6666666666666666,
+      "recall@5": 0.6666666666666666,
+      "recall@10": 0.6666666666666666,
+      "mrr": 1.0,
+      "ndcg@5": 0.7653606369886217
+    },
+    {
+      "id": "d1-036",
+      "lang": "he",
+      "category": "comparative",
+      "query": "מה ההבדל בין שני פרויקטי הראייה הממוחשבת שלה?",
+      "retrieved": [
+        "skills#playwright",
+        "skills#aws-ec2",
+        "skills#github-actions",
+        "skills#claude-api",
+        "skills#react",
+        "skills#docker",
+        "skills#vitest",
+        "skills#kafka",
+        "skills#pwa",
+        "skills#git"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0
+    },
+    {
+      "id": "d1-037",
+      "lang": "he",
+      "category": "comparative",
+      "query": "איזה פרויקט שלה הכי מתאים למשרת AI Engineer?",
+      "retrieved": [
+        "ainsof-capital#all",
+        "profile#all",
+        "preferences#all",
+        "education#all",
+        "git-mcp-server#all",
+        "skills#claude-api",
+        "vast-data-bootcamp#all",
+        "plant-health-classification#all",
+        "skills#fastapi",
+        "skills#rtl-i18n"
+      ],
+      "recall@3": 0.3333333333333333,
+      "recall@5": 0.6666666666666666,
+      "recall@10": 0.6666666666666666,
+      "mrr": 0.5,
+      "ndcg@5": 0.4776237035032179
+    },
+    {
+      "id": "d1-039",
+      "lang": "en",
+      "category": "skill_level",
+      "query": "Does she have hands-on Kubernetes experience?",
+      "retrieved": [
+        "skills#kubernetes",
+        "skills#kafka",
+        "preferences#all",
+        "profile#all",
+        "ainsof-capital#all",
+        "education#all",
+        "skills#claude-api",
+        "vast-data-bootcamp#all",
+        "skills#docker",
+        "skills#mongodb"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-040",
+      "lang": "en",
+      "category": "skill_level",
+      "query": "Has she worked with Kafka?",
+      "retrieved": [
+        "skills#kafka",
+        "ainsof-capital#all",
+        "profile#all",
+        "skills#pwa",
+        "skills#claude-api",
+        "skills#pytorch",
+        "skills#github-actions",
+        "vast-data-bootcamp#all",
+        "skills#row-level-security",
+        "skills#playwright"
+      ],
+      "recall@3": 0.5,
+      "recall@5": 0.5,
+      "recall@10": 0.5,
+      "mrr": 1.0,
+      "ndcg@5": 0.6131471927654584
+    },
+    {
+      "id": "d1-042",
+      "lang": "en",
+      "category": "skill_level",
+      "query": "Has she shipped anything with FastAPI?",
+      "retrieved": [
+        "skills#fastapi",
+        "profile#all",
+        "ainsof-capital#all",
+        "skills#rtl-i18n",
+        "skills#mobilenetv3",
+        "api-latency-582-to-40#all",
+        "skills#vitest",
+        "faq#all",
+        "skills#claude-api",
+        "skills#minio"
+      ],
+      "recall@3": 0.5,
+      "recall@5": 0.5,
+      "recall@10": 0.5,
+      "mrr": 1.0,
+      "ndcg@5": 0.6131471927654584
+    },
+    {
+      "id": "d1-043",
+      "lang": "en",
+      "category": "skill_level",
+      "query": "Any MongoDB background?",
+      "retrieved": [
+        "skills#mongodb",
+        "vast-data-bootcamp#all",
+        "postgres-rls-backbone#all",
+        "plant-health-classification#all",
+        "skills#postgresql",
+        "claims-trust-model#all",
+        "faq#all",
+        "skills#docker",
+        "skills#yolo",
+        "skills#mobilenetv3"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-044",
+      "lang": "he",
+      "category": "skill_level",
+      "query": "יש לה ניסיון ב-C#?",
+      "retrieved": [
+        "skills#csharp",
+        "skills#net-core",
+        "skills#mobilenetv3",
+        "skills#next-js",
+        "skills#claude-api",
+        "skills#rtl-i18n",
+        "skills#github-actions",
+        "skills#cplusplus",
+        "skills#sql-server",
+        "skills#vit-mini"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-045",
+      "lang": "he",
+      "category": "skill_level",
+      "query": "היא כתבה בדיקות ב-Playwright?",
+      "retrieved": [
+        "skills#playwright",
+        "skills#kafka",
+        "skills#pytest",
+        "skills#vitest",
+        "skills#pytorch",
+        "skills#react",
+        "skills#claude-api",
+        "skills#docker",
+        "skills#pwa",
+        "skills#python"
+      ],
+      "recall@3": 0.5,
+      "recall@5": 0.5,
+      "recall@10": 0.5,
+      "mrr": 1.0,
+      "ndcg@5": 0.6131471927654584
+    },
+    {
+      "id": "d1-047",
+      "lang": "he",
+      "category": "skill_level",
+      "query": "היא מכירה Docker?",
+      "retrieved": [
+        "skills#docker",
+        "profile#all",
+        "ainsof-capital#all",
+        "preferences#all",
+        "skills#mongodb",
+        "vast-data-bootcamp#all",
+        "skills#kubernetes",
+        "skills#sql-server",
+        "skills#minio",
+        "faq#all"
+      ],
+      "recall@3": 0.5,
+      "recall@5": 0.5,
+      "recall@10": 0.5,
+      "mrr": 1.0,
+      "ndcg@5": 0.6131471927654584
+    },
+    {
+      "id": "d1-048",
+      "lang": "he",
+      "category": "skill_level",
+      "query": "עבדה פעם עם SQL Server?",
+      "retrieved": [
+        "skills#sql-server",
+        "postgres-rls-backbone#all",
+        "api-latency-582-to-40#all",
+        "skills#postgresql",
+        "skills#mysql",
+        "skills#mobilenetv3",
+        "claims-trust-model#all",
+        "ainsof-capital#all",
+        "skills#row-level-security",
+        "skills#next-js"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-049",
+      "lang": "en",
+      "category": "overview_limit",
+      "query": "What accuracy did her plant health model reach?",
+      "retrieved": [
+        "plant-health-classification#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "skills#pytest",
+        "skills#vitest",
+        "skills#kafka",
+        "skills#vercel",
+        "skills#pytorch",
+        "skills#pgvector",
+        "skills#docker"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-051",
+      "lang": "he",
+      "category": "overview_limit",
+      "query": "על איזה דאטה היא אימנה את מודל זיהוי הצמחים?",
+      "retrieved": [
+        "plant-health-classification#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "skills#vitest",
+        "skills#kafka",
+        "skills#kubernetes",
+        "skills#claude-api",
+        "skills#vercel",
+        "skills#pytest"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-052",
+      "lang": "he",
+      "category": "overview_limit",
+      "query": "כמה זמן לוקחת תחזית אחת במערכת זיהוי הצמחים?",
+      "retrieved": [
+        "plant-health-classification#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "api-latency-582-to-40#all",
+        "education#all",
+        "skills#mysql",
+        "profile#all",
+        "skills#sql-server",
+        "skills#postgresql"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-053",
+      "lang": "he",
+      "category": "overview_limit",
+      "query": "אילו מחלות צמחים המערכת שלה יודעת לזהות?",
+      "retrieved": [
+        "plant-health-classification#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "skills#mysql",
+        "skills#aws-s3",
+        "skills#kubernetes",
+        "skills#sql-server",
+        "skills#postgresql",
+        "skills#mongodb"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-071",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "למה היא ויתרה על מודל הסגמנטציה בזיהוי העשבים?",
+      "retrieved": [
+        "plant-health-classification#all",
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "vast-data-bootcamp#all",
+        "skills#kafka",
+        "skills#kubernetes",
+        "skills#vitest",
+        "skills#docker",
+        "skills#mongodb",
+        "skills#playwright"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5
+    },
+    {
+      "id": "d1-072",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "מה היה האתגר העיקרי בשרת ה-Git?",
+      "retrieved": [
+        "skills#github-actions",
+        "skills#git",
+        "skills#pgvector",
+        "skills#vit-mini",
+        "skills#pytest",
+        "skills#minio",
+        "skills#vitest",
+        "skills#rtl-i18n",
+        "skills#kafka",
+        "skills#dynamodb"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0
+    },
+    {
+      "id": "d1-074",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "למה כל עובדה נשמרת אצלה בנפרד לכל מקור?",
+      "retrieved": [
+        "claims-trust-model#all",
+        "faq#all",
+        "clip-embeddings-kafka#all",
+        "skills#kubernetes",
+        "skills#kafka",
+        "skills#mongodb",
+        "plant-health-classification#all",
+        "ainsof-capital#all",
+        "skills#net-core",
+        "profile#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-075",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "איך היא דאגה ששני עורכים לא ימחקו אחד לשני שינויים?",
+      "retrieved": [
+        "skills#react",
+        "skills#kafka",
+        "skills#row-level-security",
+        "skills#kubernetes",
+        "skills#playwright",
+        "skills#github-actions",
+        "skills#git",
+        "skills#edge-functions",
+        "skills#vitest",
+        "skills#docker"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "ndcg@5": 0.0
+    },
+    {
+      "id": "d1-077",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "איך המפות ממשיכות לעבוד בלי חיבור?",
+      "retrieved": [
+        "governance-center-pwa#all",
+        "claims-trust-model#all",
+        "api-latency-582-to-40#all",
+        "skills#mobilenetv3",
+        "git-mcp-server#all",
+        "weed-detection-pipeline#all",
+        "postgres-rls-backbone#all",
+        "ainsof-capital#all",
+        "skills#github-actions",
+        "skills#git"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-078",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "למה החיפוש אחר תמונות דומות לא רץ על כל תמונה שנכנסת?",
+      "retrieved": [
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "plant-health-classification#all",
+        "skills#clip",
+        "postgres-rls-backbone#all",
+        "skills#tailwind-css",
+        "skills#edge-functions",
+        "vast-data-bootcamp#all",
+        "human-gated-translation#all",
+        "skills#github-actions"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-079",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "מה יצא מפרויקט התרגום בסוף?",
+      "retrieved": [
+        "human-gated-translation#all",
+        "skills#vitest",
+        "skills#playwright",
+        "skills#react",
+        "skills#supabase",
+        "skills#yolo",
+        "skills#git",
+        "skills#kafka",
+        "skills#docker",
+        "skills#pgvector"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-081",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "אילו בדיקות אוטומטיות רצות על מרכז הניהול והאתר?",
+      "retrieved": [
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "plant-health-classification#all",
+        "governance-center-pwa#all",
+        "postgres-rls-backbone#all",
+        "skills#aws-ec2",
+        "weed-detection-pipeline#all",
+        "api-latency-582-to-40#all",
+        "git-mcp-server#all",
+        "vast-data-bootcamp#all"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306
+    },
+    {
+      "id": "d1-082",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "מה בדיוק היה החלק שלה בפרויקט זיהוי הצמחים?",
+      "retrieved": [
+        "plant-health-classification#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "skills#kafka",
+        "skills#vitest",
+        "skills#playwright",
+        "skills#docker",
+        "skills#kubernetes",
+        "skills#claude-api",
+        "skills#github-actions"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-083",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "למה היא חסמה גישה ישירה לבסיס הנתונים?",
+      "retrieved": [
+        "claims-trust-model#all",
+        "postgres-rls-backbone#all",
+        "api-latency-582-to-40#all",
+        "skills#row-level-security",
+        "skills#mobilenetv3",
+        "skills#sql-server",
+        "faq#all",
+        "ainsof-capital#all",
+        "skills#aws-ec2",
+        "skills#net-core"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575
+    },
+    {
+      "id": "d1-085",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "איזו בעיה פותרת פלטפורמת ממשל הנתונים שבנתה?",
+      "retrieved": [
+        "api-latency-582-to-40#all",
+        "claims-trust-model#all",
+        "postgres-rls-backbone#all",
+        "governance-center-pwa#all",
+        "ainsof-capital#all",
+        "skills#mobilenetv3",
+        "skills#postgresql",
+        "faq#all",
+        "weed-detection-pipeline#all",
+        "skills#sql-server"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575
+    }
+  ]
+}
