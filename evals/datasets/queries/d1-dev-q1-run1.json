@@ -1,0 +1,230 @@
+{
+  "mode": "q1",
+  "run": 1,
+  "split": "dev",
+  "model": "openai/gpt-oss-120b",
+  "date": "2026-11-04",
+  "system": "You are an AI agent that presents Sarah Halevy. You are not Sarah. Answer only from tool results. End every professional claim with [[chunk_id]]. If the tool results do not answer the question, say you have no information. Answer in the language of the user's last message.",
+  "tool": {
+    "type": "function",
+    "function": {
+      "name": "search_portfolio",
+      "description": "Search Sarah's portfolio. Write the query in English with explicit technical terms, and replace pronouns from the conversation with the project name.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    }
+  },
+  "tokens": 17350,
+  "queries": {
+    "d1-001": {
+      "query": "Sarah Halevy translation job schedule frequency",
+      "alternatives": []
+    },
+    "d1-002": {
+      "query": "Sarah Halevy API performance before her work how slow was the API",
+      "alternatives": []
+    },
+    "d1-004": {
+      "query": "Sarah Halevy farm-photo classifier per photo returned values beyond yes or no",
+      "alternatives": []
+    },
+    "d1-005": {
+      "query": "weed detector picture capture time per image",
+      "alternatives": []
+    },
+    "d1-007": {
+      "query": "Sarah Halevy commute cities regions willing to commute",
+      "alternatives": []
+    },
+    "d1-008": {
+      "query": "Sarah Halevy UltraCode program final mark",
+      "alternatives": []
+    },
+    "d1-010": {
+      "query": "automatic translation label until editor checks it label automatic translation carry until editor checks",
+      "alternatives": []
+    },
+    "d1-011": {
+      "query": "Sarah Halevy admin interface number of screens",
+      "alternatives": []
+    },
+    "d1-012": {
+      "query": "information from a trusted source effect",
+      "alternatives": []
+    },
+    "d1-014": {
+      "query": "Where are the images stored before the weed model processes them in Sarah Halevy's portfolio",
+      "alternatives": []
+    },
+    "d1-015": {
+      "query": "Sarah Halevy plant identification model cloud platform",
+      "alternatives": []
+    },
+    "d1-017": {
+      "query": "Sarah Halevy website continued operation after data capture ended",
+      "alternatives": []
+    },
+    "d1-018": {
+      "query": "duplicate request not recorded twice idempotent handling",
+      "alternatives": []
+    },
+    "d1-019": {
+      "query": "model used to represent images as numbers",
+      "alternatives": []
+    },
+    "d1-021": {
+      "query": "project where a person must sign off before any changes take effect",
+      "alternatives": []
+    },
+    "d1-023": {
+      "query": "Sarah Halevy containerized projects location and cloud GPU rental provider",
+      "alternatives": []
+    },
+    "d1-024": {
+      "query": "Sarah Halevy system history of who did what",
+      "alternatives": []
+    },
+    "d1-025": {
+      "query": "Sarah Halevy heavy computation management in machine learning projects",
+      "alternatives": []
+    },
+    "d1-027": {
+      "query": "Sarah Halevy projects that involved Claude",
+      "alternatives": []
+    },
+    "d1-028": {
+      "query": "Sarah Halevy contributions in her projects and contributions of other team members",
+      "alternatives": []
+    },
+    "d1-030": {
+      "query": "Sarah Halevy PostgreSQL usage work specialization purposes",
+      "alternatives": []
+    },
+    "d1-031": {
+      "query": "Sarah Halevy security measures against malicious user actions and AI agents",
+      "alternatives": []
+    },
+    "d1-032": {
+      "query": "קשר בין מודל הטענות לתרגום אוטומטי",
+      "alternatives": []
+    },
+    "d1-033": {
+      "query": "most ambitious thing Sarah Halevy has shipped",
+      "alternatives": []
+    },
+    "d1-035": {
+      "query": "Sarah Halevy backend frontend expertise",
+      "alternatives": []
+    },
+    "d1-036": {
+      "query": "Sarah Halevy computer vision project",
+      "alternatives": []
+    },
+    "d1-037": {
+      "query": "Sarah Halevy AI Engineer suitable project",
+      "alternatives": []
+    },
+    "d1-039": {
+      "query": "Sarah Halevy hands-on Kubernetes experience",
+      "alternatives": []
+    },
+    "d1-040": {
+      "query": "Sarah Halevy Kafka",
+      "alternatives": []
+    },
+    "d1-042": {
+      "query": "Sarah Halevy FastAPI shipped",
+      "alternatives": []
+    },
+    "d1-043": {
+      "query": "Sarah Halevy MongoDB experience",
+      "alternatives": []
+    },
+    "d1-044": {
+      "query": "Sarah Halevy C# experience",
+      "alternatives": []
+    },
+    "d1-045": {
+      "query": "Sarah Halevy Playwright tests",
+      "alternatives": []
+    },
+    "d1-047": {
+      "query": "Sarah Halevy Docker",
+      "alternatives": []
+    },
+    "d1-048": {
+      "query": "Sarah Halevy SQL Server",
+      "alternatives": []
+    },
+    "d1-049": {
+      "query": "Sarah Halevy plant health model accuracy",
+      "alternatives": []
+    },
+    "d1-051": {
+      "query": "דאטה מודל זיהוי צמחים",
+      "alternatives": []
+    },
+    "d1-052": {
+      "query": "time taken for one prediction in plant identification system",
+      "alternatives": []
+    },
+    "d1-053": {
+      "query": "List plant diseases that the plant disease detection system developed by Sarah Halevy can identify.",
+      "alternatives": []
+    },
+    "d1-071": {
+      "query": "Why did Sarah Halevy abandon the segmentation model in weed detection",
+      "alternatives": []
+    },
+    "d1-072": {
+      "query": "Git server main challenge",
+      "alternatives": []
+    },
+    "d1-074": {
+      "query": "Why does Sarah Halevy store each fact separately for each source",
+      "alternatives": []
+    },
+    "d1-075": {
+      "query": "Sarah Halevy how she ensured two editors do not overwrite each other's changes",
+      "alternatives": []
+    },
+    "d1-077": {
+      "query": "offline map functionality how maps continue to work without a connection",
+      "alternatives": []
+    },
+    "d1-078": {
+      "query": "Why similar image search does not run on every image entered",
+      "alternatives": []
+    },
+    "d1-079": {
+      "query": "Sarah Halevy translation project final outcome",
+      "alternatives": []
+    },
+    "d1-081": {
+      "query": "אילו בדיקות אוטומטיות רצות על מרכז הניהול והאתר?",
+      "alternatives": []
+    },
+    "d1-082": {
+      "query": "Sarah Halevy role in plant identification project",
+      "alternatives": []
+    },
+    "d1-083": {
+      "query": "Sarah Halevy blocked direct access to the database reason",
+      "alternatives": []
+    },
+    "d1-085": {
+      "query": "פלטפורמת ממשל הנתונים שבנתה פותרת איזו בעיה",
+      "alternatives": []
+    }
+  }
+}

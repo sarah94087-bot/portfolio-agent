@@ -1,0 +1,390 @@
+{
+  "mode": "q2",
+  "run": 1,
+  "split": "dev",
+  "model": "openai/gpt-oss-120b",
+  "date": "2026-11-04",
+  "system": "You are an AI agent that presents Sarah Halevy. You are not Sarah. Answer only from tool results. End every professional claim with [[chunk_id]]. If the tool results do not answer the question, say you have no information. Answer in the language of the user's last message.",
+  "tool": {
+    "type": "function",
+    "function": {
+      "name": "search_portfolio",
+      "description": "Search Sarah's portfolio. Write the query in English with explicit technical terms, and replace pronouns from the conversation with the project name. Also give two alternative English phrasings that use different terms.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "alternative_queries": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "minItems": 2,
+            "maxItems": 2
+          }
+        },
+        "required": [
+          "query",
+          "alternative_queries"
+        ]
+      }
+    }
+  },
+  "tokens": 22774,
+  "queries": {
+    "d1-001": {
+      "query": "frequency of translation job in Sarah Halevy's portfolio",
+      "alternatives": [
+        "how often does the translation project run for Sarah Halevy",
+        "translation job schedule for Sarah Halevy"
+      ]
+    },
+    "d1-002": {
+      "query": "What was the response time and throughput of the API before Sarah Halevy's performance improvements?",
+      "alternatives": [
+        "Initial latency and request per second metrics of the API prior to Sarah Halevy's optimization work.",
+        "Baseline speed measurements of the API before Sarah Halevy intervened."
+      ]
+    },
+    "d1-004": {
+      "query": "Sarah Halevy farm-photo classifier output per photo besides binary yes/no",
+      "alternatives": [
+        "Details of Sarah Halevy's farm image classification results beyond yes/no per picture",
+        "What additional information does Sarah's farm-photo classifier provide for each image aside from a yes or no?"
+      ]
+    },
+    "d1-005": {
+      "query": "duration of a single image capture in the weed detector system",
+      "alternatives": [
+        "time taken to acquire one picture using the weed detection device",
+        "how long does each photo require in the weed detection application"
+      ]
+    },
+    "d1-007": {
+      "query": "What cities or regions is Sarah Halevy willing to commute to for work?",
+      "alternatives": [
+        "Identify the geographic locations Sarah Halevy is open to commuting to",
+        "List the areas where Sarah Halevy is willing to travel for a job"
+      ]
+    },
+    "d1-008": {
+      "query": "Sarah Halevy UltraCode program final mark",
+      "alternatives": [
+        "final grade Sarah Halevy UltraCode",
+        "Sarah Halevy's final score in UltraCode"
+      ]
+    },
+    "d1-010": {
+      "query": "automatic translation label until editor checks it",
+      "alternatives": [
+        "what status tag is given to machine translation before editorial review",
+        "label applied to auto-translated content pending editor verification"
+      ]
+    },
+    "d1-011": {
+      "query": "Number of screens in the admin interface built by Sarah Halevy",
+      "alternatives": [
+        "How many UI screens are in Sarah Halevy's admin panel project",
+        "Count of pages in the management interface developed by Sarah Halevy"
+      ]
+    },
+    "d1-012": {
+      "query": "What happens when information comes from a source that has already built a lot of trust?",
+      "alternatives": [
+        "Effects of receiving information from a highly trusted source",
+        "Impact of trustful source on perception of new information"
+      ]
+    },
+    "d1-014": {
+      "query": "where are images stored before being processed by the weed detection model in Sarah Halevy's portfolio",
+      "alternatives": [
+        "image storage location prior to analysis by the weed detection system in Sarah Halevy's projects",
+        "pre-processing image repository for the weeds model in Sarah Halevy's work"
+      ]
+    },
+    "d1-015": {
+      "query": "Sarah Halevy plant identification model cloud provider",
+      "alternatives": [
+        "Which cloud platform hosts Sarah Halevy's plant recognition model?",
+        "On what cloud service does Sarah Halevy run her plant identification AI?"
+      ]
+    },
+    "d1-017": {
+      "query": "Sarah Halevy website continued operation after data capture ends",
+      "alternatives": [
+        "Sarah Halevy how to keep website running when data fetching completes",
+        "Sarah Halevy method for maintaining site functionality after loading finishes"
+      ]
+    },
+    "d1-018": {
+      "query": "duplicate request handling idempotent API Sarah Halevy",
+      "alternatives": [
+        "request deduplication mechanism Sarah Halevy project",
+        "prevent double registration of repeated requests Sarah Halevy"
+      ]
+    },
+    "d1-019": {
+      "query": "Sarah Halevy model used to represent images as numbers",
+      "alternatives": [
+        "Which technique did Sarah Halevy employ for numeric image representation?",
+        "What model did Sarah Halevy apply to encode images into numeric form?"
+      ]
+    },
+    "d1-021": {
+      "query": "Sarah Halevy project sign off required before changes take effect",
+      "alternatives": [
+        "Sarah Halevy project approval workflow sign off prerequisite",
+        "Sarah Halevy project where user must sign off prior to execution"
+      ]
+    },
+    "d1-023": {
+      "query": "Sarah Halevy containerization deployment platform and cloud GPU rental provider",
+      "alternatives": [
+        "Where did Sarah Halevy use containers and which service did she use for cloud GPU rental?",
+        "Details on Sarah Halevy's containerized environment and cloud GPU rental provider"
+      ]
+    },
+    "d1-024": {
+      "query": "Sarah Halevy system history of who did what tracking audit log",
+      "alternatives": [
+        "Sarah Halevy project activity log user actions",
+        "Sarah Halevy application maintains audit trail of actions"
+      ]
+    },
+    "d1-025": {
+      "query": "Sarah Halevy strategies for managing heavy computation in machine learning projects",
+      "alternatives": [
+        "How does Sarah Halevy optimize computational resources in her ML work?",
+        "Sarah Halevy methods for reducing computational load in machine learning"
+      ]
+    },
+    "d1-027": {
+      "query": "Sarah Halevy projects involving Claude AI model",
+      "alternatives": [
+        "Sarah Halevy work with Claude language model projects",
+        "Projects by Sarah Halevy that used Anthropic Claude"
+      ]
+    },
+    "d1-028": {
+      "query": "In Sarah Halevy's portfolio, list her personal contributions and the contributions made by collaborators for each project.",
+      "alternatives": [
+        "For each project in Sarah Halevy's portfolio, what tasks did Sarah perform herself and which tasks were performed by other team members?",
+        "Identify Sarah Halevy's individual roles versus the roles of other contributors across her projects."
+      ]
+    },
+    "d1-030": {
+      "query": "Sarah Halevy PostgreSQL usage in work and specialization",
+      "alternatives": [
+        "Sarah Halevy PostgreSQL applications in professional projects",
+        "How Sarah Halevy utilized PostgreSQL in her career and specialization"
+      ]
+    },
+    "d1-031": {
+      "query": "Sarah Halevy protection mechanisms against malicious user actions and AI agents in her systems",
+      "alternatives": [
+        "How does Sarah Halevy secure her platforms from harmful user behavior and AI agent attacks?",
+        "Methods used by Sarah Halevy to defend her systems from malicious users and AI agents"
+      ]
+    },
+    "d1-032": {
+      "query": "What connects the claim model with automatic translation in Sarah Halevy's work",
+      "alternatives": [
+        "Relationship between the argumentation model and machine translation in Sarah Halevy's portfolio",
+        "How does the claim model relate to automatic translation in Sarah Halevy projects"
+      ]
+    },
+    "d1-033": {
+      "query": "What is the most ambitious project Sarah Halevy has shipped in her portfolio?",
+      "alternatives": [
+        "Identify the most ambitious shipped product by Sarah Halevy.",
+        "Which of Sarah Halevy's delivered works is considered the most ambitious?"
+      ]
+    },
+    "d1-035": {
+      "query": "Sarah Halevy backend versus frontend specialization",
+      "alternatives": [
+        "Sarah Halevy focus on backend development or frontend development",
+        "Sarah Halevy primary expertise backend or frontend"
+      ]
+    },
+    "d1-036": {
+      "query": "Sarah Halevy computer vision projects details",
+      "alternatives": [
+        "Sarah Halevy computer vision project descriptions",
+        "Information on Sarah Halevy's computer vision work"
+      ]
+    },
+    "d1-037": {
+      "query": "Identify Sarah Halevy's projects that involve AI engineering, machine learning, deep learning, or data science, and determine which is most suitable for an AI Engineer role.",
+      "alternatives": [
+        "Find Sarah Halevy projects related to artificial intelligence, neural networks, or predictive modeling to assess best fit for AI Engineer position.",
+        "List Sarah Halevy's work in AI, ML, or data analytics and evaluate the most appropriate project for an AI Engineer job."
+      ]
+    },
+    "d1-039": {
+      "query": "Sarah Halevy hands-on Kubernetes experience",
+      "alternatives": [
+        "Sarah Halevy practical Kubernetes usage",
+        "Sarah Halevy Kubernetes implementation experience"
+      ]
+    },
+    "d1-040": {
+      "query": "Sarah Halevy Apache Kafka experience",
+      "alternatives": [
+        "Sarah Halevy Kafka projects",
+        "Sarah Halevy work with Apache Kafka"
+      ]
+    },
+    "d1-042": {
+      "query": "Sarah Halevy FastAPI shipped project",
+      "alternatives": [
+        "FastAPI implementation by Sarah Halevy",
+        "Projects delivered by Sarah Halevy using FastAPI"
+      ]
+    },
+    "d1-043": {
+      "query": "Sarah Halevy MongoDB experience",
+      "alternatives": [
+        "Sarah Halevy background with MongoDB",
+        "MongoDB projects by Sarah Halevy"
+      ]
+    },
+    "d1-044": {
+      "query": "Sarah Halevy C# experience",
+      "alternatives": [
+        "Sarah Halevy proficiency in C# programming",
+        "Sarah Halevy background with C# language"
+      ]
+    },
+    "d1-045": {
+      "query": "Sarah Halevy Playwright tests",
+      "alternatives": [
+        "Sarah Halevy automated testing with Playwright",
+        "Sarah Halevy wrote Playwright test scripts"
+      ]
+    },
+    "d1-047": {
+      "query": "Sarah Halevy Docker experience",
+      "alternatives": [
+        "Sarah Halevy familiarity with Docker containers",
+        "Sarah Halevy usage of Docker in projects"
+      ]
+    },
+    "d1-048": {
+      "query": "Sarah Halevy SQL Server experience",
+      "alternatives": [
+        "Sarah Halevy work with Microsoft SQL Server",
+        "Sarah Halevy database projects using SQL Server"
+      ]
+    },
+    "d1-049": {
+      "query": "Sarah Halevy plant health model accuracy",
+      "alternatives": [
+        "Accuracy of plant health detection model by Sarah Halevy",
+        "Performance metrics of Sarah Halevy's plant disease classification model"
+      ]
+    },
+    "d1-051": {
+      "query": "What dataset was used to train Sarah Halevy's plant identification model?",
+      "alternatives": [
+        "Data sources employed for training the plant identification model developed by Sarah Halevy",
+        "Which data did Sarah Halevy use to train her plant recognition model"
+      ]
+    },
+    "d1-052": {
+      "query": "משך זמן של תחזית אחת במערכת זיהוי הצמחים של שרה הלוי",
+      "alternatives": [
+        "כמה זמן נדרש לביצוע תחזית במערכת זיהוי צמחים",
+        "זמן חישוב תחזית במערכת זיהוי הצמחים של שרה"
+      ]
+    },
+    "d1-053": {
+      "query": "What plant diseases can the Sarah Halevy disease detection system recognize?",
+      "alternatives": [
+        "Which plant pathologies are identified by Sarah Halevy's detection platform?",
+        "List the crop diseases detectable by the system developed by Sarah Halevy."
+      ]
+    },
+    "d1-071": {
+      "query": "Sarah Halevy segmentation model weed detection why abandoned",
+      "alternatives": [
+        "reason Sarah stopped using segmentation approach for weed identification",
+        "Sarah Halevy gave up on segmentation model in weed detection project"
+      ]
+    },
+    "d1-072": {
+      "query": "Sarah Halevy Git server main challenge",
+      "alternatives": [
+        "Sarah Halevy primary difficulty with Git server setup",
+        "What was the biggest obstacle in Sarah Halevy's Git server project"
+      ]
+    },
+    "d1-074": {
+      "query": "Why does Sarah store each fact separately for each source?",
+      "alternatives": [
+        "Reason for keeping individual facts distinct per source in Sarah's system",
+        "Explanation of separate fact storage per source in Sarah's portfolio"
+      ]
+    },
+    "d1-075": {
+      "query": "Sarah Halevy how she prevented two editors from overwriting each other's changes in a collaborative editing system",
+      "alternatives": [
+        "Sarah Halevy method for avoiding conflict when multiple editors modify the same document",
+        "Sarah Halevy solution to ensure concurrent edits do not delete each other's changes"
+      ]
+    },
+    "d1-077": {
+      "query": "Explain how maps continue to work without an internet connection in Sarah Halevy's mapping projects.",
+      "alternatives": [
+        "Describe offline functionality of mapping applications developed by Sarah Halevy.",
+        "How do Sarah Halevy's map solutions operate when disconnected from the network?"
+      ]
+    },
+    "d1-078": {
+      "query": "Why does the similar image search not run on every uploaded image in Sarah Halevy's portfolio?",
+      "alternatives": [
+        "Explanation for selective execution of similar image detection in Sarah Halevy projects",
+        "Reasons similar image search is not applied to all images in Sarah Halevy's work"
+      ]
+    },
+    "d1-079": {
+      "query": "final deliverables of the translation project by Sarah Halevy",
+      "alternatives": [
+        "what are the outcomes of Sarah Halevy translation project",
+        "translation project results by Sarah Halevy"
+      ]
+    },
+    "d1-081": {
+      "query": "automated tests running on admin center and website Sarah Halevy",
+      "alternatives": [
+        "Sarah Halevy continuous integration tests for management console and website",
+        "What automated test suites does Sarah Halevy have for admin panel and site"
+      ]
+    },
+    "d1-082": {
+      "query": "Sarah Halevy role in plant identification project responsibilities contributions",
+      "alternatives": [
+        "What tasks did Sarah Halevy perform in the plant recognition project?",
+        "Details of Sarah Halevy's involvement in the flora identification system"
+      ]
+    },
+    "d1-083": {
+      "query": "Why Sarah Halevy blocked direct access to the database",
+      "alternatives": [
+        "Reason for Sarah Halevy restricting direct database connections",
+        "Sarah Halevy's motivation for disabling direct DB access"
+      ]
+    },
+    "d1-085": {
+      "query": "data governance platform built by Sarah Halevy",
+      "alternatives": [
+        "Sarah Halevy data governance solution description",
+        "What problem does Sarah Halevy's data governance platform solve"
+      ]
+    }
+  }
+}

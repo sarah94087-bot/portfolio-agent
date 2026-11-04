@@ -1,0 +1,1298 @@
+{
+  "config": "stage3-C4-R3-multilingual-e5-small-Q2-run1",
+  "commit": "c154973",
+  "date": "2026-11-04",
+  "split": "dev",
+  "n": 50,
+  "skipped": {
+    "refuse_no_info": 9,
+    "redirect_off_topic": 4
+  },
+  "groups": {
+    "all": {
+      "recall@3": {
+        "mean": 0.6966666666666668,
+        "low": 0.5866666666666667,
+        "high": 0.8,
+        "n": 50
+      },
+      "recall@5": {
+        "mean": 0.85,
+        "low": 0.7633333333333333,
+        "high": 0.9266666666666667,
+        "n": 50
+      },
+      "recall@10": {
+        "mean": 0.9633333333333333,
+        "low": 0.93,
+        "high": 0.9933333333333333,
+        "n": 50
+      },
+      "mrr": {
+        "mean": 0.5388571428571428,
+        "low": 0.45838095238095233,
+        "high": 0.6215238095238095,
+        "n": 50
+      },
+      "ndcg@5": {
+        "mean": 0.5922015505345111,
+        "low": 0.5146333863871148,
+        "high": 0.6662906869580474,
+        "n": 50
+      }
+    },
+    "he": {
+      "recall@3": {
+        "mean": 0.6458333333333334,
+        "low": 0.5,
+        "high": 0.78125,
+        "n": 32
+      },
+      "recall@5": {
+        "mean": 0.859375,
+        "low": 0.75,
+        "high": 0.9583333333333334,
+        "n": 32
+      },
+      "recall@10": {
+        "mean": 0.9635416666666666,
+        "low": 0.9166666666666666,
+        "high": 1.0,
+        "n": 32
+      },
+      "mrr": {
+        "mean": 0.5388392857142857,
+        "low": 0.4354166666666667,
+        "high": 0.647172619047619,
+        "n": 32
+      },
+      "ndcg@5": {
+        "mean": 0.5834301785959211,
+        "low": 0.4877464674835249,
+        "high": 0.6769375649758844,
+        "n": 32
+      }
+    },
+    "en": {
+      "recall@3": {
+        "mean": 0.787037037037037,
+        "low": 0.6203703703703703,
+        "high": 0.925925925925926,
+        "n": 18
+      },
+      "recall@5": {
+        "mean": 0.8333333333333334,
+        "low": 0.6944444444444444,
+        "high": 0.9537037037037037,
+        "n": 18
+      },
+      "recall@10": {
+        "mean": 0.9629629629629629,
+        "low": 0.9074074074074073,
+        "high": 1.0,
+        "n": 18
+      },
+      "mrr": {
+        "mean": 0.5388888888888889,
+        "low": 0.42037037037037034,
+        "high": 0.6666666666666666,
+        "n": 18
+      },
+      "ndcg@5": {
+        "mean": 0.6077951006475598,
+        "low": 0.48213623913962006,
+        "high": 0.7341058946734234,
+        "n": 18
+      }
+    },
+    "cross_lingual": {
+      "recall@3": {
+        "mean": 1.0,
+        "low": 1.0,
+        "high": 1.0,
+        "n": 11
+      },
+      "recall@5": {
+        "mean": 1.0,
+        "low": 1.0,
+        "high": 1.0,
+        "n": 11
+      },
+      "recall@10": {
+        "mean": 1.0,
+        "low": 1.0,
+        "high": 1.0,
+        "n": 11
+      },
+      "mrr": {
+        "mean": 0.5909090909090909,
+        "low": 0.45454545454545453,
+        "high": 0.7575757575757577,
+        "n": 11
+      },
+      "ndcg@5": {
+        "mean": 0.695877160714299,
+        "low": 0.5930653649350754,
+        "high": 0.8203380922078028,
+        "n": 11
+      }
+    }
+  },
+  "latency_ms": {
+    "p50": 934.964799998852,
+    "p95": 1206.0047649982153
+  },
+  "items": [
+    {
+      "id": "d1-001",
+      "lang": "en",
+      "category": "single_hop",
+      "query": "frequency of translation job in Sarah Halevy's portfolio",
+      "retrieved": [
+        "faq#all",
+        "human-gated-translation#all",
+        "ainsof-capital#all",
+        "profile#all",
+        "skills#fastapi",
+        "governance-center-pwa#all",
+        "skills#clip",
+        "education#all",
+        "skills#kafka",
+        "skills#docker"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575
+    },
+    {
+      "id": "d1-002",
+      "lang": "en",
+      "category": "single_hop",
+      "query": "What was the response time and throughput of the API before Sarah Halevy's performance improvements?",
+      "retrieved": [
+        "api-latency-582-to-40#all",
+        "ainsof-capital#all",
+        "faq#all",
+        "profile#all",
+        "governance-center-pwa#all",
+        "skills#fastapi",
+        "human-gated-translation#all",
+        "skills#claude-api",
+        "weed-detection-pipeline#all",
+        "claims-trust-model#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-004",
+      "lang": "en",
+      "category": "single_hop",
+      "query": "Sarah Halevy farm-photo classifier output per photo besides binary yes/no",
+      "retrieved": [
+        "faq#all",
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "plant-health-classification#all",
+        "skills#clip",
+        "vast-data-bootcamp#all",
+        "ainsof-capital#all",
+        "human-gated-translation#all",
+        "skills#fastapi",
+        "git-mcp-server#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5
+    },
+    {
+      "id": "d1-005",
+      "lang": "en",
+      "category": "single_hop",
+      "query": "duration of a single image capture in the weed detector system",
+      "retrieved": [
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "vast-data-bootcamp#all",
+        "faq#all",
+        "governance-center-pwa#all",
+        "claims-trust-model#all",
+        "plant-health-classification#all",
+        "git-mcp-server#all",
+        "ainsof-capital#all",
+        "api-latency-582-to-40#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575
+    },
+    {
+      "id": "d1-007",
+      "lang": "en",
+      "category": "single_hop",
+      "query": "What cities or regions is Sarah Halevy willing to commute to for work?",
+      "retrieved": [
+        "faq#all",
+        "preferences#all",
+        "skills#docker",
+        "skills#fastapi",
+        "skills#kafka",
+        "skills#clip",
+        "skills#minio",
+        "profile#all",
+        "governance-center-pwa#all",
+        "skills#kubernetes"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575
+    },
+    {
+      "id": "d1-008",
+      "lang": "en",
+      "category": "single_hop",
+      "query": "Sarah Halevy UltraCode program final mark",
+      "retrieved": [
+        "education#all",
+        "faq#all",
+        "skills#fastapi",
+        "weed-detection-pipeline#all",
+        "skills#java",
+        "skills#cplusplus",
+        "skills#docker",
+        "skills#react",
+        "skills#python",
+        "skills#kafka"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-010",
+      "lang": "en",
+      "category": "single_hop",
+      "query": "automatic translation label until editor checks it",
+      "retrieved": [
+        "human-gated-translation#all",
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "claims-trust-model#all",
+        "faq#all",
+        "skills#rtl-i18n",
+        "postgres-rls-backbone#all",
+        "profile#all",
+        "git-mcp-server#all",
+        "clip-embeddings-kafka#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-011",
+      "lang": "he",
+      "category": "single_hop",
+      "query": "Number of screens in the admin interface built by Sarah Halevy",
+      "retrieved": [
+        "governance-center-pwa#all",
+        "faq#all",
+        "ainsof-capital#all",
+        "profile#all",
+        "skills#fastapi",
+        "claims-trust-model#all",
+        "skills#docker",
+        "postgres-rls-backbone#all",
+        "human-gated-translation#all",
+        "skills#clip"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-012",
+      "lang": "he",
+      "category": "single_hop",
+      "query": "What happens when information comes from a source that has already built a lot of trust?",
+      "retrieved": [
+        "claims-trust-model#all",
+        "ainsof-capital#all",
+        "faq#all",
+        "weed-detection-pipeline#all",
+        "git-mcp-server#all",
+        "human-gated-translation#all",
+        "governance-center-pwa#all",
+        "clip-embeddings-kafka#all",
+        "postgres-rls-backbone#all",
+        "api-latency-582-to-40#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-014",
+      "lang": "he",
+      "category": "single_hop",
+      "query": "where are images stored before being processed by the weed detection model in Sarah Halevy's portfolio",
+      "retrieved": [
+        "clip-embeddings-kafka#all",
+        "faq#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "plant-health-classification#all",
+        "governance-center-pwa#all",
+        "ainsof-capital#all",
+        "skills#docker",
+        "skills#clip",
+        "git-mcp-server#all"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306
+    },
+    {
+      "id": "d1-015",
+      "lang": "he",
+      "category": "single_hop",
+      "query": "Sarah Halevy plant identification model cloud provider",
+      "retrieved": [
+        "faq#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "ainsof-capital#all",
+        "plant-health-classification#all",
+        "claims-trust-model#all",
+        "human-gated-translation#all",
+        "skills#docker",
+        "profile#all",
+        "vast-data-bootcamp#all"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163
+    },
+    {
+      "id": "d1-017",
+      "lang": "he",
+      "category": "single_hop",
+      "query": "Sarah Halevy website continued operation after data capture ends",
+      "retrieved": [
+        "faq#all",
+        "api-latency-582-to-40#all",
+        "ainsof-capital#all",
+        "human-gated-translation#all",
+        "governance-center-pwa#all",
+        "vast-data-bootcamp#all",
+        "postgres-rls-backbone#all",
+        "claims-trust-model#all",
+        "skills#docker",
+        "weed-detection-pipeline#all"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163
+    },
+    {
+      "id": "d1-018",
+      "lang": "he",
+      "category": "single_hop",
+      "query": "duplicate request handling idempotent API Sarah Halevy",
+      "retrieved": [
+        "faq#all",
+        "ainsof-capital#all",
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all",
+        "vast-data-bootcamp#all",
+        "clip-embeddings-kafka#all",
+        "postgres-rls-backbone#all",
+        "skills#fastapi",
+        "git-mcp-server#all",
+        "claims-trust-model#all"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 1.0,
+      "mrr": 0.14285714285714285,
+      "ndcg@5": 0.0
+    },
+    {
+      "id": "d1-019",
+      "lang": "he",
+      "category": "single_hop",
+      "query": "Sarah Halevy model used to represent images as numbers",
+      "retrieved": [
+        "faq#all",
+        "skills#clip",
+        "vast-data-bootcamp#all",
+        "clip-embeddings-kafka#all",
+        "skills#fastapi",
+        "skills#docker",
+        "skills#kafka",
+        "weed-detection-pipeline#all",
+        "skills#python",
+        "skills#react"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306
+    },
+    {
+      "id": "d1-021",
+      "lang": "en",
+      "category": "multi_hop",
+      "query": "Sarah Halevy project sign off required before changes take effect",
+      "retrieved": [
+        "faq#all",
+        "governance-center-pwa#all",
+        "ainsof-capital#all",
+        "skills#fastapi",
+        "human-gated-translation#all",
+        "skills#clip",
+        "profile#all",
+        "skills#docker",
+        "preferences#all",
+        "git-mcp-server#all"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.3333333333333333,
+      "recall@10": 0.6666666666666666,
+      "mrr": 0.2,
+      "ndcg@5": 0.18154179253735267
+    },
+    {
+      "id": "d1-023",
+      "lang": "en",
+      "category": "multi_hop",
+      "query": "Sarah Halevy containerization deployment platform and cloud GPU rental provider",
+      "retrieved": [
+        "faq#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "skills#docker",
+        "plant-health-classification#all",
+        "ainsof-capital#all",
+        "human-gated-translation#all",
+        "governance-center-pwa#all",
+        "skills#fastapi",
+        "clip-embeddings-kafka#all"
+      ],
+      "recall@3": 0.5,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5437713091520254
+    },
+    {
+      "id": "d1-024",
+      "lang": "en",
+      "category": "multi_hop",
+      "query": "Sarah Halevy system history of who did what tracking audit log",
+      "retrieved": [
+        "faq#all",
+        "skills#fastapi",
+        "skills#docker",
+        "skills#github-actions",
+        "governance-center-pwa#all",
+        "postgres-rls-backbone#all",
+        "git-mcp-server#all",
+        "skills#kafka",
+        "api-latency-582-to-40#all",
+        "skills#react"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.6666666666666666,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0
+    },
+    {
+      "id": "d1-025",
+      "lang": "en",
+      "category": "multi_hop",
+      "query": "Sarah Halevy strategies for managing heavy computation in machine learning projects",
+      "retrieved": [
+        "faq#all",
+        "ainsof-capital#all",
+        "weed-detection-pipeline#all",
+        "human-gated-translation#all",
+        "skills#docker",
+        "skills#fastapi",
+        "vast-data-bootcamp#all",
+        "clip-embeddings-kafka#all",
+        "profile#all",
+        "skills#clip"
+      ],
+      "recall@3": 0.5,
+      "recall@5": 0.5,
+      "recall@10": 1.0,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.3065735963827292
+    },
+    {
+      "id": "d1-027",
+      "lang": "he",
+      "category": "multi_hop",
+      "query": "Sarah Halevy projects involving Claude AI model",
+      "retrieved": [
+        "skills#claude-api",
+        "ainsof-capital#all",
+        "faq#all",
+        "profile#all",
+        "human-gated-translation#all",
+        "skills#clip",
+        "skills#fastapi",
+        "skills#docker",
+        "skills#python",
+        "skills#react"
+      ],
+      "recall@3": 0.5,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5437713091520254
+    },
+    {
+      "id": "d1-028",
+      "lang": "he",
+      "category": "multi_hop",
+      "query": "In Sarah Halevy's portfolio, list her personal contributions and the contributions made by collaborators for each project.",
+      "retrieved": [
+        "faq#all",
+        "profile#all",
+        "skills#clip",
+        "skills#kafka",
+        "skills#docker",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "postgres-rls-backbone#all",
+        "api-latency-582-to-40#all",
+        "clip-embeddings-kafka#all"
+      ],
+      "recall@3": 0.3333333333333333,
+      "recall@5": 0.3333333333333333,
+      "recall@10": 0.6666666666666666,
+      "mrr": 1.0,
+      "ndcg@5": 0.46927872602275644
+    },
+    {
+      "id": "d1-030",
+      "lang": "he",
+      "category": "multi_hop",
+      "query": "Sarah Halevy PostgreSQL usage in work and specialization",
+      "retrieved": [
+        "faq#all",
+        "profile#all",
+        "skills#postgresql",
+        "ainsof-capital#all",
+        "postgres-rls-backbone#all",
+        "vast-data-bootcamp#all",
+        "skills#docker",
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "skills#sql-server"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.3333333333333333,
+      "recall@10": 1.0,
+      "mrr": 0.2,
+      "ndcg@5": 0.18154179253735267
+    },
+    {
+      "id": "d1-031",
+      "lang": "he",
+      "category": "multi_hop",
+      "query": "Sarah Halevy protection mechanisms against malicious user actions and AI agents in her systems",
+      "retrieved": [
+        "faq#all",
+        "git-mcp-server#all",
+        "ainsof-capital#all",
+        "profile#all",
+        "vast-data-bootcamp#all",
+        "claims-trust-model#all",
+        "clip-embeddings-kafka#all",
+        "governance-center-pwa#all",
+        "skills#docker",
+        "human-gated-translation#all"
+      ],
+      "recall@3": 0.5,
+      "recall@5": 0.5,
+      "recall@10": 0.5,
+      "mrr": 0.5,
+      "ndcg@5": 0.38685280723454163
+    },
+    {
+      "id": "d1-032",
+      "lang": "he",
+      "category": "multi_hop",
+      "query": "What connects the claim model with automatic translation in Sarah Halevy's work",
+      "retrieved": [
+        "human-gated-translation#all",
+        "ainsof-capital#all",
+        "faq#all",
+        "claims-trust-model#all",
+        "profile#all",
+        "clip-embeddings-kafka#all",
+        "governance-center-pwa#all",
+        "skills#clip",
+        "weed-detection-pipeline#all",
+        "skills#kafka"
+      ],
+      "recall@3": 0.5,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 0.8772153153380493
+    },
+    {
+      "id": "d1-033",
+      "lang": "en",
+      "category": "comparative",
+      "query": "What is the most ambitious project Sarah Halevy has shipped in her portfolio?",
+      "retrieved": [
+        "faq#all",
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "skills#fastapi",
+        "skills#clip",
+        "skills#kafka",
+        "profile#all",
+        "skills#docker",
+        "human-gated-translation#all",
+        "clip-embeddings-kafka#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.7737056144690833
+    },
+    {
+      "id": "d1-035",
+      "lang": "en",
+      "category": "comparative",
+      "query": "Sarah Halevy backend versus frontend specialization",
+      "retrieved": [
+        "faq#all",
+        "preferences#all",
+        "profile#all",
+        "ainsof-capital#all",
+        "vast-data-bootcamp#all",
+        "api-latency-582-to-40#all",
+        "human-gated-translation#all",
+        "plant-health-classification#all",
+        "skills#fastapi",
+        "governance-center-pwa#all"
+      ],
+      "recall@3": 0.6666666666666666,
+      "recall@5": 0.6666666666666666,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.5307212739772434
+    },
+    {
+      "id": "d1-036",
+      "lang": "he",
+      "category": "comparative",
+      "query": "Sarah Halevy computer vision projects details",
+      "retrieved": [
+        "faq#all",
+        "plant-health-classification#all",
+        "skills#clip",
+        "education#all",
+        "weed-detection-pipeline#all",
+        "skills#docker",
+        "skills#fastapi",
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "clip-embeddings-kafka#all"
+      ],
+      "recall@3": 0.5,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6240505200038379
+    },
+    {
+      "id": "d1-037",
+      "lang": "he",
+      "category": "comparative",
+      "query": "Identify Sarah Halevy's projects that involve AI engineering, machine learning, deep learning, or data science, and determine which is most suitable for an AI Engineer role.",
+      "retrieved": [
+        "ainsof-capital#all",
+        "profile#all",
+        "faq#all",
+        "vast-data-bootcamp#all",
+        "preferences#all",
+        "education#all",
+        "skills#fastapi",
+        "skills#python",
+        "governance-center-pwa#all",
+        "human-gated-translation#all"
+      ],
+      "recall@3": 0.3333333333333333,
+      "recall@5": 0.3333333333333333,
+      "recall@10": 0.6666666666666666,
+      "mrr": 0.5,
+      "ndcg@5": 0.2960819109658652
+    },
+    {
+      "id": "d1-039",
+      "lang": "en",
+      "category": "skill_level",
+      "query": "Sarah Halevy hands-on Kubernetes experience",
+      "retrieved": [
+        "faq#all",
+        "skills#kubernetes",
+        "ainsof-capital#all",
+        "skills#docker",
+        "education#all",
+        "skills#fastapi",
+        "skills#git",
+        "skills#kafka",
+        "api-latency-582-to-40#all",
+        "weed-detection-pipeline#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575
+    },
+    {
+      "id": "d1-040",
+      "lang": "en",
+      "category": "skill_level",
+      "query": "Sarah Halevy Apache Kafka experience",
+      "retrieved": [
+        "faq#all",
+        "skills#kafka",
+        "vast-data-bootcamp#all",
+        "skills#fastapi",
+        "governance-center-pwa#all",
+        "skills#docker",
+        "ainsof-capital#all",
+        "clip-embeddings-kafka#all",
+        "skills#clip",
+        "skills#git"
+      ],
+      "recall@3": 0.5,
+      "recall@5": 0.5,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.38685280723454163
+    },
+    {
+      "id": "d1-042",
+      "lang": "en",
+      "category": "skill_level",
+      "query": "Sarah Halevy FastAPI shipped project",
+      "retrieved": [
+        "faq#all",
+        "skills#fastapi",
+        "plant-health-classification#all",
+        "profile#all",
+        "governance-center-pwa#all",
+        "git-mcp-server#all",
+        "skills#docker",
+        "ainsof-capital#all",
+        "human-gated-translation#all",
+        "skills#clip"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6934264036172708
+    },
+    {
+      "id": "d1-043",
+      "lang": "en",
+      "category": "skill_level",
+      "query": "Sarah Halevy MongoDB experience",
+      "retrieved": [
+        "skills#mongodb",
+        "faq#all",
+        "skills#docker",
+        "ainsof-capital#all",
+        "skills#fastapi",
+        "profile#all",
+        "governance-center-pwa#all",
+        "api-latency-582-to-40#all",
+        "skills#clip",
+        "vast-data-bootcamp#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-044",
+      "lang": "he",
+      "category": "skill_level",
+      "query": "Sarah Halevy C# experience",
+      "retrieved": [
+        "faq#all",
+        "skills#fastapi",
+        "skills#csharp",
+        "skills#cplusplus",
+        "skills#clip",
+        "skills#java",
+        "skills#kafka",
+        "profile#all",
+        "skills#docker",
+        "skills#git"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5
+    },
+    {
+      "id": "d1-045",
+      "lang": "he",
+      "category": "skill_level",
+      "query": "Sarah Halevy Playwright tests",
+      "retrieved": [
+        "skills#playwright",
+        "faq#all",
+        "skills#clip",
+        "governance-center-pwa#all",
+        "skills#kafka",
+        "skills#pytest",
+        "skills#docker",
+        "weed-detection-pipeline#all",
+        "git-mcp-server#all",
+        "skills#pwa"
+      ],
+      "recall@3": 0.5,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 0.8772153153380493
+    },
+    {
+      "id": "d1-047",
+      "lang": "he",
+      "category": "skill_level",
+      "query": "Sarah Halevy Docker experience",
+      "retrieved": [
+        "faq#all",
+        "skills#docker",
+        "vast-data-bootcamp#all",
+        "skills#fastapi",
+        "weed-detection-pipeline#all",
+        "skills#git",
+        "skills#kafka",
+        "skills#clip",
+        "git-mcp-server#all",
+        "claims-trust-model#all"
+      ],
+      "recall@3": 0.5,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6240505200038379
+    },
+    {
+      "id": "d1-048",
+      "lang": "he",
+      "category": "skill_level",
+      "query": "Sarah Halevy SQL Server experience",
+      "retrieved": [
+        "skills#sql-server",
+        "faq#all",
+        "skills#postgresql",
+        "ainsof-capital#all",
+        "skills#docker",
+        "vast-data-bootcamp#all",
+        "skills#fastapi",
+        "profile#all",
+        "skills#mysql",
+        "api-latency-582-to-40#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-049",
+      "lang": "en",
+      "category": "overview_limit",
+      "query": "Sarah Halevy plant health model accuracy",
+      "retrieved": [
+        "weed-detection-pipeline#all",
+        "faq#all",
+        "plant-health-classification#all",
+        "clip-embeddings-kafka#all",
+        "ainsof-capital#all",
+        "human-gated-translation#all",
+        "claims-trust-model#all",
+        "vast-data-bootcamp#all",
+        "education#all",
+        "skills#fastapi"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5
+    },
+    {
+      "id": "d1-051",
+      "lang": "he",
+      "category": "overview_limit",
+      "query": "What dataset was used to train Sarah Halevy's plant identification model?",
+      "retrieved": [
+        "faq#all",
+        "weed-detection-pipeline#all",
+        "plant-health-classification#all",
+        "vast-data-bootcamp#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "skills#python",
+        "human-gated-translation#all",
+        "clip-embeddings-kafka#all",
+        "skills#kubernetes"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5
+    },
+    {
+      "id": "d1-052",
+      "lang": "he",
+      "category": "overview_limit",
+      "query": "משך זמן של תחזית אחת במערכת זיהוי הצמחים של שרה הלוי",
+      "retrieved": [
+        "weed-detection-pipeline#all",
+        "faq#all",
+        "plant-health-classification#all",
+        "clip-embeddings-kafka#all",
+        "api-latency-582-to-40#all",
+        "vast-data-bootcamp#all",
+        "claims-trust-model#all",
+        "education#all",
+        "git-mcp-server#all",
+        "ainsof-capital#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5
+    },
+    {
+      "id": "d1-053",
+      "lang": "he",
+      "category": "overview_limit",
+      "query": "What plant diseases can the Sarah Halevy disease detection system recognize?",
+      "retrieved": [
+        "faq#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "claims-trust-model#all",
+        "plant-health-classification#all",
+        "ainsof-capital#all",
+        "skills#docker",
+        "git-mcp-server#all",
+        "governance-center-pwa#all"
+      ],
+      "recall@3": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 1.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0
+    },
+    {
+      "id": "d1-071",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "Sarah Halevy segmentation model weed detection why abandoned",
+      "retrieved": [
+        "faq#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "api-latency-582-to-40#all",
+        "human-gated-translation#all",
+        "plant-health-classification#all",
+        "skills#docker",
+        "governance-center-pwa#all",
+        "skills#fastapi"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575
+    },
+    {
+      "id": "d1-072",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "Sarah Halevy Git server main challenge",
+      "retrieved": [
+        "git-mcp-server#all",
+        "faq#all",
+        "governance-center-pwa#all",
+        "skills#git",
+        "human-gated-translation#all",
+        "skills#github-actions",
+        "weed-detection-pipeline#all",
+        "skills#docker",
+        "clip-embeddings-kafka#all",
+        "ainsof-capital#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-074",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "Why does Sarah store each fact separately for each source?",
+      "retrieved": [
+        "claims-trust-model#all",
+        "faq#all",
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "ainsof-capital#all",
+        "human-gated-translation#all",
+        "skills#docker",
+        "api-latency-582-to-40#all",
+        "skills#fastapi",
+        "postgres-rls-backbone#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-075",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "Sarah Halevy how she prevented two editors from overwriting each other's changes in a collaborative editing system",
+      "retrieved": [
+        "faq#all",
+        "claims-trust-model#all",
+        "postgres-rls-backbone#all",
+        "ainsof-capital#all",
+        "human-gated-translation#all",
+        "clip-embeddings-kafka#all",
+        "governance-center-pwa#all",
+        "api-latency-582-to-40#all",
+        "git-mcp-server#all",
+        "profile#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5
+    },
+    {
+      "id": "d1-077",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "Explain how maps continue to work without an internet connection in Sarah Halevy's mapping projects.",
+      "retrieved": [
+        "faq#all",
+        "governance-center-pwa#all",
+        "human-gated-translation#all",
+        "skills#docker",
+        "api-latency-582-to-40#all",
+        "skills#fastapi",
+        "skills#kafka",
+        "skills#clip",
+        "ainsof-capital#all",
+        "claims-trust-model#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575
+    },
+    {
+      "id": "d1-078",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "Why does the similar image search not run on every uploaded image in Sarah Halevy's portfolio?",
+      "retrieved": [
+        "clip-embeddings-kafka#all",
+        "faq#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "governance-center-pwa#all",
+        "git-mcp-server#all",
+        "claims-trust-model#all",
+        "ainsof-capital#all",
+        "api-latency-582-to-40#all",
+        "plant-health-classification#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@5": 1.0
+    },
+    {
+      "id": "d1-079",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "final deliverables of the translation project by Sarah Halevy",
+      "retrieved": [
+        "faq#all",
+        "human-gated-translation#all",
+        "ainsof-capital#all",
+        "profile#all",
+        "governance-center-pwa#all",
+        "skills#fastapi",
+        "claims-trust-model#all",
+        "weed-detection-pipeline#all",
+        "skills#kafka",
+        "vast-data-bootcamp#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575
+    },
+    {
+      "id": "d1-081",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "automated tests running on admin center and website Sarah Halevy",
+      "retrieved": [
+        "faq#all",
+        "governance-center-pwa#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "human-gated-translation#all",
+        "profile#all",
+        "git-mcp-server#all",
+        "clip-embeddings-kafka#all",
+        "postgres-rls-backbone#all",
+        "skills#docker"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575
+    },
+    {
+      "id": "d1-082",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "Sarah Halevy role in plant identification project responsibilities contributions",
+      "retrieved": [
+        "faq#all",
+        "plant-health-classification#all",
+        "weed-detection-pipeline#all",
+        "skills#clip",
+        "skills#fastapi",
+        "skills#docker",
+        "skills#kafka",
+        "ainsof-capital#all",
+        "skills#pwa",
+        "skills#git"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575
+    },
+    {
+      "id": "d1-083",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "Why Sarah Halevy blocked direct access to the database",
+      "retrieved": [
+        "faq#all",
+        "claims-trust-model#all",
+        "postgres-rls-backbone#all",
+        "api-latency-582-to-40#all",
+        "ainsof-capital#all",
+        "skills#docker",
+        "governance-center-pwa#all",
+        "skills#fastapi",
+        "human-gated-translation#all",
+        "profile#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5
+    },
+    {
+      "id": "d1-085",
+      "lang": "he",
+      "category": "cross_lingual",
+      "query": "data governance platform built by Sarah Halevy",
+      "retrieved": [
+        "faq#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all",
+        "human-gated-translation#all",
+        "profile#all",
+        "postgres-rls-backbone#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all"
+      ],
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5
+    }
+  ],
+  "retriever": "R3-multilingual-e5-small"
+}
