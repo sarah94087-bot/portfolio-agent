@@ -52,7 +52,7 @@ skills:
     evidence: [governance-center-pwa]
   - name: Python
     level: used
-    evidence: [weed-detection-pipeline, clip-embeddings-kafka, git-mcp-server]
+    evidence: [weed-detection-pipeline, clip-embeddings-kafka, git-mcp-server, plant-health-classification]
   - name: PyTorch
     level: used
     evidence: [weed-detection-pipeline]
@@ -67,7 +67,7 @@ skills:
     evidence: [weed-detection-pipeline]
   - name: CLIP
     level: used
-    evidence: [clip-embeddings-kafka]
+    evidence: [clip-embeddings-kafka, plant-health-classification]
   - name: ViT-mini
     level: used
     evidence: [clip-embeddings-kafka]
@@ -86,6 +86,15 @@ skills:
   - name: Git
     level: used
     evidence: [git-mcp-server]
+  - name: YOLO
+    level: used
+    evidence: [plant-health-classification]
+  - name: FastAPI
+    level: used
+    evidence: [plant-health-classification]
+  - name: AWS EC2
+    level: used
+    evidence: [plant-health-classification]
   - name: "Java"
     level: studied
     evidence: [education]
