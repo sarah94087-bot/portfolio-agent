@@ -1,0 +1,158 @@
+# D3 Job match (docs/03-evaluation-methodology.md, section 2): job descriptions split into the
+# requirements each one states, with Sarah's label per requirement: strong / partial / none.
+# kind (must / nice) follows the ad: a stated requirement is must, "an advantage" is nice.
+#
+# Sources: d3-01 to d3-05 are rewritten from public ads Sarah collected on 2026-11-04. The
+# wording is ours and the employers are not named; the requirements keep the ads' meaning.
+#
+# Labels: drafted by Claude from the records in portfolio/, then approved by Sarah as they are
+# (2026-11-04). Agreement with the agent (kappa) is therefore agreement with a reviewed draft,
+# not with labels Sarah wrote blind; the report says so when it gives kappa.
+#
+# depends_on: [this-agent] marks labels that rest on this agent's own record, which is written
+# at the end of M2. Without it those labels drop to partial (2.4 to none).
+#
+# Still to add: 6 to 11 jobs, including low-match and unrelated roles, and 3 with indirect
+# injection (synthetic, shared with D2).
+
+- id: d3-01
+  title: "AI Engineer for engineering teams (part time)"
+  lang: he
+  source: rewritten
+  description: |
+    חברה שמתכננת ומקימה פרויקטים לתעשיות הפארמה, הביוטכנולוגיה והתעשייה המתקדמת מתחילה להכניס
+    AI לעבודה ההנדסית עצמה. המשרה בהיקף של שלושה ימים בשבוע, עם אפשרות להרחבה, במשרד במרכז.
+
+    בתפקיד: זיהוי והטמעה של פתרונות AI יחד עם צוותי ההנדסה וניהול הפרויקטים. פיתוח כלים לתכנון,
+    לניתוח מפרטים, להשוואת חלופות ולבחירת ציוד. בניית סוכנים שמנגישים ידע מפרויקטים קודמים.
+    ניתוח מכרזים, כתבי כמויות והצעות ספקים. חיבור הכלים למערכות החברה, הדרכת הצוותים, והפיכת
+    פיילוטים לפתרונות עם תועלת מדידה.
+
+    דרישות: ניסיון מוכח בפתרונות AI ואוטומציה שהגיעו למשתמשים, עם דוגמאות עובדות. פיתוח ב-Python
+    או TypeScript, APIs, נתונים ואינטגרציות. מודלי שפה, אחזור מידע ממסמכים וסוכנים שמשתמשים
+    בכלים. הבנה הנדסית או עבודה צמודה עם צוותים טכניים. הגדרת בדיקות דיוק ואמינות, שמירה על מידע
+    רגיש ושילוב אישור מקצועי בתהליך. עצמאות ויכולת להוביל תחום חדש. עברית ואנגלית ברמה מקצועית.
+
+    יתרון: תכנון מערכות, ניסיון בחברות הנדסה או בפרויקטים תעשייתיים, CAD/BIM, ERP וניהול פרויקטים.
+  requirements:
+    - { id: "1.1", kind: must, label: strong, text: "ניסיון מוכח בפתרונות AI ואוטומציה שהוטמעו אצל משתמשים", evidence: [human-gated-translation, ainsof-capital] }
+    - { id: "1.2", kind: must, label: strong, text: "Python או TypeScript, APIs, נתונים ואינטגרציות", evidence: [ainsof-capital, vast-data-bootcamp, git-mcp-server] }
+    - { id: "1.3", kind: must, label: strong, text: "מודלי שפה, אחזור מידע ממסמכים, סוכנים שמשתמשים בכלים", evidence: [human-gated-translation, git-mcp-server], depends_on: [this-agent] }
+    - { id: "1.4", kind: must, label: partial, text: "הבנה הנדסית או עבודה צמודה עם צוותים טכניים", evidence: [ainsof-capital, vast-data-bootcamp] }
+    - { id: "1.5", kind: must, label: strong, text: "בדיקות דיוק ואמינות, שמירה על מידע רגיש, אישור אנושי בתהליך", evidence: [human-gated-translation, git-mcp-server, postgres-rls-backbone, claims-trust-model] }
+    - { id: "1.6", kind: must, label: strong, text: "עצמאות והובלת תחום חדש", evidence: [ainsof-capital] }
+    - { id: "1.7", kind: must, label: strong, text: "עברית ואנגלית ברמה מקצועית", evidence: [governance-center-pwa] }
+    - { id: "1.8", kind: nice, label: none, text: "תכנון מערכות, חברות הנדסה או פרויקטים תעשייתיים" }
+    - { id: "1.9", kind: nice, label: none, text: "CAD/BIM" }
+    - { id: "1.10", kind: nice, label: none, text: "מערכות ERP וניהול פרויקטים" }
+
+- id: d3-02
+  title: "AI Engineer, LLM and RAG"
+  lang: en
+  source: rewritten
+  description: |
+    An AI Engineer role in central Israel, building AI agents and the systems around them.
+
+    The work: writing and tuning prompts and system instructions, and managing context, memory and
+    conversation flow for agents. Designing and improving RAG end to end: chunking, embeddings,
+    vector databases and retrieval. Analyzing model answers and finding the root cause in the
+    prompt, the context, the retrieval or the agent's architecture. Building backend services
+    and APIs in Python, internal UIs and evaluation tools. Taking proofs of concept and complex
+    integrations to production with technical and business stakeholders.
+
+    Requirements: hands-on prompt engineering, LLMs, and RAG with a vector database. Full-stack
+    development with an emphasis on Python, REST APIs and databases. Defining evaluation methods
+    and measuring the quality of model outputs. Delivering a complete AI solution: model, backend
+    and UI. Analytical thinking and turning business needs into AI solutions. Communication and
+    teamwork.
+
+    A strong advantage: TypeScript or JavaScript with React, and Git, Docker and CI/CD.
+  requirements:
+    - { id: "2.1", kind: must, label: strong, text: "Prompt engineering and working with LLMs", evidence: [human-gated-translation], depends_on: [this-agent] }
+    - { id: "2.2", kind: must, label: strong, text: "RAG and vector database solutions", evidence: [clip-embeddings-kafka], depends_on: [this-agent] }
+    - { id: "2.3", kind: must, label: strong, text: "Full-stack development with Python, REST APIs and databases", evidence: [ainsof-capital, postgres-rls-backbone, api-latency-582-to-40] }
+    - { id: "2.4", kind: must, label: strong, text: "Defining evaluation methods and measuring model output quality", depends_on: [this-agent] }
+    - { id: "2.5", kind: must, label: strong, text: "A complete end-to-end AI solution: model, backend and UI", evidence: [ainsof-capital, human-gated-translation, governance-center-pwa] }
+    - { id: "2.6", kind: must, label: partial, text: "Analytical thinking and translating business needs into AI solutions", evidence: [claims-trust-model] }
+    - { id: "2.7", kind: must, label: partial, text: "Communication and teamwork", evidence: [vast-data-bootcamp] }
+    - { id: "2.8", kind: nice, label: strong, text: "TypeScript or JavaScript, React", evidence: [governance-center-pwa] }
+    - { id: "2.9", kind: nice, label: strong, text: "Git, Docker and CI/CD", evidence: [git-mcp-server, weed-detection-pipeline, human-gated-translation] }
+
+- id: d3-03
+  title: "Machine Learning Engineer at a large consumer tech company"
+  lang: en
+  source: rewritten
+  description: |
+    A Machine Learning Engineer at a large company whose products reach billions of users, on
+    mobile and web.
+
+    The work: building product features with product, design and infrastructure teams; reviewing
+    code for quality and performance; setting technical direction, leading large initiatives and
+    mentoring; designing scalable systems, fixing performance problems and reducing technical
+    debt; owning components end to end.
+
+    Minimum: using data and analysis to explain technical problems; a degree in computer science
+    or a related field, or equivalent practical experience; leading change and complex technical
+    projects; programming experience.
+
+    Preferred: information retrieval (indexing, querying, ranking); NLP techniques such as
+    preprocessing, tokenization and sentiment analysis; a master's degree or PhD; data
+    structures and algorithms, including graphs and optimization; TensorFlow, PyTorch or
+    scikit-learn; using AI tools to redesign workflows with measurable impact; responsible AI
+    practice, such as risk assessment and bias mitigation; keeping up with AI, such as context
+    engineering and agent orchestration.
+  requirements:
+    - { id: "3.1", kind: must, label: strong, text: "Using data and analysis to explain technical problems", evidence: [api-latency-582-to-40] }
+    - { id: "3.2", kind: must, label: partial, text: "A degree in computer science or equivalent practical experience", evidence: [education] }
+    - { id: "3.3", kind: must, label: partial, text: "Leading change and complex technical projects", evidence: [ainsof-capital] }
+    - { id: "3.4", kind: must, label: strong, text: "Programming experience", evidence: [ainsof-capital, git-mcp-server] }
+    - { id: "3.5", kind: nice, label: strong, text: "Information retrieval: indexing, querying, ranking", evidence: [clip-embeddings-kafka], depends_on: [this-agent] }
+    - { id: "3.6", kind: nice, label: partial, text: "NLP: preprocessing, tokenization, sentiment analysis", depends_on: [this-agent] }
+    - { id: "3.7", kind: nice, label: none, text: "A master's degree or PhD" }
+    - { id: "3.8", kind: nice, label: partial, text: "Data structures and algorithms, graphs and optimization", evidence: [education] }
+    - { id: "3.9", kind: nice, label: strong, text: "TensorFlow, PyTorch or scikit-learn", evidence: [weed-detection-pipeline] }
+    - { id: "3.10", kind: nice, label: partial, text: "Using AI tools to redesign workflows with measurable impact", evidence: [human-gated-translation] }
+    - { id: "3.11", kind: nice, label: partial, text: "Responsible AI: risk assessment, bias mitigation, quality reviews", evidence: [human-gated-translation, claims-trust-model] }
+    - { id: "3.12", kind: nice, label: strong, text: "Keeping up with AI: context engineering, agent orchestration", evidence: [git-mcp-server], depends_on: [this-agent] }
+
+- id: d3-04
+  title: "AI Agent Engineer on the Microsoft stack"
+  lang: he
+  source: rewritten
+  description: |
+    חברת שירותי טכנולוגיה מחפשת AI Agent Engineer למשרה מלאה במרכז. התפקיד: פיתוח, הקמה והטמעה של
+    סוכני AI ארגוניים ופתרונות Generative AI, אפיון צרכים עסקיים, תכנון ארכיטקטורה ופיתוח.
+
+    דרישות חובה: השכלה רלוונטית. פתרונות AI או סוכנים שעלו ל-production. ניסיון מעשי עם Copilot
+    Studio, Azure AI Foundry ו-Power Platform. היכרות מעמיקה עם Microsoft 365 ו-Azure. עבודה עם
+    MCP ואינטגרציה דרך REST APIs. הבנה מעמיקה של RAG, Prompt Engineering ו-Agentic AI.
+  requirements:
+    - { id: "4.1", kind: must, label: strong, text: "השכלה רלוונטית", evidence: [education] }
+    - { id: "4.2", kind: must, label: strong, text: "פתרונות AI או סוכנים שעלו ל-production", evidence: [human-gated-translation] }
+    - { id: "4.3", kind: must, label: none, text: "Copilot Studio, Azure AI Foundry ו-Power Platform" }
+    - { id: "4.4", kind: must, label: none, text: "היכרות מעמיקה עם Microsoft 365 ו-Azure" }
+    - { id: "4.5", kind: must, label: strong, text: "MCP ואינטגרציה דרך REST APIs", evidence: [git-mcp-server, ainsof-capital] }
+    - { id: "4.6", kind: must, label: strong, text: "RAG, Prompt Engineering ו-Agentic AI", evidence: [git-mcp-server], depends_on: [this-agent] }
+
+- id: d3-05
+  title: "QA Automation Tech Lead in the defense sector"
+  lang: he
+  source: rewritten
+  # The ad Sarah pasted ends mid-sentence after "Web Scraping"; 5.6 keeps what is there.
+  # Willingness to pass a security clearance is a condition, not a skill, so it is not a requirement.
+  description: |
+    חברת שירותי טכנולוגיה מחפשת, לפעילות שלה במגזר הביטחוני, QA Automation Tech Lead למשרה מלאה
+    במרכז. התפקיד: להקים ולהוביל את מערך האוטומציה והאיכות בצוות שמפתח אפליקציות Web. תכנון
+    ובניית התשתיות, בדיקות E2E ב-Playwright, אוטומציה לרכיבי Backend ותקשורת, עבודה בסביבות רשת
+    וענן מורכבות, וחיבור מלא של התהליכים ל-CI/CD. נדרשת נכונות לעבור סיווג ביטחוני.
+
+    דרישות חובה: תואר ראשון במדעי המחשב או הכשרה ביחידה צבאית רלוונטית. 4 שנות ניסיון ומעלה בפיתוח
+    אוטומציה. ניסיון מעשי מוכח ב-Playwright. הבנה עמוקה בארכיטקטורת רשתות, בבדיקות Backend
+    וב-SSH Tunnels. ניסיון בסביבות ענן: VPS, CDN ו-DNS. ניסיון ב-CI/CD או ב-Web Scraping.
+  requirements:
+    - { id: "5.1", kind: must, label: partial, text: "תואר ראשון במדעי המחשב או הכשרה צבאית רלוונטית", evidence: [education] }
+    - { id: "5.2", kind: must, label: none, text: "4 שנות ניסיון ומעלה בפיתוח אוטומציה" }
+    - { id: "5.3", kind: must, label: strong, text: "ניסיון מעשי מוכח ב-Playwright", evidence: [governance-center-pwa] }
+    - { id: "5.4", kind: must, label: partial, text: "ארכיטקטורת רשתות, בדיקות Backend ו-SSH Tunnels", evidence: [git-mcp-server] }
+    - { id: "5.5", kind: must, label: partial, text: "סביבות ענן: VPS, CDN ו-DNS", evidence: [plant-health-classification, governance-center-pwa] }
+    - { id: "5.6", kind: must, label: strong, text: "CI/CD או Web Scraping", evidence: [human-gated-translation, git-mcp-server] }
