@@ -1,0 +1,256 @@
+# D4 Conversations (docs/03-evaluation-methodology.md, section 2): 12 conversations of 3 to 6
+# turns. Written by Claude, approved by Sarah on 2026-11-04. evals/conversations/dataset.py
+# says what each field means.
+#
+# Contact (US-7.1): offered on a sign of interest (a high match, an explicit request, a question
+# on availability), not after a plain factual question, not on a low match, and not twice in a
+# row. A draft (request_contact) only after the visitor agreed; sending is never done in chat.
+
+- id: d4-01
+  title: "Translation pipeline, then contact"
+  tests: [follow_up, contact]
+  turns:
+    - user: "Tell me about her translation pipeline."
+      lang: en
+      gold_chunks: [human-gated-translation#problem, human-gated-translation#architecture]
+      contact: none
+      expect: "Describes the pipeline: the Claude API, a schedule every 6 hours, and a human approval gate."
+    - user: "What was the hardest part there?"
+      lang: en
+      gold_chunks: [human-gated-translation#why-hard]
+      contact: none
+      expect: "Reads 'there' as the translation pipeline: running machine translation without a model output ever overwriting a person's edit."
+    - user: "And what happens if an editor already fixed a translation?"
+      lang: en
+      gold_chunks: [human-gated-translation#architecture, human-gated-translation#decisions]
+      expect: "Once a person touched a field, the machine never overwrites it; the overlay marks it human."
+    - user: "Ok, how can I get in touch with her?"
+      lang: en
+      gold_chunks: [faq#how-can-i-contact-her]
+      contact: offer
+      expect: "Offers to leave Sarah a message through the site, or to download the CV; gives no phone or email in the chat."
+
+- id: d4-02
+  title: "API latency, Hebrew to English"
+  tests: [follow_up, language_switch]
+  turns:
+    - user: "ספרי לי על השיפור בזמני התגובה של ה-API."
+      lang: he
+      gold_chunks: [api-latency-582-to-40#problem, api-latency-582-to-40#results]
+      expect: "בעברית: מ-582ms ל-40ms לבקשה, עם ציטוט."
+    - user: "מה גרם לאיטיות מלכתחילה?"
+      lang: he
+      gold_chunks: [api-latency-582-to-40#why-hard]
+      expect: "בעברית: המרחק בין ה-API למסד, שאילתות N+1, ושליפות שרצו אחת אחרי השנייה."
+    - user: "Can you explain how she fixed it, in English?"
+      lang: en
+      gold_chunks: [api-latency-582-to-40#architecture, api-latency-582-to-40#decisions]
+      expect: "Switches to English and explains the fix of the same project."
+    - user: "Did anything break along the way?"
+      lang: en
+      gold_chunks: [api-latency-582-to-40#what-broke]
+      expect: "Stays in English and on the latency project."
+
+- id: d4-03
+  title: "VAST Data, English to Hebrew"
+  tests: [follow_up, language_switch]
+  turns:
+    - user: "What did she do at VAST Data?"
+      lang: en
+      gold_chunks: [vast-data-bootcamp#context, vast-data-bootcamp#role]
+      expect: "A Data / ML bootcamp in 2025; she built weed detection and image embeddings on her own."
+    - user: "Why didn't she use UNet for the weeds?"
+      lang: en
+      gold_chunks: [weed-detection-pipeline#decisions]
+      expect: "No local GPU: UNet was too slow to train and heavy to run; MobileNetV3 runs on CPU."
+    - user: "תסבירי את זה שוב בעברית, בבקשה."
+      lang: he
+      gold_chunks: [weed-detection-pipeline#decisions]
+      expect: "אותו הסבר בעברית; מונחים טכניים נשארים באנגלית."
+    - user: "ומה היה הפרויקט השני שלה שם?"
+      lang: he
+      gold_chunks: [clip-embeddings-kafka#problem, vast-data-bootcamp#projects]
+      expect: "מבין ש'שם' הוא VAST Data, ומתאר את מערכת ה-embeddings עם CLIP, Kafka ו-pgvector."
+
+- id: d4-04
+  title: "MCP server, then a high job match, then a message"
+  tests: [follow_up, project_to_job, contact]
+  turns:
+    - user: "Has she built anything with MCP?"
+      lang: en
+      gold_chunks: [git-mcp-server#problem]
+      contact: none
+      expect: "Describes grounded-git-mcp, a personal project, with a citation."
+    - user: "How does it stop an agent from running something dangerous?"
+      lang: en
+      gold_chunks: [git-mcp-server#architecture]
+      expect: "Risk classes, no shell, one-time tokens bound to the repository state, and the I CONFIRM phrase."
+    - job: d3-02
+      lang: en
+      tools: [match_job]
+      contact: offer
+      expect: "A job-match report with a high overall match, and an offer to leave Sarah a message."
+    - user: "Yes, I'd like to leave her a message."
+      lang: en
+      tools: [request_contact]
+      expect: "Drafts a message that sums up the conversation, for the visitor to edit and confirm; nothing is sent from the chat."
+      must_not: ["the message was sent"]
+
+- id: d4-05
+  title: "A low match, without pushing contact"
+  tests: [project_to_job, contact]
+  turns:
+    - user: "יש לה ניסיון בפיתוח אפליקציות iOS?"
+      lang: he
+      contact: none
+      expect: "אומרת שאין בתיק מידע על iOS, בלי להמציא."
+      must_not: ["שרה פיתחה אפליקציות iOS"]
+    - job: d3-07
+      lang: he
+      tools: [match_job]
+      contact: none
+      expect: "דוח עם התאמה נמוכה והפערים בראש; לא דוחפת להשאיר הודעה."
+    - user: "אז במה היא כן חזקה?"
+      lang: he
+      gold_chunks: [profile#context]
+      contact: none
+      expect: "מסכמת את החוזקות שבתיק: backend, PostgreSQL ו-AI, עם ציטוטים."
+
+- id: d4-06
+  title: "Current work, then availability"
+  tests: [follow_up, contact]
+  turns:
+    - user: "What is she working on these days?"
+      lang: en
+      gold_chunks: [ainsof-capital#context]
+      contact: none
+      expect: "Her AI Engineer role at Ainsof Capital in 2026, the sole engineer of a data-governance platform."
+    - user: "Why is she looking for something new?"
+      lang: en
+      gold_chunks: [faq#why-is-she-looking-for-a-new-role]
+      expect: "Says this is not discussed here and refers to Sarah; does not guess."
+    - user: "When could she start, and would she work hybrid?"
+      lang: en
+      gold_chunks: [preferences#context]
+      contact: offer
+      expect: "She can start immediately and is open to remote, hybrid or office work; offers to leave her a message."
+      must_not: ["a specific start date"]
+
+- id: d4-07
+  title: "Database permissions, in Hebrew"
+  tests: [follow_up]
+  turns:
+    - user: "איך היא דאגה להרשאות במסד הנתונים?"
+      lang: he
+      gold_chunks: [postgres-rls-backbone#problem, postgres-rls-backbone#architecture]
+      expect: "Row-Level Security במסד עצמו, ולא רק בקוד האפליקציה."
+    - user: "וכמה policies כאלה היו?"
+      lang: he
+      gold_chunks: [postgres-rls-backbone#results]
+      expect: "31 RLS policies, עם ציטוט."
+    - user: "מה היה הכי קשה בזה?"
+      lang: he
+      gold_chunks: [postgres-rls-backbone#why-hard]
+      expect: "הרשאות במסד, עורכים במקביל שלא דורסים זה את זה, ובקשה חוזרת שלא מתבצעת פעמיים."
+    - user: "ואיך זה מתחבר למודל הטענות שלה?"
+      lang: he
+      gold_chunks: [claims-trust-model#architecture]
+      expect: "מחבר בין שני הפרויקטים: כללי השדות של מודל הטענות נאכפים במסד."
+
+- id: d4-08
+  title: "Salary in the middle, then back to the project"
+  tests: [follow_up, contact]
+  turns:
+    - user: "Tell me about the governance center she built."
+      lang: en
+      gold_chunks: [governance-center-pwa#problem]
+      expect: "The 28-screen governance center and the bilingual offline-first PWA."
+    - user: "How was it tested?"
+      lang: en
+      gold_chunks: [governance-center-pwa#results]
+      expect: "46 test files: Vitest for logic and Playwright for full browser flows."
+    - user: "What salary would she want for a role like ours?"
+      lang: en
+      gold_chunks: [faq#what-salary-does-she-expect]
+      contact: offer
+      expect: "Does not discuss salary, and offers to leave Sarah a message about it."
+    - user: "Fine. Does the PWA work offline?"
+      lang: en
+      gold_chunks: [governance-center-pwa#architecture]
+      contact: none
+      expect: "Back on the project, and does not offer contact again right away."
+
+- id: d4-09
+  title: "Skill levels, then the project behind one"
+  tests: [follow_up]
+  turns:
+    - user: "יש לה ניסיון עם Kubernetes?"
+      lang: he
+      gold_chunks: [skills#kubernetes]
+      expect: "Kubernetes נלמד בלימודים ואין לו פרויקט בתיק; לא מוצג כניסיון בעבודה."
+      must_not: ["ניסיון בעבודה עם Kubernetes"]
+    - user: "ו-Docker?"
+      lang: he
+      gold_chunks: [skills#docker]
+      expect: "Docker שימש בפרויקט, ב-VAST Data."
+    - user: "באיזה פרויקט בדיוק?"
+      lang: he
+      gold_chunks: [weed-detection-pipeline#architecture]
+      expect: "מבין שהשאלה על Docker, ומתאר את שירות זיהוי העשבים שרץ ב-Docker."
+
+- id: d4-10
+  title: "Vectors in two projects, compared"
+  tests: [follow_up]
+  turns:
+    - user: "Which of her projects used pgvector?"
+      lang: en
+      gold_chunks: [skills#pgvector, clip-embeddings-kafka#architecture]
+      expect: "The CLIP embeddings project at VAST Data."
+    - user: "How did the vectors get into it?"
+      lang: en
+      gold_chunks: [clip-embeddings-kafka#architecture]
+      expect: "Published to Kafka, then loaded into pgvector for similarity search."
+    - user: "Compare that with how data flows in her Ainsof platform."
+      lang: en
+      gold_chunks: [claims-trust-model#architecture, postgres-rls-backbone#architecture]
+      expect: "Contrasts the streaming embeddings with claims, trust and human review in PostgreSQL."
+    - user: "Which of the two was harder, and why?"
+      lang: en
+      gold_chunks: [clip-embeddings-kafka#why-hard, claims-trust-model#why-hard]
+      expect: "Compares what made each hard, from the records, without a verdict the records do not support."
+
+- id: d4-11
+  title: "A recruiter asks for contact first"
+  tests: [contact]
+  turns:
+    - user: "אני מגייסת לסטארטאפ. אפשר להשאיר לה הודעה?"
+      lang: he
+      contact: offer
+      expect: "מציעה מיד להשאיר הודעה או להוריד קורות חיים, ושואלת מה לכתוב."
+    - user: "כן. תכתבי שאנחנו מחפשים AI Engineer לצוות קטן."
+      lang: he
+      tools: [request_contact]
+      expect: "מכינה טיוטה לעריכה ולאישור; לא שולחת מהצ'אט."
+      must_not: ["ההודעה נשלחה"]
+    - user: "ותוסיפי שאני רוצה לשמוע על הפרויקט עם Claude."
+      lang: he
+      gold_chunks: [human-gated-translation#problem]
+      expect: "מעדכנת את הטיוטה עם הפרויקט, צנרת התרגום, ועדיין לא שולחת."
+      must_not: ["ההודעה נשלחה"]
+
+- id: d4-12
+  title: "GPU deployment, switching languages twice"
+  tests: [follow_up, language_switch]
+  turns:
+    - user: "Has she deployed a model on a GPU?"
+      lang: en
+      gold_chunks: [plant-health-classification#architecture]
+      expect: "The plant health pipeline, YOLO and CLIP behind FastAPI, on an AWS EC2 GPU instance."
+    - user: "על איזה שרת זה רץ?"
+      lang: he
+      gold_chunks: [plant-health-classification#architecture]
+      expect: "בעברית: AWS EC2 עם GPU, באותו פרויקט."
+    - user: "And what did YOLO do there, versus CLIP?"
+      lang: en
+      gold_chunks: [plant-health-classification#architecture]
+      expect: "Back in English: YOLO detects the plants, CLIP classifies them and their health."
