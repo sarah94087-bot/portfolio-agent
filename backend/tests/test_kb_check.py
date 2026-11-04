@@ -160,3 +160,27 @@ def test_studied_skill_can_cite_education(tmp_path):
           + "  - { name: Java, level: studied, evidence: [education] }\n"
           + "review: { approved: true, approved_on: 2026-11-03 }\n---\n")
     assert check(tmp_path) == {}
+
+
+PREFERENCES = """---
+id: preferences
+type: preferences
+title: { en: "Preferences", he: "העדפות" }
+aliases: ["roles"]
+roles: { primary: ["AI Engineer"], open_to: ["Full-Stack"] }
+work_mode: [remote, {mode}]
+availability: "Immediately"
+answers: ["What roles is she looking for?"]
+review: { approved: true, approved_on: 2026-11-04 }
+---
+
+## Context
+c
+"""
+
+
+def test_preferences_pass_and_reject_unknown_work_mode(tmp_path):
+    write(tmp_path, "preferences.md", PREFERENCES.replace("{mode}", "office"))
+    assert check(tmp_path) == {}
+    write(tmp_path, "preferences.md", PREFERENCES.replace("{mode}", "moon"))
+    assert any("work_mode" in e for e in check(tmp_path)["preferences.md"])

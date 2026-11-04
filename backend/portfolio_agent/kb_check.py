@@ -159,6 +159,35 @@ class Education(Strict):
     review: Review
 
 
+class Profile(Strict):
+    id: Literal["profile"]
+    type: Literal["profile"]
+    title: Title
+    aliases: list[str] = Field(min_length=1)
+    name: Title
+    headline: Text
+    answers: list[str] = Field(min_length=1)
+    review: Review
+
+
+class Roles(Strict):
+    primary: list[str] = Field(min_length=1)
+    open_to: list[str] = []
+
+
+class Preferences(Strict):
+    id: Literal["preferences"]
+    type: Literal["preferences"]
+    title: Title
+    aliases: list[str] = Field(min_length=1)
+    roles: Roles
+    work_mode: list[Literal["remote", "hybrid", "office"]] = Field(min_length=1)
+    locations: list[str] = []
+    availability: Text
+    answers: list[str] = Field(min_length=1)
+    review: Review
+
+
 class Skill(Strict):
     name: Text
     level: Literal["used", "studied", "listed"]
@@ -182,7 +211,14 @@ class Skills(Strict):
     review: Review
 
 
-SCHEMAS = {"project": Project, "experience": Experience, "education": Education, "skills": Skills}
+SCHEMAS = {
+    "project": Project,
+    "experience": Experience,
+    "education": Education,
+    "profile": Profile,
+    "preferences": Preferences,
+    "skills": Skills,
+}
 
 
 def split(text: str) -> tuple[dict, str]:
@@ -246,6 +282,8 @@ def check_file(path: Path) -> tuple[BaseModel | None, list[str]]:
         errors += body_errors(body, SECTIONS, REQUIRED_SECTIONS[record.depth])
     elif isinstance(record, Experience):
         errors += body_errors(body, EXPERIENCE_SECTIONS, set(EXPERIENCE_SECTIONS))
+    elif isinstance(record, Profile | Preferences):
+        errors += body_errors(body, ["Context"], {"Context"})
     return record, errors
 
 
