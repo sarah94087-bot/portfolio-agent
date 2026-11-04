@@ -1,0 +1,171 @@
+{
+  "config": "stage3-C4-R3-multilingual-e5-small-comparisons",
+  "commit": "b034c7c",
+  "date": "2026-11-04",
+  "comparisons": [
+    {
+      "a": "Q0",
+      "b": "Q1",
+      "group": "all",
+      "metric": "recall@5",
+      "mean": -0.009999999999999998,
+      "low": -0.10666666666666666,
+      "high": 0.08666666666666666,
+      "n": 50,
+      "significant": false
+    },
+    {
+      "a": "Q0",
+      "b": "Q1",
+      "group": "he",
+      "metric": "recall@5",
+      "mean": 0.005208333333333336,
+      "low": -0.140625,
+      "high": 0.15104166666666669,
+      "n": 32,
+      "significant": false
+    },
+    {
+      "a": "Q0",
+      "b": "Q1",
+      "group": "en",
+      "metric": "recall@5",
+      "mean": -0.037037037037037035,
+      "low": -0.09259259259259259,
+      "high": 0.0,
+      "n": 18,
+      "significant": false
+    },
+    {
+      "a": "Q0",
+      "b": "Q1",
+      "group": "cross_lingual",
+      "metric": "recall@5",
+      "mean": 0.09090909090909091,
+      "low": 0.0,
+      "high": 0.2727272727272727,
+      "n": 11,
+      "significant": false
+    },
+    {
+      "a": "Q0",
+      "b": "Q2",
+      "group": "all",
+      "metric": "recall@5",
+      "mean": 0.01666666666666666,
+      "low": -0.045555555555555564,
+      "high": 0.08888888888888888,
+      "n": 50,
+      "significant": false
+    },
+    {
+      "a": "Q0",
+      "b": "Q2",
+      "group": "he",
+      "metric": "recall@5",
+      "mean": 0.031249999999999993,
+      "low": -0.06250000000000001,
+      "high": 0.14583333333333331,
+      "n": 32,
+      "significant": false
+    },
+    {
+      "a": "Q0",
+      "b": "Q2",
+      "group": "en",
+      "metric": "recall@5",
+      "mean": -0.009259259259259264,
+      "low": -0.043209876543209874,
+      "high": 0.02160493827160493,
+      "n": 18,
+      "significant": false
+    },
+    {
+      "a": "Q0",
+      "b": "Q2",
+      "group": "cross_lingual",
+      "metric": "recall@5",
+      "mean": 0.09090909090909091,
+      "low": 0.0,
+      "high": 0.2727272727272727,
+      "n": 11,
+      "significant": false
+    },
+    {
+      "a": "Q1",
+      "b": "Q2",
+      "group": "all",
+      "metric": "recall@5",
+      "mean": 0.02666666666666666,
+      "low": -0.028888888888888895,
+      "high": 0.09,
+      "n": 50,
+      "significant": false
+    },
+    {
+      "a": "Q1",
+      "b": "Q2",
+      "group": "he",
+      "metric": "recall@5",
+      "mean": 0.026041666666666664,
+      "low": -0.05208333333333334,
+      "high": 0.11458333333333333,
+      "n": 32,
+      "significant": false
+    },
+    {
+      "a": "Q1",
+      "b": "Q2",
+      "group": "en",
+      "metric": "recall@5",
+      "mean": 0.027777777777777773,
+      "low": -0.02160493827160494,
+      "high": 0.08333333333333331,
+      "n": 18,
+      "significant": false
+    },
+    {
+      "a": "Q1",
+      "b": "Q2",
+      "group": "cross_lingual",
+      "metric": "recall@5",
+      "mean": 0.0,
+      "low": 0.0,
+      "high": 0.0,
+      "n": 11,
+      "significant": false
+    }
+  ],
+  "decision": {
+    "best": "Q2",
+    "best_passes_hebrew": true,
+    "chosen": "Q0",
+    "versus_best": {
+      "Q0": {
+        "mean": -0.01666666666666666,
+        "low": -0.08888888888888888,
+        "high": 0.045555555555555564,
+        "n": 50,
+        "worse": false
+      },
+      "Q1": {
+        "mean": -0.02666666666666666,
+        "low": -0.09,
+        "high": 0.028888888888888895,
+        "n": 50,
+        "worse": false
+      },
+      "Q2": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "worse": false
+      }
+    },
+    "simplest_first": [
+      "Q0",
+      "Q1",
+      "Q2"
+    ]
+  }
+}
