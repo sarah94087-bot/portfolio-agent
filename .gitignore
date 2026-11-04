@@ -32,3 +32,6 @@ spikes/results/
 Thumbs.db
 .vscode/
 .idea/
+
+# embeddings cache and local model files for the M3 experiments
+evals/.cache/

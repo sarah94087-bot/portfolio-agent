@@ -2,11 +2,11 @@
 section 4). Every strategy C1-C4 is loaded into its own temp table cloned from `chunks`, searched
 with R1 and the visitor's question as is (Q0), and scored on D1's dev split only.
 
-R2 is not here yet: no embeddings model is chosen (ADR-0009), so this answers the question for
-lexical search only.
+With no argument it runs R1. With an embeddings candidate (retrieval/embedders.py, CANDIDATES)
+it runs R2 with that model: the chunks and the queries are embedded with it, once, and cached.
 
 Run from evals/, against a local Postgres with the migrations (PGlite or docker compose):
-    DATABASE_URL=postgresql://... ../backend/.venv/Scripts/python -m retrieval.run_stage1
+    DATABASE_URL=postgresql://... ../backend/.venv/Scripts/python -m retrieval.run_stage1 [model]
 """
 
 import json
@@ -20,8 +20,9 @@ from pathlib import Path
 import psycopg
 from portfolio_agent import migrate
 from portfolio_agent.ingest import Doc, chunk, load, upsert
-from portfolio_agent.retrieval.lexical import search
+from portfolio_agent.retrieval import lexical, vector
 
+from retrieval.embedders import Embedder
 from retrieval.harness import D1Item, compare, load_d1, run, write_results
 
 D1_PATH = Path(__file__).resolve().parent.parent / "datasets" / "d1.yaml"
@@ -35,22 +36,44 @@ HEBREW_THRESHOLD = 0.85  # Recall@5 for he and cross_lingual (docs/03, section 6
 SPLIT = "dev"  # test runs once, in stage 5, on the final configuration
 
 
-def config_name(strategy: str) -> str:
-    return f"stage1-{strategy}-R1-Q0"
+def retriever_label(embedder: Embedder | None = None) -> str:
+    return "R1" if embedder is None else f"R2-{embedder.name.split('/')[-1]}"
+
+
+def config_name(strategy: str, retriever: str = "R1") -> str:
+    return f"stage1-{strategy}-{retriever}-Q0"
 
 
 def run_strategy(
-    conn: psycopg.Connection, docs: list[Doc], items: Sequence[D1Item], strategy: str
+    conn: psycopg.Connection, docs: list[Doc], items: Sequence[D1Item], strategy: str,
+    embedder: Embedder | None = None,
 ) -> dict:
-    """One strategy in its own temp table, dropped afterwards (PGlite shares one session)."""
+    """One strategy in its own temp table, dropped afterwards (PGlite shares one session).
+
+    R1 by default; R2 when an embedder is given. R2 embeds what R1 indexes (Chunk.content).
+    """
     table = f"stage1_{strategy.lower()}"
     conn.execute(f"drop table if exists {table}")
     conn.execute(f"create temp table {table} (like chunks including all)")
     try:
         chunks = chunk(docs, strategy)
         upsert(conn, chunks, table)
-        result = run(items, lambda q, k: search(conn, q, k, table), split=SPLIT)
-        return {"strategy": strategy, "chunks": len(chunks), **result}
+        if embedder is None:
+            def retrieve(q, k):
+                return lexical.search(conn, q, k, table)
+        else:
+            vector.add_embedding_column(conn, table, embedder.dim)
+            vecs = embedder.embed([c.content for c in chunks], "passage")
+            by_id = {c.id: v for c, v in zip(chunks, vecs, strict=True)}
+            vector.store_embeddings(conn, table, by_id)
+
+            def retrieve(q, k):
+                return vector.search(conn, embedder.embed([q], "query")[0], k, table)
+        result = run(items, retrieve, split=SPLIT)
+        return {
+            "strategy": strategy, "retriever": retriever_label(embedder),
+            "chunks": len(chunks), **result,
+        }
     finally:
         conn.execute(f"drop table {table}")
 
@@ -108,12 +131,12 @@ def decide(results: dict[str, dict], simplest_first: Sequence[str] = SIMPLEST_FI
 
 def stage1(
     db_url: str, items: Sequence[D1Item], docs: list[Doc] | None = None,
-    strategies: Sequence[str] = STRATEGIES,
+    strategies: Sequence[str] = STRATEGIES, embedder: Embedder | None = None,
 ) -> dict:
     migrate.run(db_url)
     docs = load() if docs is None else docs
     with psycopg.connect(db_url, autocommit=True) as conn:
-        results = {s: run_strategy(conn, docs, items, s) for s in strategies}
+        results = {s: run_strategy(conn, docs, items, s, embedder) for s in strategies}
     return {
         "results": results,
         "comparisons": pairwise(results),
@@ -145,11 +168,22 @@ def main() -> int:
         print("DATABASE_URL is required (a local Postgres; see the module docstring)",
               file=sys.stderr)
         return 2
-    out = stage1(db_url, load_d1(D1_PATH))
+    embedder = None
+    if len(sys.argv) > 1:
+        from retrieval.embedders import CANDIDATES, Cached, load_env
+
+        if sys.argv[1] not in CANDIDATES:
+            print(f"unknown model, expected one of {sorted(CANDIDATES)}", file=sys.stderr)
+            return 2
+        load_env()
+        embedder = Cached(CANDIDATES[sys.argv[1]]())
+    label = retriever_label(embedder)
+    out = stage1(db_url, load_d1(D1_PATH), embedder=embedder)
     for s, r in out["results"].items():
-        print(write_results(r, config_name(s)))
+        print(write_results(r, config_name(s, label)))
+    name = "stage1-comparisons" if label == "R1" else f"stage1-{label}-comparisons"
     comparisons = write_results(
-        {"comparisons": out["comparisons"], "decision": out["decision"]}, "stage1-comparisons"
+        {"comparisons": out["comparisons"], "decision": out["decision"]}, name
     )
     print(comparisons)
     print(table(out["results"]))

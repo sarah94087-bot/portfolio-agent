@@ -20,6 +20,12 @@ dev = [
   "pytest>=8.3",
   "uvicorn>=0.32",
   "ruff==0.17.3",  # pinned so CI lints with the same rules as local
+  "numpy>=2,<3",  # evals/retrieval/embedders.py
+]
+# The open embeddings candidates of the M3 experiments, run locally (not in CI, no model files).
+experiments = [
+  "onnxruntime>=1.20,<2",
+  "tokenizers>=0.20,<1",
 ]
 
 [tool.setuptools]
