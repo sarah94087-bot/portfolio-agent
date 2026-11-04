@@ -102,6 +102,17 @@ def load_env() -> None:
             os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
 
 
+def post(client: httpx.Client, url: str, retries: int = 6, **kwargs) -> httpx.Response:
+    """POST, waiting and trying again on 429, since free tiers limit requests per minute."""
+    for attempt in range(retries):
+        r = client.post(url, **kwargs)
+        if r.status_code != 429 or attempt == retries - 1:
+            r.raise_for_status()
+            return r
+        time.sleep(float(r.headers.get("retry-after") or 20 * (attempt + 1)))
+    raise AssertionError("unreachable")
+
+
 def env(name: str) -> str:
     value = os.environ.get(name)
     if not value:
@@ -125,11 +136,10 @@ class CloudflareEmbedder:
         out = []
         with httpx.Client(timeout=60) as client:
             for i in range(0, len(texts), self.batch):
-                r = client.post(
-                    url, headers={"Authorization": f"Bearer {token}"},
+                r = post(
+                    client, url, headers={"Authorization": f"Bearer {token}"},
                     json={"text": [prefix + t for t in texts[i : i + self.batch]]},
                 )
-                r.raise_for_status()
                 out += unit(np.array(r.json()["result"]["data"], dtype=np.float32)).tolist()
         return out
 
@@ -140,7 +150,7 @@ class GeminiEmbedder:
 
     name: str = "gemini-embedding-001"
     dim: int = 768
-    batch: int = 50
+    batch: int = 20
 
     def embed(self, texts: Sequence[str], kind: Kind) -> list[list[float]]:
         key = env("GEMINI_API_KEY_EVALS")
@@ -148,12 +158,11 @@ class GeminiEmbedder:
         out = []
         with httpx.Client(timeout=60) as client:
             for i in range(0, len(texts), self.batch):
-                r = client.post(
-                    url, headers={"Authorization": f"Bearer {key}"},
+                r = post(
+                    client, url, headers={"Authorization": f"Bearer {key}"},
                     json={"model": self.name, "input": list(texts[i : i + self.batch]),
                           "dimensions": self.dim},
                 )
-                r.raise_for_status()
                 rows = [d["embedding"] for d in r.json()["data"]]
                 out += unit(np.array(rows, dtype=np.float32)).tolist()
         return out
@@ -175,8 +184,9 @@ class Cached:
 
     def embed(self, texts: Sequence[str], kind: Kind) -> list[list[float]]:
         missing = list(dict.fromkeys(t for t in texts if self.key(t, kind) not in self.store))
-        if missing:
-            for t, v in zip(missing, self.inner.embed(missing, kind), strict=True):
+        for i in range(0, len(missing), 20):  # saved per batch, so a quota error loses little
+            part = missing[i : i + 20]
+            for t, v in zip(part, self.inner.embed(part, kind), strict=True):
                 self.store[self.key(t, kind)] = v
             self.path.parent.mkdir(parents=True, exist_ok=True)
             self.path.write_text(json.dumps(self.store), encoding="utf-8")
