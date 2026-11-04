@@ -31,7 +31,7 @@ skills:
     evidence: [human-gated-translation]
   - name: GitHub Actions
     level: used
-    evidence: [human-gated-translation]
+    evidence: [human-gated-translation, git-mcp-server]
   - name: Tailwind CSS
     level: used
     evidence: [governance-center-pwa]
@@ -52,7 +52,7 @@ skills:
     evidence: [governance-center-pwa]
   - name: Python
     level: used
-    evidence: [weed-detection-pipeline, clip-embeddings-kafka]
+    evidence: [weed-detection-pipeline, clip-embeddings-kafka, git-mcp-server]
   - name: PyTorch
     level: used
     evidence: [weed-detection-pipeline]
@@ -77,6 +77,15 @@ skills:
   - name: pgvector
     level: used
     evidence: [clip-embeddings-kafka]
+  - name: MCP
+    level: used
+    evidence: [git-mcp-server]
+  - name: PyTest
+    level: used
+    evidence: [git-mcp-server]
+  - name: Git
+    level: used
+    evidence: [git-mcp-server]
   - name: "Java"
     level: studied
     evidence: [education]
