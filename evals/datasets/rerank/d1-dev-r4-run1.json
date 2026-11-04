@@ -1,0 +1,146 @@
+{
+  "model": "openai/gpt-oss-120b",
+  "date": "2026-11-04",
+  "system": "You rank search results for an assistant that answers questions about Sarah's work. Order the candidate passages from the most to the least useful for answering the visitor's question. Rank every candidate id you are given, and only those.",
+  "candidates": 10,
+  "candidate_tokens": 150,
+  "tokens": 11746,
+  "calls": 5,
+  "rankings": {
+    "d1-001": {
+      "candidates": [
+        "ainsof-capital#all",
+        "human-gated-translation#all",
+        "profile#all",
+        "governance-center-pwa#all",
+        "preferences#all",
+        "git-mcp-server#all",
+        "faq#all",
+        "claims-trust-model#all",
+        "skills#rtl-i18n",
+        "education#all"
+      ],
+      "ranking": [
+        "human-gated-translation#all",
+        "profile#all",
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "skills#rtl-i18n",
+        "education#all",
+        "claims-trust-model#all",
+        "git-mcp-server#all",
+        "faq#all",
+        "preferences#all"
+      ],
+      "tokens": 2038
+    },
+    "d1-002": {
+      "candidates": [
+        "api-latency-582-to-40#all",
+        "ainsof-capital#all",
+        "skills#claude-api",
+        "governance-center-pwa#all",
+        "profile#all",
+        "skills#fastapi",
+        "postgres-rls-backbone#all",
+        "human-gated-translation#all",
+        "claims-trust-model#all",
+        "weed-detection-pipeline#all"
+      ],
+      "ranking": [
+        "api-latency-582-to-40#all",
+        "profile#all",
+        "governance-center-pwa#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "postgres-rls-backbone#all",
+        "human-gated-translation#all",
+        "weed-detection-pipeline#all",
+        "skills#claude-api",
+        "skills#fastapi"
+      ],
+      "tokens": 2182
+    },
+    "d1-004": {
+      "candidates": [
+        "faq#all",
+        "plant-health-classification#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "git-mcp-server#all",
+        "claims-trust-model#all",
+        "human-gated-translation#all",
+        "ainsof-capital#all",
+        "vast-data-bootcamp#all",
+        "api-latency-582-to-40#all"
+      ],
+      "ranking": [
+        "plant-health-classification#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "faq#all",
+        "human-gated-translation#all",
+        "ainsof-capital#all",
+        "git-mcp-server#all",
+        "api-latency-582-to-40#all",
+        "claims-trust-model#all"
+      ],
+      "tokens": 2600
+    },
+    "d1-005": {
+      "candidates": [
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "faq#all",
+        "plant-health-classification#all",
+        "api-latency-582-to-40#all",
+        "claims-trust-model#all",
+        "ainsof-capital#all",
+        "git-mcp-server#all",
+        "governance-center-pwa#all"
+      ],
+      "ranking": [
+        "weed-detection-pipeline#all",
+        "vast-data-bootcamp#all",
+        "api-latency-582-to-40#all",
+        "clip-embeddings-kafka#all",
+        "plant-health-classification#all",
+        "faq#all",
+        "claims-trust-model#all",
+        "ainsof-capital#all",
+        "git-mcp-server#all",
+        "governance-center-pwa#all"
+      ],
+      "tokens": 2622
+    },
+    "d1-007": {
+      "candidates": [
+        "git-mcp-server#all",
+        "ainsof-capital#all",
+        "api-latency-582-to-40#all",
+        "preferences#all",
+        "governance-center-pwa#all",
+        "vast-data-bootcamp#all",
+        "claims-trust-model#all",
+        "education#all",
+        "faq#all",
+        "skills#supabase"
+      ],
+      "ranking": [
+        "preferences#all",
+        "ainsof-capital#all",
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all",
+        "claims-trust-model#all",
+        "git-mcp-server#all",
+        "vast-data-bootcamp#all",
+        "education#all",
+        "faq#all",
+        "skills#supabase"
+      ],
+      "tokens": 2304
+    }
+  }
+}
