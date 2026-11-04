@@ -76,6 +76,10 @@ class Chunk:
     text: str
     header: str = ""  # C2 only: which record this is, for a section that does not say
     aliases: str = ""  # the record's aliases in both languages, for trigram matching (R1)
+    # Skills only: the records that show the skill. Shown with the chunk, so the agent can say
+    # where she used it, but not indexed: record ids would match questions about those records
+    # (docs/experiments/retrieval-2026-11-04.md, stage 1).
+    evidence: tuple[str, ...] = ()
 
     @property
     def content(self) -> str:
@@ -83,8 +87,15 @@ class Chunk:
         return f"{self.header}\n\n{self.text}" if self.header else self.text
 
     @property
+    def display(self) -> str:
+        """What the agent reads and cites: the text, and the evidence for a skill."""
+        if not self.evidence:
+            return self.text
+        return f"{self.text} Evidence: {', '.join(self.evidence)}."
+
+    @property
     def content_hash(self) -> str:
-        indexed = f"{self.content}\n\n{self.aliases}"
+        indexed = f"{self.content}\n\n{self.aliases}\n\n{self.display}"
         return hashlib.sha256(indexed.encode("utf-8")).hexdigest()
 
 
@@ -104,7 +115,7 @@ def load(portfolio_dir: Path = PORTFOLIO_DIR) -> list[Doc]:
     for path in sorted(portfolio_dir.rglob("*.md")):
         record, _ = check_file(path)
         _, body = split(path.read_text(encoding="utf-8"))
-        docs.append(Doc(record, doc_sections(body)))
+        docs.append(Doc(record, with_metrics(record, doc_sections(body))))
     return docs
 
 
@@ -120,6 +131,30 @@ def doc_sections(body: str) -> list[tuple[str, str]]:
     parts += [(SECTION_IDS.get(name) or slug(name), text) for name, text in body_sections(body)]
     cleaned = [(sid, re.sub(r"<!--.*?-->", "", t, flags=re.DOTALL).strip()) for sid, t in parts]
     return [(sid, text) for sid, text in cleaned if text]
+
+
+def with_metrics(record: BaseModel, sections: list[tuple[str, str]]) -> list[tuple[str, str]]:
+    """A project's frontmatter metrics, appended to its Results section as text.
+
+    Frontmatter is not chunked, so without this a number that is only in `metrics` (such as the
+    count of SQL migrations) could not be found or cited. How it was measured goes with it.
+    """
+    metrics = getattr(record, "metrics", None)
+    if not metrics:
+        return sections
+    lines = []
+    for m in metrics:
+        figure = m.value or ", ".join(
+            f"{name} {v}" for name, v in (("before", m.before), ("after", m.after)) if v
+        )
+        lines.append(f"- {m.label}: {figure}. How it was measured: {m.how_measured}")
+    block = "Measured:\n" + "\n".join(lines)
+    out = list(sections)
+    idx = next((i for i, (sid, _) in enumerate(out) if sid == "results"), None)
+    if idx is None:
+        return [*out, ("results", block)]
+    out[idx] = ("results", f"{out[idx][1]}\n\n{block}")
+    return out
 
 
 def chunk(docs: list[Doc], strategy: str) -> list[Chunk]:
@@ -174,12 +209,12 @@ def skill_chunks(skills: Skills, with_header: bool) -> list[Chunk]:
     chunks = []
     for s in skills.skills:
         text = f"{s.name}. Level: {s.level}, {LEVEL_TEXT[s.level]}."
-        if s.evidence:
-            text += f" Evidence: {', '.join(s.evidence)}."
         if s.note:
             text += f" {s.note}"
         sid = slug(s.name)
-        chunks.append(Chunk(f"skills#{sid}", "skills", (sid,), text, header))
+        chunks.append(
+            Chunk(f"skills#{sid}", "skills", (sid,), text, header, evidence=tuple(s.evidence))
+        )
     return chunks
 
 
@@ -241,7 +276,7 @@ def upsert(
                     " norm = excluded.norm, content_hash = excluded.content_hash,"
                     " commit_sha = excluded.commit_sha, updated_at = now()"
                 ).format(t),
-                (c.id, c.record_id, list(c.sections), c.text, c.header,
+                (c.id, c.record_id, list(c.sections), c.display, c.header,
                  normalize(c.aliases), normalize(c.content), c.content_hash, commit_sha),
             )
         if gone:

@@ -155,10 +155,40 @@ def test_skills_are_one_chunk_each_in_every_strategy_and_say_the_level(kb):
     for strategy in STRATEGIES:
         skills = [c for c in chunk(docs, strategy) if c.record_id == "skills"]
         assert [c.id for c in skills] == ["skills#postgresql", "skills#csharp", "skills#cplusplus"]
-    used, studied, listed = (c.text for c in chunk(docs, "C1") if c.record_id == "skills")
-    assert used == "PostgreSQL. Level: used, Sarah used it in project work. Evidence: demo."
-    assert "not in project work" in studied
-    assert "Evidence" not in listed
+    used, studied, listed = (c for c in chunk(docs, "C1") if c.record_id == "skills")
+    assert used.display == "PostgreSQL. Level: used, Sarah used it in project work. Evidence: demo."
+    assert "not in project work" in studied.text
+    assert "Evidence" not in listed.display
+
+
+def test_skill_evidence_is_shown_but_not_indexed(kb):
+    # Record ids in the index matched questions about those records (stage 1, 4.11.2026).
+    for strategy in STRATEGIES:
+        used = next(c for c in chunk(load(kb), strategy) if c.id == "skills#postgresql")
+        assert used.evidence == ("demo",)
+        assert "demo" not in used.content
+        assert used.display.endswith("Evidence: demo.")
+
+
+def test_project_metrics_are_added_to_results_with_how_they_were_measured(tmp_path):
+    metrics = (
+        'metrics:\n'
+        '  - { label: "API latency", before: "582ms", after: "40ms",'
+        ' how_measured: "Same endpoint." }\n'
+        '  - { label: "SQL migrations", value: "108", how_measured: "Counted in the repo." }\n'
+        'architecture:'
+    )
+    text = PROJECT.format(problem="p", architecture="a").replace("architecture:", metrics, 1)
+    (tmp_path / "demo.md").write_text(text, encoding="utf-8")
+    for strategy in STRATEGIES:
+        found = [c for c in chunk(load(tmp_path), strategy) if "SQL migrations: 108" in c.text]
+        assert found and all("results" in c.sections for c in found)
+    results = next(c for c in chunk(load(tmp_path), "C1") if c.id == "demo#results")
+    assert results.text == (
+        "results\n\nMeasured:\n"
+        "- API latency: before 582ms, after 40ms. How it was measured: Same endpoint.\n"
+        "- SQL migrations: 108. How it was measured: Counted in the repo."
+    )
 
 
 def test_slugs():

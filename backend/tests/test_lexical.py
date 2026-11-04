@@ -45,6 +45,14 @@ def test_upsert_writes_only_what_changed_and_removes_what_is_gone(conn, c1):
     assert conn.execute("select count(*) from t").fetchone()[0] == len(c1) - 1
 
 
+def test_skill_evidence_is_stored_for_the_agent_but_not_searched(conn, c1):
+    upsert(conn, c1, "t")
+    skill = next(c for c in c1 if c.record_id == "skills" and c.evidence)
+    text, norm = conn.execute("select text, norm from t where id = %s", (skill.id,)).fetchone()
+    assert "Evidence: " in text
+    assert skill.evidence[0] not in norm
+
+
 def test_upsert_stores_normalized_text_and_a_tsvector(conn, c1):
     upsert(conn, c1, "t")
     norm, aliases, tsv = conn.execute(
