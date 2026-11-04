@@ -140,6 +140,25 @@ class Experience(Strict):
     _publication = field_validator("review")(require_publication_check)
 
 
+class Program(Strict):
+    institution: Text
+    program: Text
+    field: Text
+    start: Text
+    end: Text
+    grade: str | None = None
+
+
+class Education(Strict):
+    id: Literal["education"]
+    type: Literal["education"]
+    title: Title
+    aliases: list[str] = Field(min_length=1)
+    programs: list[Program] = Field(min_length=1)
+    answers: list[str] = Field(min_length=1)
+    review: Review
+
+
 class Skill(Strict):
     name: Text
     level: Literal["used", "studied", "listed"]
@@ -163,7 +182,7 @@ class Skills(Strict):
     review: Review
 
 
-SCHEMAS = {"project": Project, "experience": Experience, "skills": Skills}
+SCHEMAS = {"project": Project, "experience": Experience, "education": Education, "skills": Skills}
 
 
 def split(text: str) -> tuple[dict, str]:

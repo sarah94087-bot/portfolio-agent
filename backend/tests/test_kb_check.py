@@ -139,3 +139,24 @@ def test_broken_experience_links_fail(tmp_path):
     assert results["demo.md"] == ["experience 'elsewhere' has no record"]
     assert "missing required heading '## Projects'" in results["job.md"]
     assert "project 'demo' does not point back at 'job'" in results["job.md"]
+
+
+EDUCATION = """---
+id: education
+type: education
+title: { en: "Education", he: "השכלה" }
+aliases: ["studies"]
+programs:
+  - { institution: "School", program: "Program", field: "CS", start: "2023-09", end: "2025-07" }
+answers: ["Where did she study?"]
+review: { approved: true, approved_on: 2026-11-03 }
+---
+"""
+
+
+def test_studied_skill_can_cite_education(tmp_path):
+    write(tmp_path, "education.md", EDUCATION)
+    write(tmp_path, "skills.md", SKILLS.split("  - { name: PostgreSQL")[0]
+          + "  - { name: Java, level: studied, evidence: [education] }\n"
+          + "review: { approved: true, approved_on: 2026-11-03 }\n---\n")
+    assert check(tmp_path) == {}

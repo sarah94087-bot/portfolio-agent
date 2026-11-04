@@ -77,6 +77,36 @@ skills:
   - name: pgvector
     level: used
     evidence: [clip-embeddings-kafka]
+  - name: "Java"
+    level: studied
+    evidence: [education]
+  - name: "C#"
+    level: studied
+    evidence: [education]
+  - name: "C++"
+    level: studied
+    evidence: [education]
+  - name: ".NET Core"
+    level: studied
+    evidence: [education]
+  - name: "MongoDB"
+    level: studied
+    evidence: [education]
+  - name: "DynamoDB"
+    level: studied
+    evidence: [education]
+  - name: "SQL Server"
+    level: studied
+    evidence: [education]
+  - name: "MySQL"
+    level: studied
+    evidence: [education]
+  - name: "Kubernetes"
+    level: studied
+    evidence: [education]
+  - name: "AWS S3"
+    level: studied
+    evidence: [education]
 review:
   approved: true
   approved_on: 2026-11-03
