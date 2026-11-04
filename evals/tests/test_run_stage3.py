@@ -84,14 +84,16 @@ def test_stage3_scores_q0_q1_and_the_mean_of_q2_runs_and_drops_its_table():
     items = [D1Item(id="d1-001", question=question, lang="he", category="cross_lingual",
                     expected_behavior="answer", gold_chunks=["human-gated-translation#problem"],
                     split="dev")]
-    q1 = {"d1-001": {"query": "human approval of machine translation", "alternatives": []}}
+    q1 = {"d1-001": {"query": "Sarah Halevy human approval of machine translation",
+                     "alternatives": []}}
     q2 = [{"d1-001": {"query": f"machine translation review {r}",
-                      "alternatives": ["human gate translation", "translation editor"]}}
+                      "alternatives": ["Sarah's human gate translation", "translation editor"]}}
           for r in (1, 2, 3)]
     out = stage3(DB_URL, items, Fake(), q1, q2)
     assert list(out["results"]) == list(SIMPLEST_FIRST)
     assert out["results"]["Q0"]["items"][0]["query"] == question
-    assert out["results"]["Q1"]["items"][0]["query"] == q1["d1-001"]["query"]
+    # The name comes off the agent's query (ADR-0013), and never off the visitor's question.
+    assert out["results"]["Q1"]["items"][0]["query"] == "human approval of machine translation"
     assert out["results"]["Q2"]["runs"] == 3 and len(out["q2_runs"]) == 3
     assert out["results"]["Q2"]["items"][0]["query"][2] == "machine translation review 3"
     assert out["decision"]["chosen"] in SIMPLEST_FIRST

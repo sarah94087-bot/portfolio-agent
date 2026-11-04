@@ -2,8 +2,10 @@
 section 4)? C4 (ADR-0010), R3 (ADR-0011) with multilingual-e5-small (ADR-0012), D1 dev only.
 
 - Q0: the visitor's question as is.
-- Q1: the query the agent wrote (retrieval/rewrite.py, saved once).
-- Q2: Q1 and two alternative phrasings. Each runs R3, and the three rankings are fused with RRF.
+- Q1: the query the agent wrote (retrieval/rewrite.py, saved once), with Sarah's name
+  removed in code (portfolio_agent/retrieval/query.py, ADR-0013).
+- Q2: Q1 and two alternative phrasings, the name removed from each. Each runs R3, and the
+  three rankings are fused with RRF.
   The phrasings come from a model, so Q2 runs 3 times, and it is scored per question as the mean
   of the three runs. The decision order is Q0, Q1, Q2: no call, the same call, a longer call.
 
@@ -21,6 +23,7 @@ from portfolio_agent import migrate
 from portfolio_agent.ingest import Doc, chunk, load, upsert
 from portfolio_agent.retrieval import hybrid, vector
 from portfolio_agent.retrieval.lexical import CANDIDATES, Hit
+from portfolio_agent.retrieval.query import name_pattern, owner_names, strip_names
 
 from retrieval.embedders import Embedder
 from retrieval.harness import GROUPS, METRICS, D1Item, load_d1, run, summarize, write_results
@@ -79,6 +82,14 @@ def stage3(
 ) -> dict:
     migrate.run(db_url)
     docs = load() if docs is None else docs
+    pattern = name_pattern(owner_names(d.record for d in docs))
+
+    def clean(saved: Mapping[str, dict]) -> dict[str, dict]:
+        return {i: {"query": strip_names(q["query"], pattern),
+                    "alternatives": [strip_names(a, pattern) for a in q["alternatives"]]}
+                for i, q in saved.items()}
+
+    q1, q2_runs = clean(q1), [clean(s) for s in q2_runs]
     with psycopg.connect(db_url, autocommit=True) as conn:
         conn.execute(f"drop table if exists {TABLE}")
         conn.execute(f"create temp table {TABLE} (like chunks including all)")
