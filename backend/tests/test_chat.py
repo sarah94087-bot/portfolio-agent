@@ -133,6 +133,10 @@ def test_a_full_turn_streams_in_order_and_saves_what_the_visitor_saw(use):
     sources = next(d for e, d in events if e == "sources")["sources"]
     assert [s["chunk_id"] for s in sources] == ["git-mcp-server#all"]
     assert sources[0]["record_title"].startswith("grounded-git-mcp")
+    assert "commit" in sources[0]
+    usage = next(d for e, d in events if e == "usage")
+    assert usage["dropped"] == 1 and usage["redacted"] == 1  # made-up#all, the phone
+    assert 0 <= usage["setup_ms"] <= usage["total_ms"]
 
     with psycopg.connect(DB_URL) as conn:
         rows = conn.execute(

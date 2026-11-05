@@ -96,3 +96,10 @@
     }
   }
 }
+
+/* S3 open from 1100px (68.75rem, as in TracePanel): the panel (460px) sits beside the conversation. */
+@media (min-width: 68.75rem) {
+  :root[data-trace="open"] main {
+    padding-inline-end: 460px;
+  }
+}

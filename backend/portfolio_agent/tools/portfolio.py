@@ -11,6 +11,7 @@ the trace, rather than failing.
 """
 
 import json
+import re
 import time
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -70,11 +71,24 @@ def _section(chunk_id: str) -> str:
     return "Whole record" if section == "all" else section
 
 
-def _view(hit: Hit, ctx: PortfolioContext) -> dict:
+EXCERPT = 140
+
+
+def _excerpt(text: str) -> str:
+    """The start of a chunk on one line, without Markdown marks."""
+    flat = " ".join(re.sub(r"[#*_>`|]+", " ", text).split())
+    return flat if len(flat) <= EXCERPT else flat[:EXCERPT].rsplit(" ", 1)[0] + "…"
+
+
+def _title(hit: Hit, ctx: PortfolioContext) -> str:
     record = ctx.records.get(hit.record_id)
+    return record.title if record else hit.record_id
+
+
+def _view(hit: Hit, ctx: PortfolioContext) -> dict:
     return {
         "chunk_id": hit.id,
-        "record_title": record.title if record else hit.record_id,
+        "record_title": _title(hit, ctx),
         "section": _section(hit.id),
         "text": hit.text,
     }
@@ -117,12 +131,14 @@ def search_portfolio(args: SearchArgs, ctx: PortfolioContext) -> ToolResult:
                 for h in hits]
         method = "R1"
     considered = len(hits)
+    ranked = hits
     if args.types:
         wanted = set(args.types)
         hits = [h for h in hits
                 if (r := ctx.records.get(h.record_id)) is not None and r.type in wanted]
     kept = _within_budget(hits)
     views = [_view(h, ctx) for h in kept]
+    chosen = {h.id for h in kept}
     trace = {
         "query_used": query,
         "method": method,
@@ -131,6 +147,13 @@ def search_portfolio(args: SearchArgs, ctx: PortfolioContext) -> ToolResult:
             for i, (v, h) in enumerate(zip(views, kept, strict=True), start=1)
         ],
         "candidates_considered": considered,
+        # Every candidate in fused order, for the trace panel's table (US-4.2): the scores of
+        # each method, and which ones went to the model. A short excerpt, not the whole chunk.
+        "candidates": [
+            {"chunk_id": h.id, "record_title": _title(h, ctx), "excerpt": _excerpt(h.text),
+             "scores": {**h.scores, "rerank": None}, "selected": h.id in chosen}
+            for h in ranked
+        ],
         "latency_ms": timings,
     }
     model = {"query_used": query, "results": views}

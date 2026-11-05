@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CompassIcon, JobIcon, LayersIcon, StarIcon } from "@/components/ui/icons";
 import { newTurn, retry as retryTurn, run, type Turn } from "@/lib/chat";
 import { AgentMessage, type ChatStrings } from "./AgentMessage";
 import { Composer, type ComposerMode, type ComposerStrings } from "./Composer";
+import { TracePanel } from "./TracePanel";
 
 // One tone per starter, in the design's order: ink, stone, salmon, accent (the job check).
 const starterStyles = [
@@ -37,6 +38,29 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
   const lastQuestion = useRef<HTMLDivElement>(null);
   const pageLang = lang === "he" ? "he" : "en";
   const busy = turns.some((t) => t.status === "sending" || t.status === "streaming");
+
+  // S3: one answer's trace at a time. Focus goes back to what opened it.
+  const [trace, setTrace] = useState<{ key: string; chunkId?: string } | null>(null);
+  const traceFrom = useRef<HTMLElement | null>(null);
+  const traced = trace && turns.find((t) => t.key === trace.key);
+  const closeTrace = useCallback(() => {
+    setTrace(null);
+    traceFrom.current?.focus();
+  }, []);
+  function openTrace(turn: Turn, from: HTMLElement, chunkId?: string) {
+    if (trace?.key === turn.key && !chunkId) return closeTrace();
+    traceFrom.current = from;
+    setTrace({ key: turn.key, chunkId });
+  }
+  // From 1100px the panel pushes the conversation aside instead of covering it (globals.css).
+  useEffect(() => {
+    const root = document.documentElement;
+    if (traced) root.dataset.trace = "open";
+    else delete root.dataset.trace;
+    return () => {
+      delete root.dataset.trace;
+    };
+  }, [traced]);
 
   function update(next: Turn) {
     if (next.conversationId) conversationId.current = next.conversationId;
@@ -106,10 +130,29 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
               >
                 {turn.question}
               </div>
-              <AgentMessage turn={turn} lang={lang} t={chat} agentName={agentName} onRetry={() => retry(turn)} />
+              <AgentMessage
+                turn={turn}
+                lang={lang}
+                t={chat}
+                agentName={agentName}
+                onRetry={() => retry(turn)}
+                traceOpen={trace?.key === turn.key}
+                onTrace={(from, chunkId) => openTrace(turn, from, chunkId)}
+              />
             </div>
           ))}
         </div>
+      )}
+
+      {traced && (
+        <TracePanel
+          turn={traced}
+          index={turns.indexOf(traced) + 1}
+          lang={lang}
+          t={chat}
+          highlight={trace?.chunkId}
+          onClose={closeTrace}
+        />
       )}
 
       {/* The composer sticks to the bottom once the conversation starts, and on mobile from the

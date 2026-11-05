@@ -29,7 +29,11 @@ export type Step = {
   durationMs?: number;
 };
 
-export type Source = { chunkId: string; recordTitle: string; section: string; text: string };
+export type Source = { chunkId: string; recordTitle: string; section: string; text: string; commit?: string };
+
+/** A model that failed mid-round and the one that started it over (US-4.3). Kept apart from
+ * the steps, since the round's `end` replaces the step's summary. */
+export type Restart = { stepId: string; failed?: string; to?: string; reason?: string };
 
 export type TurnError = {
   code: string; // the screen is picked by code, never by message
@@ -45,8 +49,10 @@ export type Turn = {
   status: "sending" | "streaming" | "done" | "error";
   conversationId?: string;
   messageId?: string;
+  promptVersion?: string;
   parts: Part[];
   steps: Step[];
+  restarts: Restart[];
   sources: Source[];
   usage?: Record<string, unknown>;
   error?: TurnError;
@@ -70,7 +76,7 @@ export function newKey(): string {
 }
 
 export function newTurn(question: string, key: string = newKey()): Turn {
-  return { key, question, status: "sending", parts: [], steps: [], sources: [] };
+  return { key, question, status: "sending", parts: [], steps: [], restarts: [], sources: [] };
 }
 
 const chars = (s: string) => [...s].length;
@@ -125,8 +131,10 @@ export function apply(turn: Turn, { event, data }: SseEvent): Turn {
         status: "streaming",
         conversationId: str(data.conversation_id) ?? turn.conversationId,
         messageId: str(data.message_id),
+        promptVersion: str(data.prompt_version),
         parts: [],
         steps: [],
+        restarts: [],
         sources: [],
         usage: undefined,
         error: undefined,
@@ -157,7 +165,11 @@ export function apply(turn: Turn, { event, data }: SseEvent): Turn {
         keepChars === undefined
           ? turn.parts
           : truncate(turn.parts, keepChars, num(summary?.citations_from) ?? 0);
-      return { ...turn, parts, steps: upsertStep(turn.steps, step) };
+      const restarts =
+        step.status === "restart"
+          ? [...turn.restarts, { stepId: id, failed: str(summary?.failed), to: str(summary?.to), reason: str(summary?.reason) }]
+          : turn.restarts;
+      return { ...turn, parts, restarts, steps: upsertStep(turn.steps, step) };
     }
     case "sources": {
       const list = Array.isArray(data.sources) ? data.sources : [];
@@ -170,6 +182,7 @@ export function apply(turn: Turn, { event, data }: SseEvent): Turn {
           recordTitle: str(o.record_title) ?? chunkId,
           section: str(o.section) ?? "",
           text: str(o.text) ?? "",
+          commit: str(o.commit),
         }];
       });
       return { ...turn, sources };

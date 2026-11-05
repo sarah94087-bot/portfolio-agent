@@ -146,11 +146,14 @@ class _Out:
     transcript: Transcript = field(default_factory=Transcript)
     trace: tracing.Recorder = field(default_factory=tracing.Recorder)
     ttft_ms: int | None = None
+    setup_ms: int | None = None  # until `meta`: the database work before the model starts
     dropped: list[str] = field(default_factory=list)
     lang: str = "en"  # the page's, for record titles
 
     async def emit(self, event: str, data: dict[str, Any] | None = None) -> None:
         data = data or {}
+        if event == "meta" and self.setup_ms is None:
+            self.setup_ms = _since(self.started)
         if event == "token" and self.ttft_ms is None:
             self.ttft_ms = round((time.perf_counter() - self.started) * 1000)
         self.transcript.record(event, data)
@@ -272,9 +275,12 @@ async def _answer(req: ChatRequest, deps: Deps, caller: Caller, out: _Out) -> No
                 content=out.transcript.content, steps=out.transcript.steps, model=model,
                 allowed_chunks=meta["allowed_chunks"], created_at=now.isoformat()), now)
         await _sources(conn, out.transcript.cited, docs, deps, out)
+        # For the trace panel (US-4.3): the time before the model started, and how many
+        # citations were removed and contact details hidden before the answer was shown.
         await out.emit("usage", {**result.usage, "ttft_ms": out.ttft_ms,
-                                 "total_ms": _since(out.started), "model": model,
-                                 "fallback": bool(switches)})
+                                 "total_ms": _since(out.started), "setup_ms": out.setup_ms,
+                                 "model": model, "fallback": bool(switches),
+                                 "dropped": len(result.dropped), "redacted": result.redacted})
         await out.emit("done")
 
 
@@ -326,8 +332,8 @@ async def _sources(conn: psycopg.Connection, cited: list[str], docs: list[Doc], 
     rows = db.chunk_sources(conn, cited, deps.table)
     await out.emit("sources", {"sources": [
         {"chunk_id": cid, "record_title": titles.get(rid, rid),
-         "section": cid.partition("#")[2], "text": text}
-        for cid, rid, text in rows
+         "section": cid.partition("#")[2], "text": text, "commit": commit}
+        for cid, rid, text, commit in rows
     ]})
 
 

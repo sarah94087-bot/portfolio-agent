@@ -151,9 +151,10 @@ def merge_steps(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def chunk_sources(conn: psycopg.Connection, ids: list[str], table: str = "chunks") -> list[tuple]:
-    """(id, record_id, text) of the cited chunks, in citation order, for the sources event."""
+    """(id, record_id, text, commit_sha) of the cited chunks, in citation order, for the
+    sources event. The commit is the portfolio version the chunk was loaded from."""
     rows = {r[0]: r for r in conn.execute(
-        sql.SQL("select id, record_id, text from {} where id = any(%s)")
+        sql.SQL("select id, record_id, text, commit_sha from {} where id = any(%s)")
         .format(sql.Identifier(table)), (ids,),
     ).fetchall()}
     return [rows[i] for i in ids if i in rows]

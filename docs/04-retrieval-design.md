@@ -126,9 +126,20 @@
     }
   ],
   "candidates_considered": 20,
+  "candidates": [
+    {
+      "chunk_id": "human-gated-translation#decisions",
+      "record_title": "Human-gated AI translation pipeline",
+      "excerpt": "...",
+      "scores": { "lexical": 0.41, "vector": 0.83, "rrf": 0.032, "rerank": null },
+      "selected": true
+    }
+  ],
   "latency_ms": { "lexical": 12, "vector": 140, "fusion": 1 }
 }
 ```
+
+- `candidates` הם כל המועמדים לפי סדר המיזוג, עם קטע קצר (עד 140 תווים) במקום הטקסט המלא, ו-`selected` למי שהועבר למודל. הם רק בחלון המעקב: המודל קורא את `results` בלבד.
 
 - `chunk_id` הוא המזהה שהסוכן מצטט, והשרת מוודא שהוא קיים (פרק 4, תקינות ציטוטים).
 - `scores` ו-`latency_ms` מוצגים בחלון המעקב (US-4.2, US-4.3), ולכן הם חלק מהחוזה ולא רק לוג.

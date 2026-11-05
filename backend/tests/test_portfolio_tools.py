@@ -70,6 +70,14 @@ def test_search_follows_the_contract(ctx):
     assert result.chunk_ids == {r["chunk_id"] for r in model["results"]}
     assert "scores" not in model["results"][0]  # trace data stays out of the model's view
     assert trace["candidates_considered"] >= len(trace["results"])
+    # the trace panel's table: every candidate in fused order, the chosen ones marked
+    candidates = trace["candidates"]
+    assert len(candidates) == trace["candidates_considered"]
+    assert [c["chunk_id"] for c in candidates if c["selected"]] == \
+        [r["chunk_id"] for r in trace["results"]]
+    assert all(len(c["excerpt"]) <= 141 and "\n" not in c["excerpt"] for c in candidates)
+    assert all(not c["excerpt"].startswith("#") for c in candidates)
+    assert "candidates" not in model  # the model reads only what was chosen
 
 
 @needs_db

@@ -79,12 +79,13 @@ type PopoverProps = {
   top: number;
   t: ChatStrings;
   onClose: () => void;
+  onFound?: () => void; // "how was this chunk found?": the chunk's row in S3
 };
 
 // The source of one citation: a popover under the line on desktop, a bottom sheet on mobile
 // (boards A-S2 and S2-Mobile). Esc, the close button or a click outside closes it, and focus
 // goes back to the citation.
-function SourcePopover({ n, source, top, t, onClose }: PopoverProps) {
+function SourcePopover({ n, source, top, t, onClose, onFound }: PopoverProps) {
   const ref = useRef<HTMLDivElement>(null);
   const titleId = useId();
   useEffect(() => {
@@ -139,6 +140,13 @@ function SourcePopover({ n, source, top, t, onClose }: PopoverProps) {
             </p>
           ))}
         </blockquote>
+        {onFound && (
+          <div className="border-t border-border px-4 py-2.5">
+            <button type="button" onClick={onFound} className="text-[14px] font-bold text-accent underline underline-offset-2">
+              {t.trace.howFound}
+            </button>
+          </div>
+        )}
       </div>
     </>
   );
@@ -176,7 +184,15 @@ function errorText(turn: Turn, t: ChatStrings): string {
   }
 }
 
-function TraceLine({ turn, lang, t }: { turn: Turn; lang: string; t: ChatStrings }) {
+type TraceLineProps = {
+  turn: Turn;
+  lang: string;
+  t: ChatStrings;
+  open: boolean;
+  onOpen: (from: HTMLButtonElement) => void;
+};
+
+function TraceLine({ turn, lang, t, open, onOpen }: TraceLineProps) {
   const u = turn.usage ?? {};
   const num = (k: string) => (typeof u[k] === "number" ? (u[k] as number) : 0);
   const tokens = num("input_tokens") + num("output_tokens");
@@ -208,13 +224,36 @@ function TraceLine({ turn, lang, t }: { turn: Turn; lang: string; t: ChatStrings
           <span className="font-sans">{t.cached}</span>
         </Tag>
       )}
+      {typeof u.dropped === "number" && u.dropped > 0 && (
+        <Tag tone="removed">
+          <span className="font-sans">{t.trace.removedTag}</span>
+        </Tag>
+      )}
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={(e) => onOpen(e.currentTarget)}
+        className={`ms-auto flex items-center gap-1.5 rounded-[6px] px-2.5 py-1 font-sans text-[13px] font-bold text-accent hover:bg-surface-sunken ${open ? "bg-surface-sunken" : ""}`}
+      >
+        {t.trace.details}
+        <ChevronIcon size={12} className={open ? "rotate-180" : ""} />
+      </button>
     </div>
   );
 }
 
-type Props = { turn: Turn; lang: string; t: ChatStrings; agentName: string; onRetry: () => void };
+type Props = {
+  turn: Turn;
+  lang: string;
+  t: ChatStrings;
+  agentName: string;
+  onRetry: () => void;
+  traceOpen: boolean;
+  // S3 opens from the details button, or at a chunk's row from a source
+  onTrace: (from: HTMLElement, chunkId?: string) => void;
+};
 
-export function AgentMessage({ turn, lang, t, agentName, onRetry }: Props) {
+export function AgentMessage({ turn, lang, t, agentName, onRetry, traceOpen, onTrace }: Props) {
   const [open, setOpen] = useState<{ n: number; top: number; from: HTMLButtonElement } | null>(null);
   const [showSources, setShowSources] = useState(false);
   const [quiet, setQuiet] = useState(false);
@@ -307,7 +346,18 @@ export function AgentMessage({ turn, lang, t, agentName, onRetry }: Props) {
           })}
           </div>
           {open && byIndex.get(open.n) && (
-            <SourcePopover n={open.n} source={byIndex.get(open.n)!} top={open.top} t={t} onClose={close} />
+            <SourcePopover
+              n={open.n}
+              source={byIndex.get(open.n)!}
+              top={open.top}
+              t={t}
+              onClose={close}
+              onFound={turn.steps.some((s) => s.name === "search_portfolio") ? () => {
+                const from = open.from;
+                setOpen(null);
+                onTrace(from, byIndex.get(open.n)!.chunkId);
+              } : undefined}
+            />
           )}
         </div>
       )}
@@ -349,7 +399,7 @@ export function AgentMessage({ turn, lang, t, agentName, onRetry }: Props) {
       )}
 
       {(turn.status === "done" || (turn.status === "error" && turn.usage)) && (
-        <TraceLine turn={turn} lang={lang} t={t} />
+        <TraceLine turn={turn} lang={lang} t={t} open={traceOpen} onOpen={(from) => onTrace(from)} />
       )}
 
       {turn.status === "done" && turn.messageId && (
