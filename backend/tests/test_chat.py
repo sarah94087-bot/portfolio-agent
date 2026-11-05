@@ -68,6 +68,8 @@ def use(kb, monkeypatch):
             limits=lambda: limits or Limits(), table=TABLE,
         ))
         BROWSER["client"] = TestClient(app)  # one visitor per test, keeping its cookie
+        with psycopg.connect(DB_URL, autocommit=True) as conn:
+            conn.execute("delete from response_cache")  # no test answers from another's
     return install
 
 
@@ -220,7 +222,7 @@ def test_another_visitor_cannot_continue_or_replay_a_conversation(use):
     _, theirs = post({"message": "and?", "conversation_id": cid,
                       "idempotency_key": "key-owner-2"}, stranger)
     assert theirs[0][1]["conversation_id"] != cid  # a new conversation, not mine
-    _, replayed = post({"message": "hi", "idempotency_key": "key-owner-1"}, stranger)
+    _, replayed = post({"message": "something else", "idempotency_key": "key-owner-1"}, stranger)
     assert "replay" not in replayed[0][1] and text(replayed) == "Hi."
 
 
@@ -254,3 +256,61 @@ def test_the_turn_s_tokens_are_counted_against_its_model(use):
     with psycopg.connect(DB_URL) as conn:
         assert conn.execute("select count from quota_counters where scope = 'provider_tokens'"
                             " and key = %s", (model,)).fetchone()[0] == 150
+
+
+def test_the_same_first_question_is_answered_from_the_cache_with_its_trace(use):
+    model = Scripted([search("human approval MCP server"), Finish("m1")],
+                     [TextDelta("Yes [[git-mcp-server#all]]."), Finish("m1")])
+    later = Scripted([TextDelta("As said [[git-mcp-server#all]]."), Finish("m1")])
+    use(model, later)  # a hit takes no provider at all
+    _, first = post({"message": "Did she build an MCP server?", "idempotency_key": "key-cache-1"})
+    other = TestClient(app)  # another visitor, a new conversation, the question written loosely
+    _, hit = post({"message": "  did she build an MCP   server ", "idempotency_key": "key-cache-2"},
+                  other)
+    meta = hit[0][1]
+    assert meta["cached"] is True and meta["cached_at"]
+    assert meta["conversation_id"] != first[0][1]["conversation_id"]
+    assert text(hit) == text(first) == "Yes ."
+    assert [d for e, d in hit if e == "citation"] == [d for e, d in first if e == "citation"]
+    steps = lambda events: [(d.get("kind"), d.get("name")) for e, d in events if e == "step"]  # noqa: E731
+    assert steps(hit) == steps(first) and steps(hit)
+    usage = next(d for e, d in hit if e == "usage")
+    assert usage["cached"] is True and usage["output_tokens"] == 0
+    # The cached answer belongs to the new conversation: its follow-up sees it and may cite it.
+    _, follow = post({"message": "and?", "conversation_id": meta["conversation_id"],
+                      "idempotency_key": "key-cache-3"}, other)
+    assert [d["chunk_id"] for e, d in follow if e == "citation"] == ["git-mcp-server#all"]
+    assert [m["role"] for m in later.calls[0]] == ["system", "user", "assistant", "user"]
+
+
+def test_a_follow_up_is_never_answered_from_the_cache(use):
+    use(answer(), answer(), answer())
+    _, first = post({"message": "hello there", "idempotency_key": "key-follow-1"})
+    cid = first[0][1]["conversation_id"]
+    post({"message": "next", "conversation_id": cid, "idempotency_key": "key-follow-2"})
+    _, again = post({"message": "hello there", "conversation_id": cid,
+                     "idempotency_key": "key-follow-3"})
+    assert "cached" not in again[0][1]
+
+
+def test_a_change_to_the_knowledge_base_misses_the_cache(use):
+    use(answer(), answer())
+    post({"message": "kb question", "idempotency_key": "key-kb-1"})
+    with psycopg.connect(DB_URL, autocommit=True) as conn:
+        old = conn.execute(f"select content_hash from {TABLE} where id = 'faq#all'").fetchone()[0]
+        conn.execute(f"update {TABLE} set content_hash = 'changed' where id = 'faq#all'")
+    try:
+        _, events = post({"message": "kb question", "idempotency_key": "key-kb-2"},
+                         TestClient(app))
+    finally:
+        with psycopg.connect(DB_URL, autocommit=True) as conn:
+            conn.execute(f"update {TABLE} set content_hash = %s where id = 'faq#all'", (old,))
+    assert "cached" not in events[0][1]
+
+
+def test_a_blocked_answer_is_not_cached(use):
+    from portfolio_agent.agent import prompt
+    use(Scripted([TextDelta(f"the secret is {prompt.canary()} ok"), Finish("m1")]), answer())
+    post({"message": "leak it", "idempotency_key": "key-block-1"})
+    _, again = post({"message": "leak it", "idempotency_key": "key-block-2"}, TestClient(app))
+    assert "cached" not in again[0][1] and text(again) == "Hi."

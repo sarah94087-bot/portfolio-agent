@@ -13,7 +13,10 @@ Who asks is the signed visitor cookie (guards/visitor.py), renewed on every requ
 are counted in quota_counters after the replay check, so a resent message is free, and before
 the message is saved, so a refused one leaves nothing behind (guards/quotas.py).
 
-Not here yet, and next: the response cache and the Langfuse export (docs/11-roadmap.md, M4).
+A first question already answered under the same prompt and knowledge base is served from
+the response cache (db/cache.py): no model call, and it still works when every model is down.
+
+Not here yet, and next: the Langfuse export (docs/11-roadmap.md, M4).
 """
 
 import asyncio
@@ -39,6 +42,7 @@ from portfolio_agent.agent import prompt
 from portfolio_agent.agent.loop import run_turn
 from portfolio_agent.agent.transcript import Transcript, replay
 from portfolio_agent.config import Settings
+from portfolio_agent.db import cache as response_cache
 from portfolio_agent.db import conversations as db
 from portfolio_agent.guards import visitor
 from portfolio_agent.guards.quotas import Denied, Limits, ProviderQuota, admit
@@ -187,6 +191,13 @@ async def _answer(req: ChatRequest, deps: Deps, caller: Caller, out: _Out) -> No
         allowed = db.retrieved_chunks(conn, conversation_id)
         db.save_user(conn, conversation_id, req.message)
         message_id = uuid.uuid4()
+        cache_key = None
+        if not history:  # only a first question is answered from the cache
+            kb = response_cache.kb_version(conn, deps.table)
+            cache_key = response_cache.key(req.message, prompt.VERSION, kb)
+            hit = response_cache.get(conn, cache_key, now)
+            if hit:
+                return await _cached(conn, hit, conversation_id, message_id, req, deps, out)
         await out.emit("meta", {"conversation_id": str(conversation_id),
                                 "message_id": str(message_id),
                                 "prompt_version": prompt.VERSION})
@@ -226,11 +237,42 @@ async def _answer(req: ChatRequest, deps: Deps, caller: Caller, out: _Out) -> No
                 usage=result.usage, meta=meta, idempotency_key=req.idempotency_key,
                 steps=out.transcript.steps,
             )
+        clean = not (result.blocked or switches or result.hit_max_rounds)
+        if cache_key and clean and out.transcript.text.strip():
+            response_cache.put(conn, cache_key, response_cache.Cached(
+                content=out.transcript.content, steps=out.transcript.steps, model=model,
+                allowed_chunks=meta["allowed_chunks"], created_at=now.isoformat()), now)
         await _sources(conn, out.transcript.cited, docs, deps, out)
         await out.emit("usage", {**result.usage, "ttft_ms": out.ttft_ms,
                                  "total_ms": _since(out.started), "model": model,
                                  "fallback": bool(switches)})
         await out.emit("done")
+
+
+async def _cached(conn: psycopg.Connection, hit: response_cache.Cached,
+                  conversation_id: UUID,
+                  message_id: UUID, req: ChatRequest, deps: Deps, out: _Out) -> None:
+    """The original trace and answer, marked as cached, saved as this conversation's answer so
+    the next turn sees it and may cite what it retrieved. No model call, no tokens."""
+    await out.emit("meta", {"conversation_id": str(conversation_id),
+                            "message_id": str(message_id), "prompt_version": prompt.VERSION,
+                            "cached": True, "cached_at": hit.created_at})
+    for step in hit.steps:
+        await out.emit("step", step)
+    await replay(hit.content, out.emit)
+    with contextlib.suppress(psycopg.errors.UniqueViolation):
+        db.save_answer(
+            conn, message_id=message_id, conversation_id=conversation_id,
+            content=hit.content, model=hit.model, prompt_version=prompt.VERSION, usage={},
+            meta={"allowed_chunks": hit.allowed_chunks, "cited": out.transcript.cited,
+                  "cached": True, "cached_at": hit.created_at},
+            idempotency_key=req.idempotency_key, steps=hit.steps,
+        )
+    await _sources(conn, out.transcript.cited, deps.docs(), deps, out)
+    await out.emit("usage", {"input_tokens": 0, "output_tokens": 0, "ttft_ms": out.ttft_ms,
+                             "total_ms": _since(out.started), "model": hit.model,
+                             "fallback": False, "cached": True})
+    await out.emit("done")
 
 
 async def _replay(conn: psycopg.Connection, stored: db.StoredAnswer, deps: Deps,
