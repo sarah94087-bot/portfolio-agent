@@ -159,6 +159,8 @@ function errorText(turn: Turn, t: ChatStrings): string {
   switch (e.code) {
     case "disconnected":
       return t.errors.disconnected;
+    case "unreachable":
+      return t.errors.unreachable;
     case "rate_limited":
       if (e.limit === "minute") return fill(t.errors.minute, e.retryAfter ?? 60);
       if (e.limit === "conversation") return t.errors.conversation;

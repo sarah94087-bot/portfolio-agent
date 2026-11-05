@@ -72,6 +72,7 @@ const he = {
     retry: "לנסות שוב",
     errors: {
       disconnected: "החיבור נקטע לפני שהתשובה הסתיימה.",
+      unreachable: "לא הצלחנו להגיע לשרת. אפשר לנסות שוב בעוד רגע.",
       minute: "יותר מדי הודעות בדקה האחרונה. אפשר לנסות שוב בעוד {n} שניות.",
       day: "המכסה היומית של השיחה עם הסוכן נוצלה. אפשר לחזור מחר, או להוריד את קורות החיים.",
       conversation: "השיחה הזו הגיעה לאורך המרבי. אפשר להתחיל שיחה חדשה.",
@@ -145,6 +146,7 @@ const en: Dictionary = {
     retry: "Try again",
     errors: {
       disconnected: "The connection dropped before the answer finished.",
+      unreachable: "We couldn't reach the server. Try again in a moment.",
       minute: "Too many messages in the last minute. Try again in {n} seconds.",
       day: "Today's message limit is reached. Come back tomorrow, or download the CV.",
       conversation: "This conversation has reached its length limit. Start a new one.",

@@ -130,13 +130,22 @@ test("retry sends the same key and conversation, keeps the old text until meta, 
   assert.equal(states[0].status, "streaming");
 });
 
-test("a first message sends no conversation id; HTTP failure is a disconnect, never a throw", async () => {
+test("a first message sends no conversation id; a server not reached is a state, never a throw", async () => {
   const failing = recorded([], true);
   const t = await run(newTurn("שאלה", "key-abcdef"), () => {}, { stream: failing.stream,
     companySlug: "acme", lang: "he" });
   assert.deepEqual(failing.calls[0].body, { message: "שאלה", idempotency_key: "key-abcdef",
     company_slug: "acme", lang: "he" });
-  assert.equal(t.error?.code, "disconnected");
+  assert.equal(t.error?.code, "unreachable"); // nothing came back: not a cut answer
+  assert.equal(t.error?.retryable, true);
+});
+
+test("a retry that cannot reach the server says so, and keeps the text the first try showed", async () => {
+  const cut = await run(newTurn("q", "key-12345"), () => {}, {
+    stream: recorded(ANSWER.slice(0, 6), true).stream });
+  const again = await retry(cut, () => {}, { stream: recorded([], true).stream });
+  assert.equal(again.error?.code, "unreachable");
+  assert.equal(plainText(again), "שרה בנתה pipeline תרגום");
 });
 
 test("frames split anywhere, even inside a Hebrew word, parse to the same events", () => {

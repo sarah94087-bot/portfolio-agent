@@ -58,6 +58,13 @@ export const DISCONNECTED: TurnError = {
   retryable: true,
 };
 
+// Nothing came back at all: the server was not reached, or failed before the answer started.
+export const UNREACHABLE: TurnError = {
+  code: "unreachable",
+  message: "The server could not be reached.",
+  retryable: true,
+};
+
 export function newKey(): string {
   return crypto.randomUUID().replaceAll("-", "");
 }
@@ -191,7 +198,9 @@ export function apply(turn: Turn, { event, data }: SseEvent): Turn {
 /** The stream closed: without `done` (or an error), the turn was cut off. */
 export function closed(turn: Turn): Turn {
   if (turn.status === "done" || turn.status === "error") return turn;
-  return { ...turn, status: "error", error: DISCONNECTED };
+  // Still `sending`: this attempt never got its `meta`, so no answer had started.
+  const error = turn.status === "sending" ? UNREACHABLE : DISCONNECTED;
+  return { ...turn, status: "error", error };
 }
 
 export type Send = {
