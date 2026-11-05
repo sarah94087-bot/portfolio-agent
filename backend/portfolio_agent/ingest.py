@@ -14,8 +14,10 @@ import hashlib
 import re
 import statistics
 import sys
+from collections.abc import Sequence
 from dataclasses import dataclass, replace
 from pathlib import Path
+from typing import Protocol
 
 import psycopg
 from psycopg import sql
@@ -33,6 +35,7 @@ from portfolio_agent.kb_check import (
     split,
 )
 from portfolio_agent.retrieval.normalize import normalize
+from portfolio_agent.retrieval.vector import store_embeddings
 
 STRATEGIES = ("C1", "C2", "C3", "C4")
 
@@ -274,7 +277,9 @@ def upsert(
                     " sections = excluded.sections, text = excluded.text,"
                     " context_header = excluded.context_header, aliases = excluded.aliases,"
                     " norm = excluded.norm, content_hash = excluded.content_hash,"
-                    " commit_sha = excluded.commit_sha, updated_at = now()"
+                    " commit_sha = excluded.commit_sha, updated_at = now(),"
+                    # A changed chunk loses its vector, so embed_missing embeds it again.
+                    " embedding = null"
                 ).format(t),
                 (c.id, c.record_id, list(c.sections), c.display, c.header,
                  normalize(c.aliases), normalize(c.content), c.content_hash, commit_sha),
@@ -287,6 +292,26 @@ def upsert(
         "deleted": len(gone),
         "unchanged": len(chunks) - len(changed),
     }
+
+
+class PassageEmbedder(Protocol):
+    def embed_passages(self, texts: Sequence[str]) -> list[list[float]]: ...
+
+
+def embed_missing(
+    conn: psycopg.Connection, chunks: list[Chunk], embedder: PassageEmbedder,
+    table: str = "chunks",
+) -> int:
+    """Embeds the chunks whose row has no vector yet: new ones, and ones upsert changed. What is
+    embedded is what R1 indexes, Chunk.content, as in the M3 experiments. Returns how many."""
+    missing = {r[0] for r in conn.execute(
+        sql.SQL("select id from {} where embedding is null").format(sql.Identifier(table))
+    )}
+    todo = [c for c in chunks if c.id in missing]
+    if todo:
+        vectors = embedder.embed_passages([c.content for c in todo])
+        store_embeddings(conn, table, {c.id: v for c, v in zip(todo, vectors, strict=True)})
+    return len(todo)
 
 
 def count_tokens(text: str) -> int:

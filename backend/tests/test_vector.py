@@ -42,3 +42,22 @@ def test_search_ranks_by_cosine_and_skips_chunks_without_a_vector():
             assert [h.id for h in search(conn, [0, 0, 1], k=1, table="v")] == ["r#c"]
         finally:
             conn.execute("drop table v")
+
+
+@pytest.mark.skipif(not DB_URL, reason="TEST_DATABASE_URL not set")
+def test_a_copy_with_another_model_gets_its_own_column_and_chunks_is_protected():
+    from portfolio_agent.retrieval.vector import embedding_dim
+
+    migrate.run(DB_URL)
+    with psycopg.connect(DB_URL, autocommit=True) as conn:
+        conn.execute("create temp table other (like chunks including all)")
+        try:
+            assert embedding_dim(conn, "other") == 384  # copied from chunks
+            add_embedding_column(conn, "other", 768)
+            assert embedding_dim(conn, "other") == 768
+            add_embedding_column(conn, "other", 768)  # same dim: nothing to do
+            with pytest.raises(ValueError, match="migration"):
+                add_embedding_column(conn, "chunks", 768)
+            assert embedding_dim(conn, "chunks") == 384
+        finally:
+            conn.execute("drop table other")

@@ -18,11 +18,30 @@ def to_vector(values: Sequence[float]) -> str:
     return "[" + ",".join(f"{v:.7g}" for v in values) + "]"
 
 
+def embedding_dim(conn: psycopg.Connection, table: str) -> int | None:
+    """The dimension of the table's embedding column, or None when it has none."""
+    row = conn.execute(
+        "select atttypmod from pg_attribute"
+        " where attrelid = %s::regclass and attname = 'embedding' and not attisdropped",
+        (table,),
+    ).fetchone()
+    return row[0] if row else None
+
+
 def add_embedding_column(conn: psycopg.Connection, table: str, dim: int) -> None:
+    """An embedding column of `dim` dimensions. A copy of `chunks` already has the production
+    one (384, migration 0003); an experiment with another model replaces it on its own copy.
+    The real chunks table is never changed here, so its embeddings cannot be wiped."""
+    current = embedding_dim(conn, table)
+    if current == dim:
+        return
+    t = sql.Identifier(table)
+    if current is not None:
+        if table == "chunks":
+            raise ValueError(f"chunks has vector({current}); a new model needs a migration")
+        conn.execute(sql.SQL("alter table {} drop column embedding").format(t))
     conn.execute(
-        sql.SQL("alter table {} add column if not exists embedding vector({})").format(
-            sql.Identifier(table), sql.Literal(dim)
-        )
+        sql.SQL("alter table {} add column embedding vector({})").format(t, sql.Literal(dim))
     )
 
 

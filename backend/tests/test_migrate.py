@@ -20,3 +20,11 @@ def test_migrations_apply_and_are_idempotent():
         extensions = {r[0] for r in conn.execute("select extname from pg_extension")}
     assert set(first) <= names
     assert {"vector", "pg_trgm"} <= extensions
+
+
+def test_chunks_get_a_384_dimension_embedding_column():
+    from portfolio_agent.retrieval.vector import embedding_dim
+
+    migrate.run(DB_URL)
+    with psycopg.connect(DB_URL) as conn:
+        assert embedding_dim(conn, "chunks") == 384

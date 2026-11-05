@@ -1,0 +1,114 @@
+"""The production embeddings model: multilingual-e5-small, quantized ONNX, in process (ADR-0012).
+
+The same computation as OnnxEmbedder in evals/retrieval/embedders.py, which produced the M3
+results: `query: ` and `passage: ` prefixes, 512 tokens, mean pooling over the attention mask,
+unit vectors. The index and the queries must use the same files, so the files are pinned by
+SHA-256: a different export or quantization fails to load instead of silently changing the
+results. Changing them means re-embedding every chunk (ADR-0012, consequences).
+
+Where the check runs (Sarah, 2026-11-05): at build and at ingest, not on every cold start,
+where it costs 0.3 to 0.5 s on top of a 1.3 s load. Until the build step exists (M5), every
+load checks; from M5 the build verifies the bundled files and from_env loads with check=False.
+
+The model files are not in the repo (130 MB). EMBEDDING_MODEL_DIR points at a folder with
+onnx/model_quantized.onnx and tokenizer.json. numpy, onnxruntime and tokenizers are imported
+when the model loads, so code that never embeds does not pay for them.
+"""
+
+import hashlib
+import os
+import time
+from collections.abc import Sequence
+from functools import cache
+from pathlib import Path
+
+NAME = "multilingual-e5-small"
+DIM = 384
+MAX_LENGTH = 512
+QUERY_PREFIX, PASSAGE_PREFIX = "query: ", "passage: "
+BATCH = 16
+# The files every M3 result was measured with (hashed on 2026-11-05).
+FILES = {
+    "onnx/model_quantized.onnx": "f80102d3f2a1229f387d3c81909990d8945513e347b0eab049f7de3c6f98c193",
+    "tokenizer.json": "0b44a9d7b51c3c62626640cda0e2c2f70fdacdc25bbbd68038369d14ebdf4c39",
+}
+ENV_VAR = "EMBEDDING_MODEL_DIR"
+
+
+class ModelFilesError(Exception):
+    pass
+
+
+def sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for block in iter(lambda: f.read(1 << 20), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
+def verify(model_dir: Path) -> None:
+    for rel, expected in FILES.items():
+        path = model_dir / rel
+        if not path.exists():
+            raise ModelFilesError(f"{rel} is missing in {model_dir}")
+        if sha256(path) != expected:
+            raise ModelFilesError(f"{rel} is not the pinned file (SHA-256 differs)")
+
+
+def model_dir_from_env() -> Path | None:
+    value = os.environ.get(ENV_VAR)
+    return Path(value) if value else None
+
+
+class E5Embedder:
+    def __init__(self, model_dir: Path, threads: int = 1, check: bool = True):
+        import onnxruntime as ort
+        from tokenizers import Tokenizer
+
+        started = time.perf_counter()
+        if check:
+            verify(model_dir)
+        opts = ort.SessionOptions()
+        opts.intra_op_num_threads = threads  # a Vercel Hobby function has one vCPU
+        self.session = ort.InferenceSession(
+            str(model_dir / "onnx" / "model_quantized.onnx"), opts,
+            providers=["CPUExecutionProvider"],
+        )
+        self.tokenizer = Tokenizer.from_file(str(model_dir / "tokenizer.json"))
+        self.tokenizer.enable_truncation(MAX_LENGTH)
+        self.tokenizer.enable_padding()
+        self.inputs = {i.name for i in self.session.get_inputs()}
+        self.load_ms = round((time.perf_counter() - started) * 1000)
+
+    def embed_query(self, text: str) -> list[float]:
+        return self._embed([QUERY_PREFIX + text])[0]
+
+    def embed_passages(self, texts: Sequence[str]) -> list[list[float]]:
+        return self._embed([PASSAGE_PREFIX + t for t in texts])
+
+    def _embed(self, texts: Sequence[str]) -> list[list[float]]:
+        import numpy as np
+
+        out: list[list[float]] = []
+        for i in range(0, len(texts), BATCH):
+            enc = self.tokenizer.encode_batch(list(texts[i : i + BATCH]))
+            ids = np.array([e.ids for e in enc], dtype=np.int64)
+            mask = np.array([e.attention_mask for e in enc], dtype=np.int64)
+            feed = {"input_ids": ids, "attention_mask": mask}
+            if "token_type_ids" in self.inputs:
+                feed["token_type_ids"] = np.zeros_like(ids)
+            hidden = self.session.run(None, feed)[0]
+            m = mask[:, :, None].astype(np.float32)
+            pooled = (hidden * m).sum(axis=1) / np.clip(m.sum(axis=1), 1e-9, None)
+            norms = np.clip(np.linalg.norm(pooled, axis=1, keepdims=True), 1e-12, None)
+            out += (pooled / norms).tolist()
+        return out
+
+
+@cache
+def from_env() -> E5Embedder | None:
+    """The model once per process, from EMBEDDING_MODEL_DIR. None when it is not set, and the
+    search then runs R1 alone and says so in the trace (tools/portfolio.py)."""
+    model_dir = model_dir_from_env()
+    return E5Embedder(model_dir) if model_dir else None

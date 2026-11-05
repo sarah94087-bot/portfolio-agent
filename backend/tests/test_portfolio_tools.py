@@ -105,3 +105,75 @@ def test_get_project_accepts_only_project_and_role_ids(ctx):
     assert "faq" not in enum and "skills" not in enum
     for bad in ("faq", "made-up-project"):
         assert REGISTRY.call("get_project", json.dumps({"id": bad}), ctx).error == "invalid_args"
+
+
+class FakeEmbedder:
+    """Deterministic 384-dimension vectors: one axis per known word, so similar texts are close.
+    Enough to exercise R3 and ingest without the 130 MB model."""
+
+    WORDS = ["approval", "agent", "mcp", "git", "retrieval", "hybrid", "pgvector", "translation"]
+
+    def __init__(self):
+        self.passages = 0
+
+    def _vec(self, text):
+        t = text.lower()
+        v = [float(t.count(w)) for w in self.WORDS] + [0.0] * (384 - len(self.WORDS))
+        v[-1] = 0.1  # never all zero
+        n = sum(x * x for x in v) ** 0.5
+        return [x / n for x in v]
+
+    def embed_query(self, text):
+        return self._vec(text)
+
+    def embed_passages(self, texts):
+        self.passages += len(texts)
+        return [self._vec(t) for t in texts]
+
+
+@needs_db
+def test_embed_missing_embeds_new_and_changed_chunks_only(docs):
+    from dataclasses import replace
+
+    from portfolio_agent.ingest import embed_missing
+
+    chunks = chunk(docs, "C4")
+    migrate.run(DB_URL)
+    with psycopg.connect(DB_URL, autocommit=True) as conn:
+        conn.execute("create temp table e (like chunks including all)")
+        try:
+            fake = FakeEmbedder()
+            upsert(conn, chunks, "e")
+            assert embed_missing(conn, chunks, fake, "e") == len(chunks)
+            assert embed_missing(conn, chunks, fake, "e") == 0  # nothing left to embed
+            changed = [replace(chunks[0], text=chunks[0].text + " More.")] + chunks[1:]
+            upsert(conn, changed, "e")
+            assert embed_missing(conn, changed, fake, "e") == 1  # the changed one lost its vector
+            empty = conn.execute("select count(*) from e where embedding is null").fetchone()[0]
+            assert empty == 0
+        finally:
+            conn.execute("drop table e")
+
+
+@needs_db
+def test_with_an_embedder_search_runs_r3_and_reports_every_timing(docs):
+    from portfolio_agent.ingest import embed_missing
+
+    migrate.run(DB_URL)
+    with psycopg.connect(DB_URL, autocommit=True) as conn:
+        conn.execute("create temp table r (like chunks including all)")
+        try:
+            chunks = chunk(docs, "C4")
+            fake = FakeEmbedder()
+            upsert(conn, chunks, "r")
+            embed_missing(conn, chunks, fake, "r")
+            ctx = PortfolioContext.from_docs(conn, docs, table="r", embedder=fake)
+            result, _ = call(ctx, "search_portfolio", query="human approval for git mcp agent")
+            trace = result.trace_view
+            assert trace["method"] == "R3"
+            assert set(trace["latency_ms"]) == {"embed", "lexical", "vector", "fusion"}
+            first = trace["results"][0]
+            assert first["chunk_id"] == "git-mcp-server#all"
+            assert first["scores"]["vector"] is not None and first["scores"]["lexical"] is not None
+        finally:
+            conn.execute("drop table r")
