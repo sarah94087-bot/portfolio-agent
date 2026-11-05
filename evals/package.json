@@ -1,0 +1,12 @@
+{
+  "name": "portfolio-agent-evals",
+  "private": true,
+  "description": "Answer and safety evals (docs/03-evaluation-methodology.md): Promptfoo over the real agent",
+  "scripts": {
+    "t1": "node answers/run.mjs t1 --env-file ../.env",
+    "t2": "node answers/run.mjs t2 --env-file ../.env"
+  },
+  "devDependencies": {
+    "promptfoo": "0.124.1"
+  }
+}

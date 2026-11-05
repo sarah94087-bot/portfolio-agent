@@ -1,0 +1,35 @@
+# T1 and T2 (docs/03-evaluation-methodology.md, section 7) through the real agent. Run it
+# through answers/run.mjs, which sets what Python needs and picks the tier (cases.py says
+# which cases each tier has):
+#
+#   cd evals && npm run t1                                  # Groq, with the judge
+#   EVAL_MODEL=scripted EVAL_JUDGE=off npm run t1 -- --no-cache    # no tokens: the harness
+#
+# Needs DATABASE_URL (or EVAL_DATABASE_URL) with the ingested knowledge base, and
+# EMBEDDING_MODEL_DIR for R3.
+description: "Answers and safety: the real agent, checked in code and by the judge"
+
+prompts:
+  - "{{question}}"
+
+providers:
+  - id: file://provider.py
+    label: agent
+
+# The judge is from another model family than the generator (docs/03, section 4): the
+# generator is gpt-oss-120b, so the judge is qwen. A case that fell back to qwen is flagged in
+# its output (`model`), and its judge decisions are not used for calibration.
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:qwen/qwen3.8-27b
+      config:
+        apiBaseUrl: https://api.groq.com/openai/v1
+        apiKeyEnvar: GROQ_API_KEY_EVALS
+        temperature: 0
+
+tests: file://cases.py:tests  # EVAL_TIER, set by run.mjs
+
+evaluateOptions:
+  maxConcurrency: 1  # one request at a time: the minute limits are per model
+

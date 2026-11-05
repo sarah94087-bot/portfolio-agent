@@ -96,6 +96,7 @@ class Deps:
     tracer: Callable[[], Any] = tracing.Exporter.from_env  # None without Langfuse keys
     now: Callable[[], datetime] = lambda: datetime.now(UTC)
     table: str = "chunks"
+    use_cache: bool = True  # evals turn it off: they measure a fresh answer
 
 
 DEPS = Deps()
@@ -209,7 +210,7 @@ async def _answer(req: ChatRequest, deps: Deps, caller: Caller, out: _Out) -> No
         db.save_user(conn, conversation_id, req.message)
         message_id = uuid.uuid4()
         cache_key = None
-        if not history:  # only a first question is answered from the cache
+        if deps.use_cache and not history:  # only a first question, from the cache
             kb = response_cache.kb_version(conn, deps.table)
             cache_key = response_cache.key(req.message, prompt.VERSION, kb)
             hit = response_cache.get(conn, cache_key, now)

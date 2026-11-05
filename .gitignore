@@ -35,3 +35,9 @@ Thumbs.db
 
 # embeddings cache and local model files for the M3 experiments
 evals/.cache/
+
+# embeddings model files for the backend (python -m portfolio_agent.retrieval.fetch_model models/multilingual-e5-small)
+models/
+
+# the latest Promptfoo run (evals/answers/run.mjs); a run worth keeping is copied with its date and commit
+evals/results/promptfoo-*-latest.json
