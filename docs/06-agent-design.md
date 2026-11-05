@@ -51,7 +51,7 @@ async def run_turn(conversation, user_message, emit):
 
 ## 2. הנחיית המערכת
 
-ההנחיה נשמרת כקובץ עם גרסה, `api/app/agent/prompts/system.v1.md`. כל שינוי בה עובר את שכבת T1 של הבדיקות (פרק 4), וגרסת ההנחיה נרשמת בכל תשובה.
+ההנחיה נשמרת כקובץ עם גרסה, `backend/portfolio_agent/agent/prompts/system.v1.md`. כל שינוי בה עובר את שכבת T1 של הבדיקות (פרק 4), וגרסת ההנחיה נרשמת בכל תשובה.
 
 ### מבנה
 | חלק | תוכן |
