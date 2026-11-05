@@ -81,6 +81,22 @@ const he = {
       internal: "משהו השתבש אצלנו.",
     },
     newConversation: "שיחה חדשה",
+    // US-2.7, board S2-States (e).
+    feedback: {
+      up: "תשובה מועילה",
+      down: "תשובה לא מועילה",
+      thanks: "תודה.",
+      thanksMore: "תודה. אפשר להוסיף פירוט.",
+      commentLabel: "מה לא עבד? (אופציונלי)",
+      counter: "{n} / {max}",
+      challenge: "זה ניסיון באתגר",
+      challengeHint: "מוזמנים לנסות לגרום לסוכן לשקר. דיווחים עוברים דרך הכפתור הזה.",
+      send: "שליחת דיווח",
+      cancel: "ביטול",
+      sent: "תודה על הדיווח.",
+      failed: "המשוב לא נשמר. אפשר לנסות שוב.",
+      limited: "נשלח היום הרבה משוב. אפשר לנסות שוב מחר.",
+    },
   },
 };
 
@@ -155,6 +171,21 @@ const en: Dictionary = {
       internal: "Something went wrong on our side.",
     },
     newConversation: "New conversation",
+    feedback: {
+      up: "Helpful answer",
+      down: "Not a helpful answer",
+      thanks: "Thanks.",
+      thanksMore: "Thanks. You can add details.",
+      commentLabel: "What didn't work? (optional)",
+      counter: "{n} / {max}",
+      challenge: "This was a challenge attempt",
+      challengeHint: "You're welcome to try to make the agent lie. Reports go through this button.",
+      send: "Send report",
+      cancel: "Cancel",
+      sent: "Thanks for the report.",
+      failed: "The feedback wasn't saved. Try again.",
+      limited: "That's a lot of feedback for one day. Try again tomorrow.",
+    },
   },
 };
 

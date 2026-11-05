@@ -27,6 +27,7 @@ class Limits:
     visitor_minute: int = 6
     ip_day: int = 60
     conversation: int = 30
+    feedback_day: int = 50  # ratings and comments per visitor; a change of mind counts too
     model_day_tokens: int = 200_000  # Groq, per model per org (verified in M1)
     visitor_share: float = 0.8
 
@@ -39,6 +40,7 @@ class Limits:
         env = dict(os.environ) if env is None else env
         names = {"visitor_day": "LIMIT_VISITOR_DAY", "visitor_minute": "LIMIT_VISITOR_MINUTE",
                  "ip_day": "LIMIT_IP_DAY", "conversation": "LIMIT_CONVERSATION",
+                 "feedback_day": "LIMIT_FEEDBACK_DAY",
                  "model_day_tokens": "MODEL_DAY_TOKENS"}
         return cls(**{field: int(env[var]) for field, var in names.items() if env.get(var)})
 

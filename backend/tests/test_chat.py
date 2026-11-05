@@ -376,3 +376,71 @@ def test_every_request_sends_one_trace_named_by_its_message(use):
     assert "me@example.com" not in trace and "x@y.io" not in trace
     _, refused = post({"message": "x" * 1001, "idempotency_key": "key-trace-2"})
     assert len(TRACES.sent) == 2 and "input_too_long" in json.dumps(TRACES.sent[1])
+
+
+# POST /api/feedback (US-2.7), on answers made by the chat endpoint above.
+
+def answered(key):
+    _, events = post({"message": "MCP?", "idempotency_key": key})
+    return events[0][1]
+
+
+def rate(body, client=None):
+    return (client or BROWSER["client"]).post("/api/feedback", json=body).status_code
+
+
+def stored_feedback(message_id):
+    with psycopg.connect(DB_URL) as conn:
+        return conn.execute("select rating, comment, challenge from feedback where message_id = %s",
+                            (message_id,)).fetchone()
+
+
+def test_a_thumbs_down_keeps_a_masked_comment_and_a_change_of_mind_replaces_it(use):
+    use(answer())
+    mid = answered("key-fb-1")["message_id"]
+    assert rate({"message_id": mid, "rating": "down"}) == 204
+    assert stored_feedback(mid) == ("down", None, False)  # saved at once, before any comment
+    assert rate({"message_id": mid, "rating": "down", "challenge": True,
+                 "comment": "  wrong number, write to me@example.com or 050-1234567  "}) == 204
+    rating, comment, challenge = stored_feedback(mid)
+    assert rating == "down" and challenge is True
+    assert "example.com" not in comment and "1234567" not in comment
+    assert comment.startswith("wrong number") and not comment.endswith(" ")
+    assert rate({"message_id": mid, "rating": "up", "comment": "ignored",
+                 "challenge": True}) == 204
+    assert stored_feedback(mid) == ("up", None, False)
+
+
+def test_only_the_visitor_who_got_the_answer_may_rate_it(use):
+    use(answer(), answer())
+    meta = answered("key-fb-2")
+    assert rate({"message_id": meta["message_id"], "rating": "down"}, TestClient(app)) == 404
+    stranger = TestClient(app)  # a visitor with a cookie of their own
+    post({"message": "hello", "idempotency_key": "key-fb-2b"}, stranger)
+    assert rate({"message_id": meta["message_id"], "rating": "down"}, stranger) == 404
+    assert rate({"message_id": str(uuid.uuid4()), "rating": "down"}) == 404
+    with psycopg.connect(DB_URL) as conn:
+        question = conn.execute(
+            "select id from messages where conversation_id = %s and role = 'user'",
+            (meta["conversation_id"],)).fetchone()[0]
+    assert rate({"message_id": str(question), "rating": "down"}) == 404  # not an answer
+    assert stored_feedback(meta["message_id"]) is None
+
+
+def test_feedback_is_limited_per_visitor_and_checked_for_length(use):
+    use(answer(), limits=Limits(feedback_day=2))
+    mid = answered("key-fb-3")["message_id"]
+    assert rate({"message_id": mid, "rating": "down", "comment": "x" * 301}) == 422
+    assert rate({"message_id": mid, "rating": "down", "comment": "x" * 300}) == 204
+    assert rate({"message_id": mid, "rating": "up"}) == 204
+    assert rate({"message_id": mid, "rating": "down"}) == 429
+    assert stored_feedback(mid)[0] == "up"
+
+
+def test_feedback_goes_with_its_conversation(use):
+    use(answer())
+    meta = answered("key-fb-4")
+    assert rate({"message_id": meta["message_id"], "rating": "up"}) == 204
+    with psycopg.connect(DB_URL, autocommit=True) as conn:
+        conn.execute("delete from conversations where id = %s", (meta["conversation_id"],))
+    assert stored_feedback(meta["message_id"]) is None

@@ -1,4 +1,5 @@
-"""FastAPI app: health, the chat endpoint (chat.py), and the M1 spike endpoints S1 and S2."""
+"""FastAPI app: health, the chat and feedback endpoints (chat.py, feedback.py), and the M1
+spike endpoints S1 and S2."""
 
 import asyncio
 import time
@@ -7,7 +8,7 @@ from collections.abc import AsyncIterator
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 
-from portfolio_agent import __version__, chat, sse
+from portfolio_agent import __version__, chat, feedback, sse
 from portfolio_agent.config import Settings
 
 # Instance bookkeeping for the cold start spike (S2): the first request an instance serves
@@ -17,6 +18,7 @@ _requests_served = 0
 
 app = FastAPI(title="portfolio-agent", version=__version__, docs_url=None, redoc_url=None)
 app.include_router(chat.router)
+app.include_router(feedback.router)
 
 
 def _instance_info() -> dict:

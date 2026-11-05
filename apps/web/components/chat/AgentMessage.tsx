@@ -8,6 +8,7 @@ import { Tag } from "@/components/ui/Tag";
 import { ChevronIcon, CloseIcon, RetryIcon, SpinnerIcon, SwapIcon } from "@/components/ui/icons";
 import { blocks, runs, spoken, type Inline } from "@/lib/answer";
 import type { Source, Turn } from "@/lib/chat";
+import { Feedback } from "./Feedback";
 
 export type ChatStrings = Dictionary["chat"];
 
@@ -349,6 +350,10 @@ export function AgentMessage({ turn, lang, t, agentName, onRetry }: Props) {
 
       {(turn.status === "done" || (turn.status === "error" && turn.usage)) && (
         <TraceLine turn={turn} lang={lang} t={t} />
+      )}
+
+      {turn.status === "done" && turn.messageId && (
+        <Feedback key={turn.messageId} messageId={turn.messageId} lang={lang} t={t.feedback} />
       )}
     </article>
   );

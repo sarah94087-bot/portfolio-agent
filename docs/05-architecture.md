@@ -152,7 +152,7 @@ sequenceDiagram
 | Endpoint | קלט | פלט | הגנות |
 |---|---|---|---|
 | `POST /api/chat` | `message`, `conversation_id?`, `company_slug?`, `idempotency_key` | SSE | אורך, קצב, מכסות |
-| `POST /api/feedback` | `message_id`, `rating`, `comment?` | `204` | קצב, אורך |
+| `POST /api/feedback` | `message_id`, `rating` (`up` / `down`), `comment?`, `challenge?` | `204`, או `404` לתשובה שאינה של המבקר | קצב, אורך |
 | `POST /api/contact/send` | `draft_id`, `name`, `reply_to`, `body`, `website` (honeypot) | `202` | אישור מפורש, honeypot, מכסה יומית |
 | `GET /api/company/{slug}` | — | פתיח ושאלות פתיחה, או `404` | — |
 | `POST /api/visit` | `company_slug` | `204` | סינון בוטים, הגבלת התראות (US-8.3) |
@@ -171,7 +171,7 @@ sequenceDiagram
 | `conversations` | `id`, `visitor_id`, `company_slug?`, `created_at` | 30 יום (פרק 10) |
 | `messages` | `id`, `conversation_id`, `role`, `content`, `model`, `usage`, `idempotency_key` | 30 יום |
 | `steps` | `message_id`, `kind`, `name`, `args`, `result_summary`, `duration_ms` | 30 יום |
-| `feedback` | `message_id`, `rating`, `comment` | 30 יום |
+| `feedback` | `message_id`, `rating`, `comment`, `challenge` | 30 יום |
 | `quota_counters` | `scope` (`visitor` / `visitor_minute` / `ip` / `provider_tokens` / `provider_closed` / `contact` / `alert`), `key`, `day`, `count` | 7 ימים |
 | `ip_salts` | `day`, `salt` (אקראי, לא נגזר מסוד) | יומיים |
 | `response_cache` | `key_hash`, `response`, `expires_at` | לפי TTL |

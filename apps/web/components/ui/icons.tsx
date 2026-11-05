@@ -109,3 +109,16 @@ export const RetryIcon = ({ size = 15, className = "" }: IconProps) => (
     <path d="M13 8a5 5 0 1 1-1.5-3.5M13 2.5v3h-3" />
   </Svg>
 );
+
+// Thumbs up from the boards; ThumbDownIcon is the same drawing turned over.
+export const ThumbIcon = ({ size = 17, className = "" }: IconProps) => (
+  <Svg size={size} viewBox="0 0 24 24" strokeWidth={1.7} className={className}>
+    <path d="M7 11v9H4v-9zM7 11l4-7a2 2 0 0 1 2 2v3h5.2a2 2 0 0 1 2 2.3l-1.2 6a2 2 0 0 1-2 1.7H7" />
+  </Svg>
+);
+
+export const CheckIcon = ({ size = 12, className = "" }: IconProps) => (
+  <Svg size={size} strokeWidth={2.4} className={className}>
+    <path d="M3 8.5 6.5 12 13 4.5" />
+  </Svg>
+);
