@@ -83,3 +83,38 @@ def bootstrap_mean(
     means = sorted(fmean(rng.choices(values, k=len(values))) for _ in range(resamples))
     tail = (1 - confidence) / 2
     return means[math.floor(tail * resamples)], means[math.ceil((1 - tail) * resamples) - 1]
+
+
+def cohen_kappa(a: Sequence, b: Sequence) -> float | None:
+    """Agreement between two raters beyond chance (docs/03, section 4: the judge is accepted at
+    kappa >= 0.7). None when chance agreement is already 1, as when both raters gave one label
+    to everything: kappa is undefined there, and the raw agreement says what there is to say."""
+    if len(a) != len(b) or not a:
+        raise ValueError("kappa needs two label lists of the same, nonzero length")
+    n = len(a)
+    observed = sum(x == y for x, y in zip(a, b, strict=True)) / n
+    labels = set(a) | set(b)
+    expected = sum((list(a).count(k) / n) * (list(b).count(k) / n) for k in labels)
+    if expected == 1:
+        return None
+    return (observed - expected) / (1 - expected)
+
+
+def kappa_interval(a: Sequence, b: Sequence, rounds: int = 2000, seed: int = 0,
+                   confidence: float = 0.95) -> tuple[float, float] | None:
+    """Percentile bootstrap over the labeled items, resampled in pairs. Resamples where kappa is
+    undefined are left out; None if most of them are."""
+    rng = random.Random(seed)
+    pairs = list(zip(a, b, strict=True))
+    values = []
+    for _ in range(rounds):
+        sample = [pairs[rng.randrange(len(pairs))] for _ in pairs]
+        k = cohen_kappa([x for x, _ in sample], [y for _, y in sample])
+        if k is not None:
+            values.append(k)
+    if len(values) < rounds / 2:
+        return None
+    values.sort()
+    tail = (1 - confidence) / 2
+    return values[int(tail * len(values))], values[min(len(values) - 1,
+                                                       int((1 - tail) * len(values)))]

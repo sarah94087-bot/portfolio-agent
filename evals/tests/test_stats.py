@@ -1,5 +1,6 @@
 import pytest
 
+import stats
 from stats import format_rate, paired_bootstrap, wilson
 
 
@@ -93,3 +94,23 @@ def test_bootstrap_rejects_unpaired_or_empty_scores():
         paired_bootstrap([1, 0], [1])
     with pytest.raises(ValueError):
         paired_bootstrap([], [])
+
+
+def test_kappa_matches_the_textbook_example():
+    # 50 items: both yes 20, a yes b no 5, a no b yes 10, both no 15 -> kappa 0.4
+    a = ["y"] * 25 + ["n"] * 25
+    b = ["y"] * 20 + ["n"] * 5 + ["y"] * 10 + ["n"] * 15
+    assert abs(stats.cohen_kappa(a, b) - 0.4) < 1e-9
+
+
+def test_kappa_is_one_for_full_agreement_and_undefined_for_one_label():
+    assert stats.cohen_kappa([1, 0, 1, 0], [1, 0, 1, 0]) == 1.0
+    assert stats.cohen_kappa([1, 1, 1], [1, 1, 1]) is None
+
+
+def test_kappa_interval_contains_the_estimate_and_is_reproducible():
+    a = [1] * 30 + [0] * 30
+    b = [1] * 26 + [0] * 4 + [1] * 6 + [0] * 24
+    k = stats.cohen_kappa(a, b)
+    low, high = stats.kappa_interval(a, b)
+    assert low < k < high and stats.kappa_interval(a, b) == (low, high)
