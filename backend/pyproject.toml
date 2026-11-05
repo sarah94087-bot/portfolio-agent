@@ -26,9 +26,13 @@ dev = [
   "ruff==0.17.3",  # pinned so CI lints with the same rules as local
 ]
 
-[tool.setuptools]
-# Only the app package ships. migrations/ and tests/ sit next to it and are not packages.
-packages = ["portfolio_agent"]
+# Only the app package and its subpackages ship, with the prompt files the agent reads at run
+# time. migrations/ and tests/ sit next to it and are not packages.
+[tool.setuptools.packages.find]
+include = ["portfolio_agent", "portfolio_agent.*"]
+
+[tool.setuptools.package-data]
+"portfolio_agent.agent" = ["prompts/*.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
