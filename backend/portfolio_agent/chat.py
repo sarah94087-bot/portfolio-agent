@@ -34,7 +34,7 @@ from uuid import UUID
 import httpx
 import psycopg
 from fastapi import APIRouter, Request
-from fastapi.responses import StreamingResponse
+from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field
 
 from portfolio_agent import sse, tracing
@@ -127,6 +127,22 @@ async def chat(req: ChatRequest, request: Request) -> StreamingResponse:
     response.set_cookie(visitor.COOKIE, cookie, max_age=visitor.MAX_AGE, httponly=True,
                         secure=https, samesite="lax", path="/")  # 30 days from the last use
     return response
+
+
+@router.delete("/api/conversations/{conversation_id}", status_code=204)
+def delete_conversation(conversation_id: UUID, request: Request) -> Response:
+    """The visitor deletes their conversation at once (US-12.4): 204, or 404 when it is not
+    theirs or is gone already, so nobody learns which ids exist. Traces already in Langfuse go
+    in the daily retention job, by conversation id (M6)."""
+    visitor_id = visitor.read_cookie(request.cookies.get(visitor.COOKIE))
+    if visitor_id is None:
+        return Response(status_code=404)
+    url = DEPS.database_url()
+    if not url:
+        return Response(status_code=503)
+    with psycopg.connect(url, autocommit=True, connect_timeout=5) as conn:
+        deleted = db.delete_conversation(conn, conversation_id, visitor_id)
+    return Response(status_code=204 if deleted else 404)
 
 
 async def _frames(req: ChatRequest, deps: Deps, caller: Caller) -> AsyncIterator[str]:

@@ -81,6 +81,18 @@ const he = {
       internal: "משהו השתבש אצלנו.",
     },
     newConversation: "שיחה חדשה",
+    // US-12.4, board S7-S8 (the dialog and the toast).
+    conversation: {
+      actions: "פעולות על השיחה",
+      delete: "מחיקת השיחה",
+      confirmTitle: "למחוק את השיחה?",
+      confirmText: "ההודעות, צעדי העקבות והפידבק יימחקו מיד והמסך יתנקה. אי אפשר לשחזר.",
+      confirm: "מחיקה",
+      cancel: "ביטול",
+      deleting: "מוחק…",
+      deleted: "השיחה נמחקה",
+      failed: "השיחה לא נמחקה. אפשר לנסות שוב.",
+    },
     // US-2.7, board S2-States (e).
     feedback: {
       up: "תשובה מועילה",
@@ -251,6 +263,17 @@ const en: Dictionary = {
       internal: "Something went wrong on our side.",
     },
     newConversation: "New conversation",
+    conversation: {
+      actions: "Conversation actions",
+      delete: "Delete conversation",
+      confirmTitle: "Delete this conversation?",
+      confirmText: "Messages, trace steps and feedback are deleted immediately and the screen is cleared. This can't be undone.",
+      confirm: "Delete",
+      cancel: "Cancel",
+      deleting: "Deleting…",
+      deleted: "Conversation deleted",
+      failed: "The conversation wasn't deleted. Try again.",
+    },
     feedback: {
       up: "Helpful answer",
       down: "Not a helpful answer",

@@ -6,6 +6,7 @@ import { CompassIcon, JobIcon, LayersIcon, StarIcon } from "@/components/ui/icon
 import { newTurn, retry as retryTurn, run, type Turn } from "@/lib/chat";
 import { AgentMessage, type ChatStrings } from "./AgentMessage";
 import { Composer, type ComposerMode, type ComposerStrings } from "./Composer";
+import { ConversationActions } from "./ConversationActions";
 import { TracePanel } from "./TracePanel";
 
 // One tone per starter, in the design's order: ink, stone, salmon, accent (the job check).
@@ -78,6 +79,24 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
 
   function retry(turn: Turn) {
     void retryTurn(turn, update, { conversationId: conversationId.current, lang: pageLang });
+  }
+
+  // Back to the welcome screen. "New conversation" leaves the old one on the server (it expires
+  // in 30 days); after a delete it is already gone, and a toast says so (board S7-S8).
+  const [toast, setToast] = useState("");
+  useEffect(() => {
+    if (!toast) return;
+    const id = setTimeout(() => setToast(""), 4000);
+    return () => clearTimeout(id);
+  }, [toast]);
+  function startOver(message = "") {
+    setTurns([]);
+    conversationId.current = undefined;
+    setTrace(null);
+    setValue("");
+    setMode("question");
+    setToast(message);
+    requestAnimationFrame(() => inputRef.current?.focus());
   }
 
   function pick(index: number) {
@@ -160,6 +179,15 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
       <div
         className={`sticky bottom-0 -mx-4 mt-auto bg-surface px-4 pb-[max(18px,env(safe-area-inset-bottom))] pt-3 ${started ? "md:pb-[22px]" : "md:static md:mx-0 md:mt-6 md:bg-transparent md:p-0"}`}
       >
+        {started && (
+          <ConversationActions
+            t={chat}
+            conversationId={turns.findLast((x) => x.conversationId)?.conversationId}
+            busy={busy}
+            onNew={() => startOver()}
+            onDeleted={() => startOver(chat.conversation.deleted)}
+          />
+        )}
         <Composer
           ref={inputRef}
           lang={lang}
@@ -176,6 +204,13 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
           onSubmit={(text) => send(text)}
         />
         <p className="mt-2.5 text-[12.5px] leading-[1.5] text-text-muted md:mt-4 md:text-small">{privacy}</p>
+      </div>
+
+      {/* Always in the page, so screen readers hear the toast when its text arrives. */}
+      <div role="status" className="pointer-events-none fixed inset-x-0 top-[72px] z-50 flex justify-center px-4 md:top-[88px]">
+        {toast && (
+          <p className="rounded-[10px] bg-text px-3.5 py-2.5 text-[14px] font-semibold text-surface shadow-pop">{toast}</p>
+        )}
       </div>
     </>
   );

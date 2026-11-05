@@ -153,6 +153,7 @@ sequenceDiagram
 |---|---|---|---|
 | `POST /api/chat` | `message`, `conversation_id?`, `company_slug?`, `idempotency_key` | SSE | אורך, קצב, מכסות |
 | `POST /api/feedback` | `message_id`, `rating` (`up` / `down`), `comment?`, `challenge?` | `204`, או `404` לתשובה שאינה של המבקר | קצב, אורך |
+| `DELETE /api/conversations/{id}` | — | `204`, או `404` לשיחה שאינה של המבקר (US-12.4) | עוגייה חתומה |
 | `POST /api/contact/send` | `draft_id`, `name`, `reply_to`, `body`, `website` (honeypot) | `202` | אישור מפורש, honeypot, מכסה יומית |
 | `GET /api/company/{slug}` | — | פתיח ושאלות פתיחה, או `404` | — |
 | `POST /api/visit` | `company_slug` | `204` | סינון בוטים, הגבלת התראות (US-8.3) |

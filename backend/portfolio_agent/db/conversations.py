@@ -59,6 +59,17 @@ def open_conversation(
     ).fetchone()[0]
 
 
+def delete_conversation(conn: psycopg.Connection, conversation_id: UUID, visitor_id: str) -> bool:
+    """Deletes one of this visitor's conversations now (US-12.4). Its messages, their steps and
+    their feedback go with it (on delete cascade, migrations 0004 and 0008). False when there is
+    no such conversation of theirs: gone already, or someone else's."""
+    row = conn.execute(
+        "delete from conversations where id = %s and visitor_id = %s returning id",
+        (conversation_id, visitor_id),
+    ).fetchone()
+    return row is not None
+
+
 @dataclass(frozen=True)
 class PendingQuestion:
     message_id: UUID

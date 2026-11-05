@@ -448,3 +448,43 @@ def test_feedback_goes_with_its_conversation(use):
     with psycopg.connect(DB_URL, autocommit=True) as conn:
         conn.execute("delete from conversations where id = %s", (meta["conversation_id"],))
     assert stored_feedback(meta["message_id"]) is None
+
+
+# DELETE /api/conversations/{id} (US-12.4).
+
+def counts(conversation_id, message_id):
+    with psycopg.connect(DB_URL) as conn:
+        return tuple(conn.execute(q, (p,)).fetchone()[0] for q, p in [
+            ("select count(*) from conversations where id = %s", conversation_id),
+            ("select count(*) from messages where conversation_id = %s", conversation_id),
+            ("select count(*) from steps where message_id = %s", message_id),
+            ("select count(*) from feedback where message_id = %s", message_id),
+        ])
+
+
+def test_a_visitor_deletes_their_conversation_with_its_messages_steps_and_feedback(use):
+    use(Scripted([search("MCP"), Finish("m1")],
+                 [TextDelta("Yes [[git-mcp-server#all]]."), Finish("m1")]),
+        answer())
+    meta = answered("key-del-1")
+    cid, mid = meta["conversation_id"], meta["message_id"]
+    assert rate({"message_id": mid, "rating": "down", "comment": "x"}) == 204
+    assert counts(cid, mid) == (1, 2, 3, 1)
+
+    stranger = TestClient(app)
+    post({"message": "hello", "idempotency_key": "key-del-1b"}, stranger)
+    assert stranger.delete(f"/api/conversations/{cid}").status_code == 404
+    assert TestClient(app).delete(f"/api/conversations/{cid}").status_code == 404  # no cookie
+    assert counts(cid, mid) == (1, 2, 3, 1)
+
+    assert BROWSER["client"].delete(f"/api/conversations/{cid}").status_code == 204
+    assert counts(cid, mid) == (0, 0, 0, 0)
+    assert BROWSER["client"].delete(f"/api/conversations/{cid}").status_code == 404  # gone
+
+
+def test_a_message_to_a_deleted_conversation_starts_a_new_one(use):
+    use(answer(), answer())
+    cid = answered("key-del-2")["conversation_id"]
+    assert BROWSER["client"].delete(f"/api/conversations/{cid}").status_code == 204
+    _, events = post({"message": "again", "idempotency_key": "key-del-3", "conversation_id": cid})
+    assert events[0][1]["conversation_id"] != cid and text(events) == "Hi."

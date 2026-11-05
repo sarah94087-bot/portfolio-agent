@@ -122,3 +122,15 @@ export const CheckIcon = ({ size = 12, className = "" }: IconProps) => (
     <path d="M3 8.5 6.5 12 13 4.5" />
   </Svg>
 );
+
+export const PlusIcon = ({ size = 14, className = "" }: IconProps) => (
+  <Svg size={size} strokeWidth={1.8} className={className}>
+    <path d="M8 3v10M3 8h10" />
+  </Svg>
+);
+
+export const TrashIcon = ({ size = 14, className = "" }: IconProps) => (
+  <Svg size={size} strokeWidth={1.6} className={className}>
+    <path d="M2.5 4h11M6.5 4V2.5h3V4M4 4l.7 9.5h6.6L12 4M6.8 6.5v4.5M9.2 6.5v4.5" />
+  </Svg>
+);
