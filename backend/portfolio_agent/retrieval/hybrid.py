@@ -6,12 +6,17 @@ not three equal voices of which two are lexical. Each side brings its top CANDID
 search_portfolio contract (docs/04, section 8).
 """
 
+import time
 from collections.abc import Sequence
 
 import psycopg
 
 from portfolio_agent.retrieval import lexical, vector
 from portfolio_agent.retrieval.lexical import CANDIDATES, RRF_K, Hit
+
+
+def _ms(start: float, end: float) -> int:
+    return round((end - start) * 1000)
 
 
 def rrf(rankings: Sequence[Sequence[str]], k: int = RRF_K) -> list[tuple[str, float]]:
@@ -28,12 +33,22 @@ def rrf(rankings: Sequence[Sequence[str]], k: int = RRF_K) -> list[tuple[str, fl
 
 def search(
     conn: psycopg.Connection, query: str, query_vector: Sequence[float], k: int = 10,
-    table: str = "chunks",
+    table: str = "chunks", timings: dict[str, int] | None = None,
 ) -> list[Hit]:
-    """The k chunks with the best fused rank. The caller embeds the query, as for R2."""
+    """The k chunks with the best fused rank. The caller embeds the query, as for R2.
+
+    `timings`, when given, gets the milliseconds of each side and of the fusion, for the
+    trace panel (docs/04-retrieval-design.md, section 8).
+    """
+    t0 = time.perf_counter()
     lex = lexical.search(conn, query, CANDIDATES, table)
+    t1 = time.perf_counter()
     vec = vector.search(conn, query_vector, CANDIDATES, table)
+    t2 = time.perf_counter()
     fused = rrf([[h.id for h in lex], [h.id for h in vec]])[:k]
+    if timings is not None:
+        timings.update(lexical=_ms(t0, t1), vector=_ms(t1, t2),
+                       fusion=_ms(t2, time.perf_counter()))
     by_id = {h.id: h for h in vec} | {h.id: h for h in lex}
     lex_scores = {h.id: h.scores["rrf"] for h in lex}
     vec_scores = {h.id: h.scores["vector"] for h in vec}
