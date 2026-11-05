@@ -172,7 +172,8 @@ sequenceDiagram
 | `messages` | `id`, `conversation_id`, `role`, `content`, `model`, `usage`, `idempotency_key` | 30 יום |
 | `steps` | `message_id`, `kind`, `name`, `args`, `result_summary`, `duration_ms` | 30 יום |
 | `feedback` | `message_id`, `rating`, `comment` | 30 יום |
-| `quota_counters` | `scope` (`visitor` / `provider` / `contact` / `alert`), `key`, `day`, `count` | 7 ימים |
+| `quota_counters` | `scope` (`visitor` / `visitor_minute` / `ip` / `provider_tokens` / `provider_closed` / `contact` / `alert`), `key`, `day`, `count` | 7 ימים |
+| `ip_salts` | `day`, `salt` (אקראי, לא נגזר מסוד) | יומיים |
 | `response_cache` | `key_hash`, `response`, `expires_at` | לפי TTL |
 | `company_links` | `slug`, `company`, `role`, `opening`, `starter_questions` | עד ששרה מוחקת |
 | `contact_requests` | `draft_id`, `conversation_id`, `status`, `sent_at` | 30 יום |

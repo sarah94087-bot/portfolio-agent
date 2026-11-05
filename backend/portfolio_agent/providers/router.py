@@ -9,8 +9,9 @@ A failure before the first event is invisible to the visitor. After text was sen
 yields Restart and the next model answers the same round from the start, and the loop tells
 the visitor so: transparency is a pillar, so the switch is shown, not hidden.
 
-The day state lives in memory for now. quota_counters in the database (docs/05, section 7)
-takes it over with the persistence step, so it survives a cold start.
+Minute and 5xx pauses live in memory: they are short, and losing one costs a single call.
+A day limit is written to quota_counters through a QuotaStore (guards/quotas.py) and read at
+the start of every turn, so it survives a cold start and every instance skips the model.
 """
 
 import os
@@ -47,6 +48,12 @@ class Restart:
     reason: str
 
 
+class QuotaStore(Protocol):
+    def closed(self) -> dict[str, tuple[float, str]]: ...  # name -> (Unix time, reason)
+
+    def close(self, model: str, until: float) -> None: ...
+
+
 class AllModelsFailed(Exception):
     def __init__(self, code: str, attempts: list[tuple[str, str]]):
         super().__init__(code)
@@ -58,6 +65,7 @@ class AllModelsFailed(Exception):
 class Router:
     models: list[Model]
     clock: Callable[[], float] = time.monotonic
+    wall: Callable[[], float] = time.time
     closed_until: dict[str, float] = field(default_factory=dict)  # model name -> time
     open_reason: dict[str, str] = field(default_factory=dict)
 
@@ -65,18 +73,29 @@ class Router:
         now = self.clock()
         return [m for m in self.models if self.closed_until.get(m.name, 0.0) <= now]
 
-    def trip(self, model: Model, error: ProviderError) -> None:
+    def trip(self, model: Model, error: ProviderError, store: QuotaStore | None = None) -> None:
         pause = {
             "rate_minute": error.retry_after or MINUTE,
             "rate_day": error.retry_after or DAY_FALLBACK,
             "unavailable": error.retry_after or UNAVAILABLE_PAUSE,
         }.get(error.kind)
         if pause is not None:
-            self.closed_until[model.name] = self.clock() + pause
-            self.open_reason[model.name] = error.kind
+            self._close(model.name, self.clock() + pause, error.kind)
+            if store is not None and error.kind == "rate_day":
+                store.close(model.name, self.wall() + pause)
 
-    def for_turn(self) -> "TurnRouter":
-        return TurnRouter(self)
+    def _close(self, name: str, until: float, reason: str) -> None:
+        if until > self.closed_until.get(name, 0.0):
+            self.closed_until[name] = until
+            self.open_reason[name] = reason
+
+    def for_turn(self, store: QuotaStore | None = None) -> "TurnRouter":
+        """With a store, what other instances learned today is loaded first."""
+        if store is not None:
+            offset = self.clock() - self.wall()  # Unix time -> this router's clock
+            for name, (until, reason) in store.closed().items():
+                self._close(name, until + offset, reason)
+        return TurnRouter(self, store)
 
 
 @dataclass
@@ -85,6 +104,7 @@ class TurnRouter:
     for this turn only, since the next visitor's question may suit it fine."""
 
     router: Router
+    store: QuotaStore | None = None
     dropped: set[str] = field(default_factory=set)
     current: str | None = None
     switches: list[dict[str, str]] = field(default_factory=list)  # for the trace and usage
@@ -120,7 +140,7 @@ class TurnRouter:
             except ProviderError as e:
                 if e.kind == "bad_request":
                     raise  # the request itself is wrong; another model would fail the same
-                self.router.trip(model, e)
+                self.router.trip(model, e, self.store)
                 attempts.append((model.name, e.kind))
                 self.switches.append({"from": model.name, "reason": e.kind})
                 if started:

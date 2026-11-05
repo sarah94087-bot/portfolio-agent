@@ -26,27 +26,36 @@ class StoredAnswer:
     meta: dict[str, Any]
 
 
-def find_answer(conn: psycopg.Connection, idempotency_key: str) -> StoredAnswer | None:
+def find_answer(conn: psycopg.Connection, idempotency_key: str,
+                visitor_id: str | None) -> StoredAnswer | None:
+    """Only the visitor's own answers: a key someone else used replays nothing to you."""
     row = conn.execute(
-        "select id, conversation_id, content, model, usage, meta from messages"
-        " where role = 'assistant' and idempotency_key = %s",
-        (idempotency_key,),
+        "select m.id, m.conversation_id, m.content, m.model, m.usage, m.meta"
+        " from messages m join conversations c on c.id = m.conversation_id"
+        " where m.role = 'assistant' and m.idempotency_key = %s"
+        " and c.visitor_id is not distinct from %s",
+        (idempotency_key, visitor_id),
     ).fetchone()
     return StoredAnswer(*row) if row else None
 
 
 def open_conversation(
-    conn: psycopg.Connection, conversation_id: UUID | None, company_slug: str | None = None
+    conn: psycopg.Connection, conversation_id: UUID | None, company_slug: str | None = None,
+    visitor_id: str | None = None,
 ) -> UUID:
-    """The conversation to continue, or a new one when none is given or it is gone (expired
-    after 30 days, say): the visitor then starts over instead of getting an error."""
+    """The conversation to continue, or a new one when none is given, it is gone (expired
+    after 30 days, say) or it is someone else's: the visitor then starts over instead of
+    getting an error, and never sees another visitor's history."""
     if conversation_id is not None:
-        row = conn.execute("select id from conversations where id = %s",
-                           (conversation_id,)).fetchone()
+        row = conn.execute(
+            "select id from conversations where id = %s and visitor_id is not distinct from %s",
+            (conversation_id, visitor_id),
+        ).fetchone()
         if row:
             return row[0]
     return conn.execute(
-        "insert into conversations (company_slug) values (%s) returning id", (company_slug,)
+        "insert into conversations (company_slug, visitor_id) values (%s, %s) returning id",
+        (company_slug, visitor_id),
     ).fetchone()[0]
 
 

@@ -3,6 +3,7 @@ Runs only when TEST_DATABASE_URL is set (CI, or local)."""
 
 import json
 import os
+import uuid
 
 import psycopg
 import pytest
@@ -10,6 +11,8 @@ from fastapi.testclient import TestClient
 
 from portfolio_agent import chat, migrate
 from portfolio_agent.agent.guard import CV_POINTER
+from portfolio_agent.guards import visitor
+from portfolio_agent.guards.quotas import Limits
 from portfolio_agent.ingest import chunk, load, upsert
 from portfolio_agent.main import app
 from portfolio_agent.providers.base import Finish, TextDelta, ToolCall
@@ -57,18 +60,23 @@ def use(kb, monkeypatch):
     """Point the endpoint at the test database and a provider made per request."""
     providers = []
 
-    def install(*factories, enabled=True):
+    def install(*factories, enabled=True, limits=None):
         providers.extend(factories)
         monkeypatch.setattr(chat, "DEPS", chat.Deps(
-            database_url=lambda: DB_URL, provider=lambda: providers.pop(0),
-            embedder=lambda: None, docs=lambda: kb, agent_enabled=lambda: enabled, table=TABLE,
+            database_url=lambda: DB_URL, provider=lambda quota: providers.pop(0),
+            embedder=lambda: None, docs=lambda: kb, agent_enabled=lambda: enabled,
+            limits=lambda: limits or Limits(), table=TABLE,
         ))
+        BROWSER["client"] = TestClient(app)  # one visitor per test, keeping its cookie
     return install
 
 
-def post(body):
-    with TestClient(app) as client:
-        response = client.post("/api/chat", json=body)
+BROWSER = {}
+
+
+def post(body, client=None):
+    client = client or BROWSER["client"]
+    response = client.post("/api/chat", json=body)
     if response.status_code != 200:
         return response.status_code, []
     events = []
@@ -183,3 +191,66 @@ def test_a_malformed_request_is_rejected(use):
     use()
     assert post({"message": "hi", "idempotency_key": "bad key!"})[0] == 422
     assert post({"message": "", "idempotency_key": "key-empty-1"})[0] == 422
+
+
+def answer(model="m1", usage=None):
+    return Scripted([TextDelta("Hi."), Finish(model, usage or {})])
+
+
+def test_a_visitor_gets_a_signed_cookie_kept_for_30_days_and_its_id_on_the_conversation(use):
+    use(answer())
+    response = BROWSER["client"].post("/api/chat",
+                                      json={"message": "hi", "idempotency_key": "key-cookie-1"})
+    header = response.headers["set-cookie"]
+    assert header.startswith(f"{visitor.COOKIE}=") and "HttpOnly" in header
+    assert "Max-Age=2592000" in header and "SameSite=lax" in header
+    vid = visitor.read_cookie(response.cookies[visitor.COOKIE])
+    cid = next(json.loads(f.split("data: ", 1)[1]) for f in response.text.split("\n\n")
+               if f.startswith("event: meta"))["conversation_id"]
+    with psycopg.connect(DB_URL) as conn:
+        assert conn.execute("select visitor_id from conversations where id = %s",
+                            (cid,)).fetchone()[0] == vid
+
+
+def test_another_visitor_cannot_continue_or_replay_a_conversation(use):
+    use(Scripted([TextDelta("Mine."), Finish("m")]), answer(), answer())
+    _, mine = post({"message": "hi", "idempotency_key": "key-owner-1"})
+    cid = mine[0][1]["conversation_id"]
+    stranger = TestClient(app)  # no cookie: another visitor
+    _, theirs = post({"message": "and?", "conversation_id": cid,
+                      "idempotency_key": "key-owner-2"}, stranger)
+    assert theirs[0][1]["conversation_id"] != cid  # a new conversation, not mine
+    _, replayed = post({"message": "hi", "idempotency_key": "key-owner-1"}, stranger)
+    assert "replay" not in replayed[0][1] and text(replayed) == "Hi."
+
+
+def test_a_forged_cookie_is_replaced_by_a_new_visitor(use):
+    use(answer())
+    forged = TestClient(app, cookies={visitor.COOKIE: "someone-else.AAAAAAAAAAAAAAAAAAAAAA"})
+    response = forged.post("/api/chat", json={"message": "hi", "idempotency_key": "key-forge-1"})
+    assert visitor.read_cookie(response.cookies[visitor.COOKIE]) not in (None, "someone-else")
+
+
+def test_past_the_minute_limit_the_error_is_rate_limited_and_nothing_is_saved(use):
+    use(answer(), answer(), NeverCalled(), limits=Limits(visitor_minute=2))
+    post({"message": "one", "idempotency_key": "key-rate-1"})
+    post({"message": "two", "idempotency_key": "key-rate-2"})
+    _, events = post({"message": "three", "idempotency_key": "key-rate-3"})
+    assert [e for e, _ in events] == ["error", "done"]
+    error = events[0][1]
+    assert error["code"] == "rate_limited" and error["limit"] == "minute"
+    assert error["retryable"] is True and 0 < error["retry_after"] <= 60
+    with psycopg.connect(DB_URL) as conn:
+        assert conn.execute("select count(*) from messages where content = 'three'"
+                            ).fetchone()[0] == 0
+    _, again = post({"message": "one", "idempotency_key": "key-rate-1"})
+    assert again[0][1]["replay"] is True  # a resent message is free, even past the limit
+
+
+def test_the_turn_s_tokens_are_counted_against_its_model(use):
+    model = f"m-{uuid.uuid4().hex}"
+    use(answer(model, {"input_tokens": 120, "output_tokens": 30}))
+    post({"message": "hi", "idempotency_key": "key-spend-1"})
+    with psycopg.connect(DB_URL) as conn:
+        assert conn.execute("select count from quota_counters where scope = 'provider_tokens'"
+                            " and key = %s", (model,)).fetchone()[0] == 150

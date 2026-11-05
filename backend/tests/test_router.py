@@ -142,3 +142,46 @@ def test_from_env_follows_the_adr_order_without_duplicates():
         "groq/openai/gpt-oss-120b", "groq/qwen/qwen3.8-27b", "groq/openai/gpt-oss-20b"]
     with pytest.raises(ValueError):
         from_env(httpx.AsyncClient(), {})
+
+
+class Store:
+    """quota_counters as the router sees it, shared between "instances"."""
+
+    def __init__(self):
+        self.until = {}
+
+    def closed(self):
+        return {name: (until, "rate_day") for name, until in self.until.items()}
+
+    def close(self, model, until):
+        self.until[model] = max(until, self.until.get(model, 0.0))
+
+
+def test_a_day_limit_is_written_to_the_store_and_a_cold_instance_skips_the_model():
+    store, wall = Store(), Clock()
+    wall.t = 1_700_000_000.0
+    a, b = Fake("a", "rate_day", retry_after=5000), Fake("b")
+    run(Router([a, b], Clock(), wall).for_turn(store))
+    assert store.until == {"a": 1_700_000_000.0 + 5000}
+
+    a2 = Fake("a")  # a new instance after a cold start: a is healthy as far as it knows
+    cold = Router([a2, Fake("b")], Clock(), wall)
+    assert text(run(cold.for_turn(store))) == "b" and a2.calls == 0
+    wall.t += 5001
+    cold2 = Router([a2, Fake("b")], Clock(), wall)
+    assert text(run(cold2.for_turn(store))) == "a"
+
+
+def test_a_minute_limit_stays_in_memory():
+    store = Store()
+    run(Router([Fake("a", "rate_minute"), Fake("b")], Clock()).for_turn(store))
+    assert store.until == {}
+
+
+def test_when_the_store_closes_every_model_the_error_is_quota_exhausted():
+    store, wall = Store(), Clock()
+    store.until = {"a": wall.t + 100, "b": wall.t + 100}
+    a, b = Fake("a"), Fake("b")
+    with pytest.raises(AllModelsFailed) as e:
+        run(Router([a, b], Clock(), wall).for_turn(store))
+    assert e.value.code == "quota_exhausted" and a.calls == b.calls == 0

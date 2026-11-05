@@ -9,8 +9,11 @@ answer saved with its steps, and `sources`, `usage` and `done` last. Every failu
 A resent message (same idempotency_key, US-10.5) is answered from the database: the stored
 answer is replayed through the citation filter, with no model call and no quota spent.
 
-Not here yet, and next: the signed visitor cookie, rate limits and quotas in quota_counters,
-the response cache and the Langfuse export (docs/11-roadmap.md, M4).
+Who asks is the signed visitor cookie (guards/visitor.py), renewed on every request. Limits
+are counted in quota_counters after the replay check, so a resent message is free, and before
+the message is saved, so a refused one leaves nothing behind (guards/quotas.py).
+
+Not here yet, and next: the response cache and the Langfuse export (docs/11-roadmap.md, M4).
 """
 
 import asyncio
@@ -20,13 +23,14 @@ import time
 import uuid
 from collections.abc import AsyncIterator, Callable
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from functools import cache
 from typing import Any
 from uuid import UUID
 
 import httpx
 import psycopg
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -36,6 +40,8 @@ from portfolio_agent.agent.loop import run_turn
 from portfolio_agent.agent.transcript import Transcript, replay
 from portfolio_agent.config import Settings
 from portfolio_agent.db import conversations as db
+from portfolio_agent.guards import visitor
+from portfolio_agent.guards.quotas import Denied, Limits, ProviderQuota, admit
 from portfolio_agent.ingest import Doc, load
 from portfolio_agent.providers.base import NeedsFallback
 from portfolio_agent.providers.openai_compat import ProviderError
@@ -47,7 +53,6 @@ from portfolio_agent.tools.registry import Registry
 log = logging.getLogger(__name__)
 router = APIRouter()
 
-MAX_MESSAGE = 1000  # docs/09-security-privacy.md; a job description (8,000) comes with M7
 REGISTRY = Registry.of([SEARCH, GET_PROJECT])
 
 
@@ -74,30 +79,47 @@ class Deps:
     """What a request needs from outside. Tests swap these for fakes."""
 
     database_url: Callable[[], str | None] = lambda: Settings.from_env().database_url
-    provider: Callable[[], Any] = lambda: _router().for_turn()
+    provider: Callable[[ProviderQuota], Any] = lambda quota: _router().for_turn(quota)
     embedder: Callable[[], Any] = embedder.from_env
     docs: Callable[[], list[Doc]] = _docs
     agent_enabled: Callable[[], bool] = lambda: Settings.from_env().agent_enabled
+    limits: Callable[[], Limits] = Limits.from_env
+    now: Callable[[], datetime] = lambda: datetime.now(UTC)
     table: str = "chunks"
 
 
 DEPS = Deps()
 
 
+@dataclass(frozen=True)
+class Caller:
+    visitor_id: str
+    ip: str  # hashed before it is stored or counted; never sent to a provider
+
+
 @router.post("/api/chat")
-async def chat(req: ChatRequest) -> StreamingResponse:
-    return StreamingResponse(
-        _frames(req, DEPS),
+async def chat(req: ChatRequest, request: Request) -> StreamingResponse:
+    cookie = request.cookies.get(visitor.COOKIE)
+    visitor_id = visitor.read_cookie(cookie)
+    if visitor_id is None:  # new, expired, or not ours
+        visitor_id, cookie = visitor.new_cookie()
+    ip = visitor.client_ip(dict(request.headers), request.client and request.client.host)
+    response = StreamingResponse(
+        _frames(req, DEPS, Caller(visitor_id, ip)),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache, no-transform", "X-Accel-Buffering": "no"},
     )
+    https = request.headers.get("x-forwarded-proto", request.url.scheme) == "https"
+    response.set_cookie(visitor.COOKIE, cookie, max_age=visitor.MAX_AGE, httponly=True,
+                        secure=https, samesite="lax", path="/")  # 30 days from the last use
+    return response
 
 
-async def _frames(req: ChatRequest, deps: Deps) -> AsyncIterator[str]:
+async def _frames(req: ChatRequest, deps: Deps, caller: Caller) -> AsyncIterator[str]:
     """The turn runs as a task and pushes frames; this hands them to the response as they
     come, so the first token reaches the browser while the model is still writing."""
     queue: asyncio.Queue[str | None] = asyncio.Queue()
-    task = asyncio.create_task(_turn(req, deps, queue))
+    task = asyncio.create_task(_turn(req, deps, caller, queue))
     while (frame := await queue.get()) is not None:
         yield frame
     await task
@@ -117,15 +139,16 @@ class _Out:
         self.transcript.record(event, data)
         await self.queue.put(sse.encode(event, data))
 
-    async def error(self, code: str, message: str, retryable: bool) -> None:
-        await self.emit("error", {"code": code, "message": message, "retryable": retryable})
+    async def error(self, code: str, message: str, retryable: bool, **extra: Any) -> None:
+        await self.emit("error", {"code": code, "message": message, "retryable": retryable,
+                                  **extra})
         await self.emit("done")
 
 
-async def _turn(req: ChatRequest, deps: Deps, queue: asyncio.Queue) -> None:
+async def _turn(req: ChatRequest, deps: Deps, caller: Caller, queue: asyncio.Queue) -> None:
     out = _Out(queue)
     try:
-        await _answer(req, deps, out)
+        await _answer(req, deps, caller, out)
     except Exception:  # anything unexpected still ends the stream with a code
         log.exception("chat turn failed")
         await out.error("internal", "Something went wrong on our side.", True)
@@ -133,22 +156,33 @@ async def _turn(req: ChatRequest, deps: Deps, queue: asyncio.Queue) -> None:
         await queue.put(None)
 
 
-async def _answer(req: ChatRequest, deps: Deps, out: _Out) -> None:
+async def _answer(req: ChatRequest, deps: Deps, caller: Caller, out: _Out) -> None:
     if not deps.agent_enabled():
         return await out.error("provider_unavailable", "The agent is paused.", False)
-    if len(req.message) > MAX_MESSAGE:
+    limits = deps.limits()
+    if len(req.message) > limits.message_chars:
         return await out.error(
-            "input_too_long", f"The message is longer than {MAX_MESSAGE} characters.", False)
+            "input_too_long", f"The message is longer than {limits.message_chars} characters.",
+            False)
     url = deps.database_url()
     if not url:
         return await out.error("internal", "No database is configured.", True)
 
     with psycopg.connect(url, autocommit=True, connect_timeout=5) as conn:
-        stored = db.find_answer(conn, req.idempotency_key)
+        stored = db.find_answer(conn, req.idempotency_key, caller.visitor_id)
         if stored:
             return await _replay(conn, stored, deps, out)
 
-        conversation_id = db.open_conversation(conn, req.conversation_id, req.company_slug)
+        now = deps.now()
+        conversation_id = db.open_conversation(conn, req.conversation_id, req.company_slug,
+                                               caller.visitor_id)
+        try:
+            admit(conn, visitor_id=caller.visitor_id,
+                  ip_hash=visitor.ip_hash(conn, caller.ip, now.date()),
+                  conversation_id=conversation_id, now=now, limits=limits)
+        except Denied as e:
+            return await out.error(e.code, e.message, e.retryable, limit=e.limit,
+                                   retry_after=e.retry_after)
         history = db.history(conn, conversation_id)
         allowed = db.retrieved_chunks(conn, conversation_id)
         db.save_user(conn, conversation_id, req.message)
@@ -159,7 +193,8 @@ async def _answer(req: ChatRequest, deps: Deps, out: _Out) -> None:
 
         docs = deps.docs()
         ctx = PortfolioContext.from_docs(conn, docs, embedder=deps.embedder(), table=deps.table)
-        provider = deps.provider()
+        quota = ProviderQuota(conn, now, limits)
+        provider = deps.provider(quota)
         try:
             result = await run_turn(
                 system_prompt=prompt.system_prompt(), history=history,
@@ -180,6 +215,9 @@ async def _answer(req: ChatRequest, deps: Deps, out: _Out) -> None:
             "hit_max_rounds": result.hit_max_rounds, "switches": switches,
         }
         model = result.models[-1] if result.models else None
+        if model:  # all of the turn's tokens go to the model that finished it; a switch is rare
+            quota.spend(model, result.usage.get("input_tokens", 0)
+                        + result.usage.get("output_tokens", 0))
         # The same message sent twice at once: the other request saved it, and that is fine.
         with contextlib.suppress(psycopg.errors.UniqueViolation):
             db.save_answer(
