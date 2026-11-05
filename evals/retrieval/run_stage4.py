@@ -57,8 +57,8 @@ SYSTEM = (
     "visitor's question. Rank every candidate id you are given, and only those."
 )
 
-# (question, query, candidates) -> (ranking, tokens)
-Ranker = Callable[[str, str, Sequence[Hit]], tuple[list[str], int]]
+# (question, query, candidates) -> (ranking, tokens, ms spent waiting on 429)
+Ranker = Callable[[str, str, Sequence[Hit]], tuple[list[str], int, int]]
 
 
 def rank_tool(ids: Sequence[str]) -> dict:
@@ -77,11 +77,17 @@ def prompt(question: str, query: str, hits: Sequence[Hit]) -> str:
             f"Candidates:\n\n{candidates_block(hits)}")
 
 
+# Groq answers 400 when the model's tool call fails its own validation, about 1 call in 90
+# (stage 4, run 2). It is tried once more; if that fails too, the ranking is empty, so R4
+# keeps R3's order for that question (rerank.apply_order), and the fallback is counted.
+BAD_REQUEST_TRIES = 2
+
+
 def groq_ranker(client: httpx.Client) -> Ranker:
     headers = {"Authorization": f"Bearer {env('GROQ_API_KEY_EVALS')}"}
     model = env("GROQ_MODEL")
 
-    def rank(question: str, query: str, hits: Sequence[Hit]) -> tuple[list[str], int]:
+    def rank(question: str, query: str, hits: Sequence[Hit]) -> tuple[list[str], int, int]:
         ids = [h.id for h in hits]
         body = {
             "model": model, "tools": [rank_tool(ids)],
@@ -89,10 +95,20 @@ def groq_ranker(client: httpx.Client) -> Ranker:
             "messages": [{"role": "system", "content": SYSTEM},
                          {"role": "user", "content": prompt(question, query, hits)}],
         }
-        data = post(client, GROQ_URL, headers=headers, json=body).json()
+        waits: list[float] = []
+        for attempt in range(BAD_REQUEST_TRIES):
+            try:
+                data = post(client, GROQ_URL, waits=waits, headers=headers, json=body).json()
+                break
+            except httpx.HTTPStatusError as e:
+                if e.response.status_code != 400:
+                    raise
+                if attempt == BAD_REQUEST_TRIES - 1:  # R3's order, as the site does
+                    return [], 0, round(sum(waits) * 1000)
         calls = data["choices"][0]["message"].get("tool_calls") or []
         ranking = json.loads(calls[0]["function"]["arguments"])["ranking"] if calls else []
-        return [str(c) for c in ranking], data.get("usage", {}).get("total_tokens", 0)
+        return ([str(c) for c in ranking], data.get("usage", {}).get("total_tokens", 0),
+                round(sum(waits) * 1000))
     return rank
 
 
@@ -144,12 +160,13 @@ def stage4(
                     if spent >= max_tokens:
                         continue
                     start = time.perf_counter()
-                    ranking, used = ranker(item.question, q, hits)
-                    ms = round((time.perf_counter() - start) * 1000)
+                    ranking, used, wait_ms = ranker(item.question, q, hits)
+                    ms = round((time.perf_counter() - start) * 1000) - wait_ms
                     spent += used
                     saved["tokens"] += used
                     saved["calls"] += 1
-                    got = {"candidates": ids, "ranking": ranking, "tokens": used, "ms": ms}
+                    got = {"candidates": ids, "ranking": ranking, "tokens": used, "ms": ms,
+                           "wait_ms": wait_ms, "fallback": not ranking}
                     saved["rankings"][item.id] = got
                     saved_path.parent.mkdir(parents=True, exist_ok=True)
                     saved_path.write_text(json.dumps(saved, ensure_ascii=False, indent=2)
@@ -159,6 +176,7 @@ def stage4(
             conn.execute(f"drop table {TABLE}")
     missing = [i.id for i in todo if queries[i.id] not in r4]
     status = {"calls": saved["calls"], "tokens": saved["tokens"], "spent_now": spent,
+              "fallbacks": sum(bool(r.get("fallback")) for r in saved["rankings"].values()),
               "missing": missing}
     if pilot or missing:
         return {"status": status}

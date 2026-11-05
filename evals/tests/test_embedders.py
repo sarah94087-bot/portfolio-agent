@@ -71,3 +71,17 @@ def test_stage1_with_r2_embeds_chunks_as_passages_and_questions_as_queries():
     assert kinds == ["passage", "query"]
     assert fake.calls[1][1] == [items[0].question]
     assert r["items"][0]["retrieved"], "R2 returned nothing"
+
+
+def test_post_reports_each_429_wait_apart_from_the_call(monkeypatch):
+    import httpx
+
+    from retrieval import embedders
+
+    slept = []
+    monkeypatch.setattr(embedders.time, "sleep", slept.append)
+    answers = iter([httpx.Response(429, headers={"retry-after": "3"}), httpx.Response(200)])
+    client = httpx.Client(transport=httpx.MockTransport(lambda request: next(answers)))
+    waits: list[float] = []
+    assert embedders.post(client, "https://example.test", waits=waits).status_code == 200
+    assert slept == [3.0] and len(waits) == 1

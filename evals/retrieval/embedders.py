@@ -102,14 +102,22 @@ def load_env() -> None:
             os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
 
 
-def post(client: httpx.Client, url: str, retries: int = 6, **kwargs) -> httpx.Response:
-    """POST, waiting and trying again on 429, since free tiers limit requests per minute."""
+def post(client: httpx.Client, url: str, retries: int = 6, waits: list[float] | None = None,
+         **kwargs) -> httpx.Response:
+    """POST, waiting and trying again on 429, since free tiers limit requests per minute.
+
+    Each wait, with its failed attempt, is added to `waits` in seconds, so a caller can tell
+    the time of the call itself from the time spent on the rate limit.
+    """
     for attempt in range(retries):
+        start = time.perf_counter()
         r = client.post(url, **kwargs)
         if r.status_code != 429 or attempt == retries - 1:
             r.raise_for_status()
             return r
         time.sleep(float(r.headers.get("retry-after") or 20 * (attempt + 1)))
+        if waits is not None:
+            waits.append(time.perf_counter() - start)
     raise AssertionError("unreachable")
 
 
