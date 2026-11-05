@@ -1,5 +1,5 @@
-# T0 for every PR and push to main (docs/03-evaluation-methodology.md, section 7).
-# T1 evals join this workflow in M4.
+# T0 for every PR and push to main (docs/03-evaluation-methodology.md, section 7), and the T1
+# cases with a scripted model (t1-harness). The live T1 joins after its first calibrated run.
 # TODO(M6): pin every action to a commit SHA (docs/09-security-privacy.md, T13).
 name: ci
 
@@ -58,11 +58,67 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
       - run: npm run lint
+      # the pure client logic: SSE folding, the trace view, feedback, delete (lib/*.test.ts)
+      - run: npm test
       # next-env.d.ts and the route types (LayoutProps, PageProps) are generated, not committed
       - run: npx next typegen
       - run: npx tsc --noEmit
       - run: npm run build
       - run: npm audit --omit=dev --audit-level=moderate
+
+  # T1's cases through the real agent (database, tools, citation filter, guard and the code
+  # checks), with a scripted model and no judge: no tokens, so it runs on every push. The live
+  # T1, with Groq and the judge, joins once its first run is calibrated (docs/03, section 7).
+  # Without the embedding model in CI, search runs R1, and says so in the trace.
+  t1-harness:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: agent
+          POSTGRES_PASSWORD: agent
+          POSTGRES_DB: agent
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U agent -d agent"
+          --health-interval 2s --health-timeout 3s --health-retries 20
+    env:
+      EVAL_DATABASE_URL: postgresql://agent:agent@localhost:5432/agent
+      EVAL_MODEL: scripted
+      EVAL_JUDGE: "off"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: evals/package-lock.json
+      - run: pip install -e "backend[dev]"
+      - run: python -m portfolio_agent.migrate
+        env:
+          DATABASE_URL: ${{ env.EVAL_DATABASE_URL }}
+      # The chunks without vectors, as the backend tests load them: load.py stops without the
+      # embedding model, on purpose. An empty table fails here, since the scripted cases would
+      # pass on it without searching anything.
+      - name: Load the knowledge base
+        working-directory: backend
+        run: |
+          python - <<'EOF'
+          import os, psycopg
+          from portfolio_agent.ingest import chunk, load, upsert
+          with psycopg.connect(os.environ["EVAL_DATABASE_URL"], autocommit=True) as conn:
+              print(upsert(conn, chunk(load(), "C4")))
+              n = conn.execute("select count(*) from chunks").fetchone()[0]
+              assert n > 0, "no chunks loaded"
+          EOF
+      - run: npm ci
+        working-directory: evals
+      - run: node answers/run.mjs t1 --no-cache
+        working-directory: evals
 
   secrets:
     runs-on: ubuntu-latest
