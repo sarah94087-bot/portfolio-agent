@@ -45,6 +45,21 @@ def _output(result: dict) -> dict:
     return json.loads(out) if isinstance(out, str) else out
 
 
+def _rubrics(r: dict) -> list[dict]:
+    return [c for c in (r.get("gradingResult") or {}).get("componentResults", [])
+            if (c.get("assertion") or {}).get("type") == "llm-rubric"]
+
+
+def judge_errors(results_path: Path) -> list[str]:
+    """Rubrics the judge never decided: Promptfoo records a failed judge call (a 429, a reply
+    that is not JSON) as `pass: false` with the error as the reason, marked only by
+    metadata.graderError (seen in a run with a fake judge, Promptfoo 0.124.1)."""
+    run = json.loads(results_path.read_text(encoding="utf-8"))
+    return [f"{r['vars']['id']}/{c['assertion'].get('metric', 'judge')}"
+            for r in run["results"]["results"] for c in _rubrics(r)
+            if (c.get("metadata") or {}).get("graderError")]
+
+
 def decisions(results_path: Path) -> list[dict]:
     """Every judge decision of a Promptfoo run, with what Sarah needs to label it."""
     run = json.loads(results_path.read_text(encoding="utf-8"))
@@ -53,10 +68,10 @@ def decisions(results_path: Path) -> list[dict]:
         answer = _output(r)
         if "qwen" in (answer.get("model") or ""):
             continue  # written by the judge's own family
-        for c in (r.get("gradingResult") or {}).get("componentResults", []):
-            a = c.get("assertion") or {}
-            if a.get("type") != "llm-rubric":
-                continue
+        for c in _rubrics(r):
+            a = c["assertion"]
+            if (c.get("metadata") or {}).get("graderError"):
+                continue  # not a verdict: labeling it would score the judge on an error
             metric = a.get("metric", "judge")
             out.append({
                 "key": f"{r['vars']['id']}/{metric}",
@@ -155,6 +170,9 @@ def main(argv: list[str]) -> int:
         n = sample(Path(argv[2]), force="--force" in argv)
         print(f"{n} decisions written to {LABELS.relative_to(EVALS)}, verdicts to "
               f"{JUDGE.relative_to(EVALS)}")
+        errors = judge_errors(Path(argv[2]))
+        if errors:
+            print(f"{len(errors)} rubrics left out, the judge call failed: {', '.join(errors)}")
         return 0
     if len(argv) >= 2 and argv[1] == "score":
         report = score()

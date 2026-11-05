@@ -47,6 +47,17 @@ def test_the_sample_is_blind_spread_over_metrics_and_skips_the_judge_s_own_famil
         {i["key"] for i in items}
 
 
+def test_a_failed_judge_call_is_not_a_verdict(tmp_path):
+    # As Promptfoo 0.124.1 writes it: pass false, the error as the reason, graderError set.
+    r = result("d1-001", {"grounded": True, "behavior": False})
+    r["gradingResult"]["componentResults"][2]["metadata"] = {"graderError": True}
+    r["gradingResult"]["componentResults"][2]["reason"] = "429 Too Many Requests"
+    path = tmp_path / "run.json"
+    path.write_text(json.dumps({"results": {"results": [r]}}), encoding="utf-8")
+    assert [d["key"] for d in calibrate.decisions(path)] == ["d1-001/grounded"]
+    assert calibrate.judge_errors(path) == ["d1-001/behavior"]
+
+
 def test_labels_are_never_overwritten(run, tmp_path):
     labels, judge = tmp_path / "labels.yaml", tmp_path / "judge.json"
     calibrate.sample(run, labels, judge)
