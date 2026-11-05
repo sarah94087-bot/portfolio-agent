@@ -4,8 +4,8 @@
   "system": "You rank search results for an assistant that answers questions about Sarah's work. Order the candidate passages from the most to the least useful for answering the visitor's question. Rank every candidate id you are given, and only those.",
   "candidates": 10,
   "candidate_tokens": 150,
-  "tokens": 11746,
-  "calls": 5,
+  "tokens": 133564,
+  "calls": 58,
   "rankings": {
     "d1-001": {
       "candidates": [
@@ -141,6 +141,1487 @@
         "skills#supabase"
       ],
       "tokens": 2304
+    },
+    "d1-008": {
+      "candidates": [
+        "education#all",
+        "weed-detection-pipeline#all",
+        "governance-center-pwa#all",
+        "skills#cplusplus",
+        "human-gated-translation#all",
+        "claims-trust-model#all",
+        "skills#kubernetes",
+        "vast-data-bootcamp#all",
+        "skills#csharp",
+        "skills#dynamodb"
+      ],
+      "ranking": [
+        "education#all",
+        "weed-detection-pipeline#all",
+        "governance-center-pwa#all",
+        "skills#cplusplus",
+        "human-gated-translation#all",
+        "claims-trust-model#all",
+        "skills#kubernetes",
+        "vast-data-bootcamp#all",
+        "skills#csharp",
+        "skills#dynamodb"
+      ],
+      "tokens": 1694,
+      "ms": 1067
+    },
+    "d1-010": {
+      "candidates": [
+        "human-gated-translation#all",
+        "governance-center-pwa#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "faq#all",
+        "postgres-rls-backbone#all",
+        "skills#rtl-i18n",
+        "profile#all",
+        "clip-embeddings-kafka#all",
+        "skills#fastapi"
+      ],
+      "ranking": [
+        "human-gated-translation#all",
+        "profile#all",
+        "governance-center-pwa#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "faq#all",
+        "postgres-rls-backbone#all",
+        "skills#rtl-i18n",
+        "clip-embeddings-kafka#all",
+        "skills#fastapi"
+      ],
+      "tokens": 2109,
+      "ms": 1308
+    },
+    "d1-011": {
+      "candidates": [
+        "governance-center-pwa#all",
+        "postgres-rls-backbone#all",
+        "ainsof-capital#all",
+        "skills#rtl-i18n",
+        "skills#mobilenetv3",
+        "skills#vit-mini",
+        "claims-trust-model#all",
+        "skills#github-actions",
+        "clip-embeddings-kafka#all",
+        "faq#all"
+      ],
+      "ranking": [
+        "governance-center-pwa#all",
+        "skills#rtl-i18n",
+        "postgres-rls-backbone#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "faq#all",
+        "skills#github-actions",
+        "skills#mobilenetv3",
+        "skills#vit-mini",
+        "clip-embeddings-kafka#all"
+      ],
+      "tokens": 1836,
+      "ms": 1139
+    },
+    "d1-012": {
+      "candidates": [
+        "claims-trust-model#all",
+        "ainsof-capital#all",
+        "faq#all",
+        "api-latency-582-to-40#all",
+        "weed-detection-pipeline#all",
+        "human-gated-translation#all",
+        "postgres-rls-backbone#all",
+        "git-mcp-server#all",
+        "skills#supabase",
+        "vast-data-bootcamp#all"
+      ],
+      "ranking": [
+        "claims-trust-model#all",
+        "ainsof-capital#all",
+        "faq#all",
+        "git-mcp-server#all",
+        "human-gated-translation#all",
+        "postgres-rls-backbone#all",
+        "api-latency-582-to-40#all",
+        "weed-detection-pipeline#all",
+        "vast-data-bootcamp#all",
+        "skills#supabase"
+      ],
+      "tokens": 2559,
+      "ms": 1817
+    },
+    "d1-014": {
+      "candidates": [
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "vast-data-bootcamp#all",
+        "faq#all",
+        "claims-trust-model#all",
+        "human-gated-translation#all",
+        "plant-health-classification#all",
+        "ainsof-capital#all",
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all"
+      ],
+      "ranking": [
+        "weed-detection-pipeline#all",
+        "vast-data-bootcamp#all",
+        "clip-embeddings-kafka#all",
+        "plant-health-classification#all",
+        "human-gated-translation#all",
+        "claims-trust-model#all",
+        "ainsof-capital#all",
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all",
+        "faq#all"
+      ],
+      "tokens": 2598,
+      "ms": 17932
+    },
+    "d1-015": {
+      "candidates": [
+        "ainsof-capital#all",
+        "weed-detection-pipeline#all",
+        "claims-trust-model#all",
+        "faq#all",
+        "plant-health-classification#all",
+        "clip-embeddings-kafka#all",
+        "human-gated-translation#all",
+        "governance-center-pwa#all",
+        "api-latency-582-to-40#all",
+        "vast-data-bootcamp#all"
+      ],
+      "ranking": [
+        "plant-health-classification#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "faq#all",
+        "human-gated-translation#all",
+        "governance-center-pwa#all",
+        "api-latency-582-to-40#all"
+      ],
+      "tokens": 2460,
+      "ms": 16453
+    },
+    "d1-017": {
+      "candidates": [
+        "api-latency-582-to-40#all",
+        "ainsof-capital#all",
+        "postgres-rls-backbone#all",
+        "claims-trust-model#all",
+        "faq#all",
+        "governance-center-pwa#all",
+        "weed-detection-pipeline#all",
+        "vast-data-bootcamp#all",
+        "human-gated-translation#all",
+        "clip-embeddings-kafka#all"
+      ],
+      "ranking": [
+        "governance-center-pwa#all",
+        "api-latency-582-to-40#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "human-gated-translation#all",
+        "faq#all",
+        "postgres-rls-backbone#all",
+        "weed-detection-pipeline#all",
+        "vast-data-bootcamp#all",
+        "clip-embeddings-kafka#all"
+      ],
+      "tokens": 2927,
+      "ms": 20370
+    },
+    "d1-018": {
+      "candidates": [
+        "api-latency-582-to-40#all",
+        "postgres-rls-backbone#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "vast-data-bootcamp#all",
+        "clip-embeddings-kafka#all",
+        "faq#all",
+        "weed-detection-pipeline#all",
+        "education#all",
+        "governance-center-pwa#all"
+      ],
+      "ranking": [
+        "postgres-rls-backbone#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all",
+        "faq#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "education#all"
+      ],
+      "tokens": 2522,
+      "ms": 22144
+    },
+    "d1-019": {
+      "candidates": [
+        "skills#clip",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "skills#minio",
+        "skills#fastapi",
+        "skills#claude-api",
+        "clip-embeddings-kafka#all",
+        "skills#python",
+        "skills#typescript",
+        "faq#all"
+      ],
+      "ranking": [
+        "clip-embeddings-kafka#all",
+        "skills#clip",
+        "vast-data-bootcamp#all",
+        "skills#python",
+        "weed-detection-pipeline#all",
+        "skills#minio",
+        "skills#fastapi",
+        "skills#claude-api",
+        "skills#typescript",
+        "faq#all"
+      ],
+      "tokens": 1818,
+      "ms": 14702
+    },
+    "d1-021": {
+      "candidates": [
+        "claims-trust-model#all",
+        "human-gated-translation#all",
+        "governance-center-pwa#all",
+        "ainsof-capital#all",
+        "faq#all",
+        "git-mcp-server#all",
+        "postgres-rls-backbone#all",
+        "api-latency-582-to-40#all",
+        "profile#all",
+        "plant-health-classification#all"
+      ],
+      "ranking": [
+        "git-mcp-server#all",
+        "governance-center-pwa#all",
+        "claims-trust-model#all",
+        "ainsof-capital#all",
+        "human-gated-translation#all",
+        "postgres-rls-backbone#all",
+        "api-latency-582-to-40#all",
+        "profile#all",
+        "faq#all",
+        "plant-health-classification#all"
+      ],
+      "tokens": 2714,
+      "ms": 19248
+    },
+    "d1-023": {
+      "candidates": [
+        "vast-data-bootcamp#all",
+        "plant-health-classification#all",
+        "api-latency-582-to-40#all",
+        "weed-detection-pipeline#all",
+        "preferences#all",
+        "governance-center-pwa#all",
+        "postgres-rls-backbone#all",
+        "git-mcp-server#all",
+        "claims-trust-model#all",
+        "clip-embeddings-kafka#all"
+      ],
+      "ranking": [
+        "vast-data-bootcamp#all",
+        "plant-health-classification#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all",
+        "postgres-rls-backbone#all",
+        "git-mcp-server#all",
+        "claims-trust-model#all",
+        "preferences#all"
+      ],
+      "tokens": 2613,
+      "ms": 20137
+    },
+    "d1-024": {
+      "candidates": [
+        "claims-trust-model#all",
+        "clip-embeddings-kafka#all",
+        "faq#all",
+        "plant-health-classification#all",
+        "skills#kafka",
+        "skills#github-actions",
+        "git-mcp-server#all",
+        "skills#pwa",
+        "profile#all",
+        "skills#docker"
+      ],
+      "ranking": [
+        "claims-trust-model#all",
+        "faq#all",
+        "git-mcp-server#all",
+        "profile#all",
+        "clip-embeddings-kafka#all",
+        "plant-health-classification#all",
+        "skills#kafka",
+        "skills#github-actions",
+        "skills#pwa",
+        "skills#docker"
+      ],
+      "tokens": 1798,
+      "ms": 12462
+    },
+    "d1-025": {
+      "candidates": [
+        "weed-detection-pipeline#all",
+        "ainsof-capital#all",
+        "profile#all",
+        "human-gated-translation#all",
+        "plant-health-classification#all",
+        "git-mcp-server#all",
+        "claims-trust-model#all",
+        "governance-center-pwa#all",
+        "clip-embeddings-kafka#all",
+        "education#all"
+      ],
+      "ranking": [
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "plant-health-classification#all",
+        "human-gated-translation#all",
+        "profile#all",
+        "governance-center-pwa#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "git-mcp-server#all",
+        "education#all"
+      ],
+      "tokens": 2345,
+      "ms": 35642
+    },
+    "d1-027": {
+      "candidates": [
+        "skills#claude-api",
+        "ainsof-capital#all",
+        "profile#all",
+        "skills#clip",
+        "plant-health-classification#all",
+        "git-mcp-server#all",
+        "skills#github-actions",
+        "faq#all",
+        "skills#pytorch",
+        "human-gated-translation#all"
+      ],
+      "ranking": [
+        "human-gated-translation#all",
+        "profile#all",
+        "skills#claude-api",
+        "skills#github-actions",
+        "ainsof-capital#all",
+        "skills#clip",
+        "plant-health-classification#all",
+        "git-mcp-server#all",
+        "skills#pytorch",
+        "faq#all"
+      ],
+      "tokens": 1849,
+      "ms": 13747
+    },
+    "d1-028": {
+      "candidates": [
+        "faq#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "vast-data-bootcamp#all",
+        "skills#clip",
+        "skills#claude-api",
+        "clip-embeddings-kafka#all",
+        "skills#github-actions",
+        "skills#mcp",
+        "postgres-rls-backbone#all"
+      ],
+      "ranking": [
+        "vast-data-bootcamp#all",
+        "clip-embeddings-kafka#all",
+        "ainsof-capital#all",
+        "postgres-rls-backbone#all",
+        "claims-trust-model#all",
+        "faq#all",
+        "skills#clip",
+        "skills#claude-api",
+        "skills#github-actions",
+        "skills#mcp"
+      ],
+      "tokens": 2060,
+      "ms": 1705
+    },
+    "d1-030": {
+      "candidates": [
+        "skills#postgresql",
+        "postgres-rls-backbone#all",
+        "profile#all",
+        "ainsof-capital#all",
+        "skills#docker",
+        "vast-data-bootcamp#all",
+        "claims-trust-model#all",
+        "skills#aws-ec2",
+        "faq#all",
+        "clip-embeddings-kafka#all"
+      ],
+      "ranking": [
+        "postgres-rls-backbone#all",
+        "ainsof-capital#all",
+        "profile#all",
+        "vast-data-bootcamp#all",
+        "clip-embeddings-kafka#all",
+        "claims-trust-model#all",
+        "skills#postgresql"
+      ],
+      "tokens": 2173,
+      "ms": 11739
+    },
+    "d1-031": {
+      "candidates": [
+        "git-mcp-server#all",
+        "ainsof-capital#all",
+        "postgres-rls-backbone#all",
+        "skills#row-level-security",
+        "claims-trust-model#all",
+        "faq#all",
+        "profile#all",
+        "skills#github-actions",
+        "governance-center-pwa#all",
+        "vast-data-bootcamp#all"
+      ],
+      "ranking": [
+        "git-mcp-server#all",
+        "postgres-rls-backbone#all",
+        "claims-trust-model#all",
+        "profile#all",
+        "ainsof-capital#all",
+        "faq#all",
+        "skills#row-level-security",
+        "skills#github-actions",
+        "governance-center-pwa#all",
+        "vast-data-bootcamp#all"
+      ],
+      "tokens": 2341,
+      "ms": 17159
+    },
+    "d1-032": {
+      "candidates": [
+        "faq#all",
+        "human-gated-translation#all",
+        "claims-trust-model#all",
+        "api-latency-582-to-40#all",
+        "git-mcp-server#all",
+        "governance-center-pwa#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "ainsof-capital#all",
+        "weed-detection-pipeline#all"
+      ],
+      "ranking": [
+        "human-gated-translation#all",
+        "claims-trust-model#all",
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "faq#all",
+        "api-latency-582-to-40#all",
+        "git-mcp-server#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all"
+      ],
+      "tokens": 2673,
+      "ms": 19868
+    },
+    "d1-033": {
+      "candidates": [
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "faq#all",
+        "claims-trust-model#all",
+        "api-latency-582-to-40#all",
+        "postgres-rls-backbone#all",
+        "git-mcp-server#all",
+        "weed-detection-pipeline#all"
+      ],
+      "ranking": [
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "claims-trust-model#all",
+        "postgres-rls-backbone#all",
+        "api-latency-582-to-40#all",
+        "git-mcp-server#all",
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "vast-data-bootcamp#all",
+        "faq#all"
+      ],
+      "tokens": 2521,
+      "ms": 20026
+    },
+    "d1-035": {
+      "candidates": [
+        "plant-health-classification#all",
+        "ainsof-capital#all",
+        "preferences#all",
+        "api-latency-582-to-40#all",
+        "vast-data-bootcamp#all",
+        "profile#all",
+        "postgres-rls-backbone#all",
+        "human-gated-translation#all",
+        "faq#all",
+        "claims-trust-model#all"
+      ],
+      "ranking": [
+        "profile#all",
+        "preferences#all",
+        "ainsof-capital#all",
+        "postgres-rls-backbone#all",
+        "api-latency-582-to-40#all",
+        "plant-health-classification#all",
+        "vast-data-bootcamp#all",
+        "human-gated-translation#all",
+        "claims-trust-model#all",
+        "faq#all"
+      ],
+      "tokens": 2393,
+      "ms": 16833
+    },
+    "d1-036": {
+      "candidates": [
+        "plant-health-classification#all",
+        "skills#clip",
+        "weed-detection-pipeline#all",
+        "education#all",
+        "clip-embeddings-kafka#all",
+        "skills#git",
+        "skills#mcp",
+        "skills#mobilenetv3",
+        "claims-trust-model#all",
+        "vast-data-bootcamp#all"
+      ],
+      "ranking": [
+        "plant-health-classification#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "skills#mobilenetv3",
+        "skills#clip",
+        "skills#git",
+        "skills#mcp",
+        "education#all",
+        "claims-trust-model#all"
+      ],
+      "tokens": 2009,
+      "ms": 14826
+    },
+    "d1-037": {
+      "candidates": [
+        "ainsof-capital#all",
+        "profile#all",
+        "preferences#all",
+        "faq#all",
+        "vast-data-bootcamp#all",
+        "education#all",
+        "skills#fastapi",
+        "plant-health-classification#all",
+        "git-mcp-server#all",
+        "skills#aws-ec2"
+      ],
+      "ranking": [
+        "plant-health-classification#all",
+        "vast-data-bootcamp#all",
+        "profile#all",
+        "ainsof-capital#all",
+        "git-mcp-server#all",
+        "education#all",
+        "skills#fastapi",
+        "skills#aws-ec2",
+        "preferences#all",
+        "faq#all"
+      ],
+      "tokens": 2280,
+      "ms": 16247
+    },
+    "d1-039": {
+      "candidates": [
+        "skills#kubernetes",
+        "ainsof-capital#all",
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all",
+        "git-mcp-server#all",
+        "weed-detection-pipeline#all",
+        "claims-trust-model#all",
+        "postgres-rls-backbone#all",
+        "education#all",
+        "vast-data-bootcamp#all"
+      ],
+      "ranking": [
+        "skills#kubernetes",
+        "education#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "git-mcp-server#all",
+        "governance-center-pwa#all",
+        "api-latency-582-to-40#all",
+        "claims-trust-model#all",
+        "postgres-rls-backbone#all",
+        "ainsof-capital#all"
+      ],
+      "tokens": 2621,
+      "ms": 2362
+    },
+    "d1-040": {
+      "candidates": [
+        "skills#kafka",
+        "vast-data-bootcamp#all",
+        "clip-embeddings-kafka#all",
+        "faq#all",
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "claims-trust-model#all",
+        "skills#kubernetes",
+        "git-mcp-server#all",
+        "skills#supabase"
+      ],
+      "ranking": [
+        "skills#kafka",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "skills#supabase",
+        "skills#kubernetes",
+        "git-mcp-server#all",
+        "governance-center-pwa#all",
+        "claims-trust-model#all",
+        "ainsof-capital#all",
+        "faq#all"
+      ],
+      "tokens": 2084,
+      "ms": 1382
+    },
+    "d1-042": {
+      "candidates": [
+        "skills#fastapi",
+        "plant-health-classification#all",
+        "governance-center-pwa#all",
+        "git-mcp-server#all",
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "human-gated-translation#all",
+        "profile#all",
+        "vast-data-bootcamp#all",
+        "faq#all"
+      ],
+      "ranking": [
+        "plant-health-classification#all",
+        "skills#fastapi",
+        "governance-center-pwa#all",
+        "git-mcp-server#all",
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "human-gated-translation#all",
+        "profile#all",
+        "vast-data-bootcamp#all",
+        "faq#all"
+      ],
+      "tokens": 2327,
+      "ms": 1520
+    },
+    "d1-043": {
+      "candidates": [
+        "skills#mongodb",
+        "ainsof-capital#all",
+        "education#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all",
+        "skills#dynamodb",
+        "postgres-rls-backbone#all",
+        "clip-embeddings-kafka#all"
+      ],
+      "ranking": [
+        "skills#mongodb",
+        "postgres-rls-backbone#all",
+        "ainsof-capital#all",
+        "skills#dynamodb",
+        "education#all",
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all"
+      ],
+      "tokens": 2280,
+      "ms": 15190
+    },
+    "d1-044": {
+      "candidates": [
+        "ainsof-capital#all",
+        "education#all",
+        "skills#csharp",
+        "skills#cplusplus",
+        "skills#github-actions",
+        "skills#typescript",
+        "skills#python",
+        "skills#react",
+        "vast-data-bootcamp#all",
+        "skills#java"
+      ],
+      "ranking": [
+        "skills#csharp",
+        "education#all",
+        "ainsof-capital#all",
+        "vast-data-bootcamp#all",
+        "skills#cplusplus",
+        "skills#java",
+        "skills#python",
+        "skills#typescript",
+        "skills#react",
+        "skills#github-actions"
+      ],
+      "tokens": 1478,
+      "ms": 4665
+    },
+    "d1-045": {
+      "candidates": [
+        "skills#playwright",
+        "governance-center-pwa#all",
+        "weed-detection-pipeline#all",
+        "skills#pytest",
+        "git-mcp-server#all",
+        "skills#pwa",
+        "skills#clip",
+        "api-latency-582-to-40#all",
+        "skills#vitest",
+        "skills#react"
+      ],
+      "ranking": [
+        "skills#playwright",
+        "governance-center-pwa#all",
+        "skills#pytest",
+        "skills#pwa",
+        "skills#react",
+        "git-mcp-server#all",
+        "weed-detection-pipeline#all",
+        "api-latency-582-to-40#all",
+        "skills#clip",
+        "skills#vitest"
+      ],
+      "tokens": 1615,
+      "ms": 12840
+    },
+    "d1-047": {
+      "candidates": [
+        "skills#docker",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "skills#kubernetes",
+        "faq#all",
+        "git-mcp-server#all",
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "claims-trust-model#all"
+      ],
+      "ranking": [
+        "skills#docker",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "skills#kubernetes",
+        "faq#all",
+        "git-mcp-server#all",
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "claims-trust-model#all"
+      ],
+      "tokens": 2117,
+      "ms": 13390
+    },
+    "d1-048": {
+      "candidates": [
+        "skills#sql-server",
+        "postgres-rls-backbone#all",
+        "ainsof-capital#all",
+        "skills#postgresql",
+        "skills#mysql",
+        "profile#all",
+        "api-latency-582-to-40#all",
+        "vast-data-bootcamp#all",
+        "clip-embeddings-kafka#all",
+        "git-mcp-server#all"
+      ],
+      "ranking": [
+        "skills#sql-server",
+        "profile#all",
+        "skills#postgresql",
+        "skills#mysql",
+        "postgres-rls-backbone#all",
+        "ainsof-capital#all",
+        "api-latency-582-to-40#all",
+        "vast-data-bootcamp#all",
+        "clip-embeddings-kafka#all",
+        "git-mcp-server#all"
+      ],
+      "tokens": 1982,
+      "ms": 16403
+    },
+    "d1-049": {
+      "candidates": [
+        "plant-health-classification#all",
+        "weed-detection-pipeline#all",
+        "claims-trust-model#all",
+        "clip-embeddings-kafka#all",
+        "ainsof-capital#all",
+        "faq#all",
+        "human-gated-translation#all",
+        "api-latency-582-to-40#all",
+        "git-mcp-server#all",
+        "vast-data-bootcamp#all"
+      ],
+      "ranking": [
+        "plant-health-classification#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "claims-trust-model#all",
+        "ainsof-capital#all",
+        "faq#all",
+        "human-gated-translation#all",
+        "api-latency-582-to-40#all",
+        "git-mcp-server#all"
+      ],
+      "tokens": 2364,
+      "ms": 16392
+    },
+    "d1-051": {
+      "candidates": [
+        "plant-health-classification#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "claims-trust-model#all",
+        "governance-center-pwa#all",
+        "vast-data-bootcamp#all",
+        "faq#all",
+        "postgres-rls-backbone#all",
+        "skills#vitest",
+        "ainsof-capital#all"
+      ],
+      "ranking": [
+        "plant-health-classification#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "claims-trust-model#all",
+        "governance-center-pwa#all",
+        "postgres-rls-backbone#all",
+        "faq#all",
+        "skills#vitest",
+        "ainsof-capital#all"
+      ],
+      "tokens": 2379,
+      "ms": 18672
+    },
+    "d1-052": {
+      "candidates": [
+        "weed-detection-pipeline#all",
+        "plant-health-classification#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "profile#all",
+        "claims-trust-model#all",
+        "faq#all",
+        "education#all",
+        "ainsof-capital#all",
+        "postgres-rls-backbone#all"
+      ],
+      "ranking": [
+        "plant-health-classification#all",
+        "profile#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "claims-trust-model#all",
+        "faq#all",
+        "education#all",
+        "ainsof-capital#all",
+        "postgres-rls-backbone#all"
+      ],
+      "tokens": 2362,
+      "ms": 16649
+    },
+    "d1-053": {
+      "candidates": [
+        "plant-health-classification#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "faq#all",
+        "weed-detection-pipeline#all",
+        "claims-trust-model#all",
+        "git-mcp-server#all",
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "skills#kubernetes"
+      ],
+      "ranking": [
+        "plant-health-classification#all",
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "vast-data-bootcamp#all",
+        "faq#all",
+        "claims-trust-model#all",
+        "git-mcp-server#all",
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "skills#kubernetes"
+      ],
+      "tokens": 2404,
+      "ms": 16740
+    },
+    "d1-071": {
+      "candidates": [
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "faq#all",
+        "claims-trust-model#all",
+        "ainsof-capital#all",
+        "plant-health-classification#all",
+        "human-gated-translation#all",
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all"
+      ],
+      "ranking": [
+        "weed-detection-pipeline#all",
+        "vast-data-bootcamp#all",
+        "clip-embeddings-kafka#all",
+        "plant-health-classification#all",
+        "faq#all",
+        "claims-trust-model#all",
+        "ainsof-capital#all",
+        "human-gated-translation#all",
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all"
+      ],
+      "tokens": 2483,
+      "ms": 20725
+    },
+    "d1-072": {
+      "candidates": [
+        "git-mcp-server#all",
+        "human-gated-translation#all",
+        "governance-center-pwa#all",
+        "skills#git",
+        "ainsof-capital#all",
+        "skills#github-actions",
+        "weed-detection-pipeline#all",
+        "vast-data-bootcamp#all",
+        "clip-embeddings-kafka#all",
+        "claims-trust-model#all"
+      ],
+      "ranking": [
+        "git-mcp-server#all",
+        "skills#git",
+        "skills#github-actions",
+        "human-gated-translation#all",
+        "governance-center-pwa#all",
+        "ainsof-capital#all",
+        "weed-detection-pipeline#all",
+        "vast-data-bootcamp#all",
+        "clip-embeddings-kafka#all",
+        "claims-trust-model#all"
+      ],
+      "tokens": 2252,
+      "ms": 15752
+    },
+    "d1-074": {
+      "candidates": [
+        "claims-trust-model#all",
+        "clip-embeddings-kafka#all",
+        "faq#all",
+        "postgres-rls-backbone#all",
+        "weed-detection-pipeline#all",
+        "ainsof-capital#all",
+        "git-mcp-server#all",
+        "api-latency-582-to-40#all",
+        "vast-data-bootcamp#all",
+        "governance-center-pwa#all"
+      ],
+      "ranking": [
+        "claims-trust-model#all",
+        "faq#all",
+        "ainsof-capital#all",
+        "postgres-rls-backbone#all",
+        "governance-center-pwa#all",
+        "api-latency-582-to-40#all",
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "vast-data-bootcamp#all",
+        "git-mcp-server#all"
+      ],
+      "tokens": 2587,
+      "ms": 18804
+    },
+    "d1-075": {
+      "candidates": [
+        "postgres-rls-backbone#all",
+        "claims-trust-model#all",
+        "faq#all",
+        "ainsof-capital#all",
+        "human-gated-translation#all",
+        "git-mcp-server#all",
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all",
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all"
+      ],
+      "ranking": [
+        "postgres-rls-backbone#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "human-gated-translation#all",
+        "git-mcp-server#all",
+        "governance-center-pwa#all",
+        "api-latency-582-to-40#all",
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "faq#all"
+      ],
+      "tokens": 2776,
+      "ms": 21231
+    },
+    "d1-077": {
+      "candidates": [
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all",
+        "ainsof-capital#all",
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "git-mcp-server#all",
+        "human-gated-translation#all",
+        "postgres-rls-backbone#all",
+        "claims-trust-model#all",
+        "vast-data-bootcamp#all"
+      ],
+      "ranking": [
+        "governance-center-pwa#all",
+        "api-latency-582-to-40#all",
+        "ainsof-capital#all",
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "git-mcp-server#all",
+        "human-gated-translation#all",
+        "postgres-rls-backbone#all",
+        "claims-trust-model#all",
+        "vast-data-bootcamp#all"
+      ],
+      "tokens": 2443,
+      "ms": 19794
+    },
+    "d1-078": {
+      "candidates": [
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "vast-data-bootcamp#all",
+        "claims-trust-model#all",
+        "human-gated-translation#all",
+        "faq#all",
+        "git-mcp-server#all",
+        "postgres-rls-backbone#all",
+        "governance-center-pwa#all",
+        "api-latency-582-to-40#all"
+      ],
+      "ranking": [
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "claims-trust-model#all",
+        "human-gated-translation#all",
+        "faq#all",
+        "git-mcp-server#all",
+        "postgres-rls-backbone#all",
+        "governance-center-pwa#all",
+        "api-latency-582-to-40#all"
+      ],
+      "tokens": 2441,
+      "ms": 18430
+    },
+    "d1-079": {
+      "candidates": [
+        "human-gated-translation#all",
+        "ainsof-capital#all",
+        "weed-detection-pipeline#all",
+        "governance-center-pwa#all",
+        "claims-trust-model#all",
+        "profile#all",
+        "plant-health-classification#all",
+        "education#all",
+        "faq#all",
+        "vast-data-bootcamp#all"
+      ],
+      "ranking": [
+        "human-gated-translation#all",
+        "profile#all",
+        "governance-center-pwa#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "weed-detection-pipeline#all",
+        "plant-health-classification#all",
+        "vast-data-bootcamp#all",
+        "education#all",
+        "faq#all"
+      ],
+      "tokens": 2295,
+      "ms": 16530
+    },
+    "d1-081": {
+      "candidates": [
+        "governance-center-pwa#all",
+        "git-mcp-server#all",
+        "api-latency-582-to-40#all",
+        "ainsof-capital#all",
+        "faq#all",
+        "claims-trust-model#all",
+        "human-gated-translation#all",
+        "postgres-rls-backbone#all",
+        "plant-health-classification#all",
+        "vast-data-bootcamp#all"
+      ],
+      "ranking": [
+        "governance-center-pwa#all",
+        "postgres-rls-backbone#all",
+        "api-latency-582-to-40#all",
+        "claims-trust-model#all",
+        "human-gated-translation#all",
+        "git-mcp-server#all",
+        "ainsof-capital#all",
+        "faq#all",
+        "plant-health-classification#all",
+        "vast-data-bootcamp#all"
+      ],
+      "tokens": 2546,
+      "ms": 17188
+    },
+    "d1-082": {
+      "candidates": [
+        "plant-health-classification#all",
+        "weed-detection-pipeline#all",
+        "claims-trust-model#all",
+        "skills#clip",
+        "faq#all",
+        "ainsof-capital#all",
+        "skills#git",
+        "skills#mcp",
+        "postgres-rls-backbone#all",
+        "skills#playwright"
+      ],
+      "ranking": [
+        "plant-health-classification#all",
+        "skills#clip",
+        "weed-detection-pipeline#all",
+        "claims-trust-model#all",
+        "ainsof-capital#all",
+        "postgres-rls-backbone#all",
+        "skills#git",
+        "skills#mcp",
+        "skills#playwright",
+        "faq#all"
+      ],
+      "tokens": 1809,
+      "ms": 12819
+    },
+    "d1-083": {
+      "candidates": [
+        "postgres-rls-backbone#all",
+        "claims-trust-model#all",
+        "api-latency-582-to-40#all",
+        "faq#all",
+        "ainsof-capital#all",
+        "git-mcp-server#all",
+        "governance-center-pwa#all",
+        "skills#dynamodb",
+        "skills#mongodb",
+        "plant-health-classification#all"
+      ],
+      "ranking": [
+        "postgres-rls-backbone#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all",
+        "git-mcp-server#all",
+        "plant-health-classification#all",
+        "skills#dynamodb",
+        "skills#mongodb",
+        "faq#all"
+      ],
+      "tokens": 2251,
+      "ms": 16697
+    },
+    "d1-085": {
+      "candidates": [
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "vast-data-bootcamp#all",
+        "api-latency-582-to-40#all",
+        "human-gated-translation#all",
+        "faq#all",
+        "governance-center-pwa#all",
+        "weed-detection-pipeline#all",
+        "skills#fastapi",
+        "postgres-rls-backbone#all"
+      ],
+      "ranking": [
+        "claims-trust-model#all",
+        "ainsof-capital#all",
+        "faq#all",
+        "governance-center-pwa#all",
+        "api-latency-582-to-40#all",
+        "postgres-rls-backbone#all",
+        "human-gated-translation#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "skills#fastapi"
+      ],
+      "tokens": 2299,
+      "ms": 18439
+    },
+    "d1-086": {
+      "candidates": [
+        "human-gated-translation#all",
+        "ainsof-capital#all",
+        "plant-health-classification#all",
+        "vast-data-bootcamp#all",
+        "governance-center-pwa#all",
+        "claims-trust-model#all",
+        "weed-detection-pipeline#all",
+        "profile#all",
+        "skills#clip",
+        "faq#all"
+      ],
+      "ranking": [
+        "human-gated-translation#all",
+        "profile#all",
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "claims-trust-model#all",
+        "plant-health-classification#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "skills#clip",
+        "faq#all"
+      ],
+      "tokens": 2343,
+      "ms": 15459
+    },
+    "d1-087": {
+      "candidates": [
+        "api-latency-582-to-40#all",
+        "profile#all",
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "postgres-rls-backbone#all",
+        "human-gated-translation#all",
+        "claims-trust-model#all",
+        "weed-detection-pipeline#all",
+        "skills#claude-api",
+        "skills#fastapi"
+      ],
+      "ranking": [
+        "api-latency-582-to-40#all",
+        "profile#all",
+        "governance-center-pwa#all",
+        "postgres-rls-backbone#all",
+        "claims-trust-model#all",
+        "human-gated-translation#all",
+        "weed-detection-pipeline#all",
+        "ainsof-capital#all",
+        "skills#fastapi",
+        "skills#claude-api"
+      ],
+      "tokens": 2425,
+      "ms": 17903
+    },
+    "d1-088": {
+      "candidates": [
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "faq#all",
+        "git-mcp-server#all",
+        "clip-embeddings-kafka#all",
+        "governance-center-pwa#all",
+        "weed-detection-pipeline#all",
+        "human-gated-translation#all",
+        "postgres-rls-backbone#all",
+        "vast-data-bootcamp#all"
+      ],
+      "ranking": [
+        "claims-trust-model#all",
+        "ainsof-capital#all",
+        "faq#all",
+        "governance-center-pwa#all",
+        "git-mcp-server#all",
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "human-gated-translation#all",
+        "postgres-rls-backbone#all",
+        "vast-data-bootcamp#all"
+      ],
+      "tokens": 2635,
+      "ms": 22811
+    },
+    "d1-089": {
+      "candidates": [
+        "git-mcp-server#all",
+        "skills#mcp",
+        "skills#git",
+        "governance-center-pwa#all",
+        "skills#github-actions",
+        "human-gated-translation#all",
+        "vast-data-bootcamp#all",
+        "clip-embeddings-kafka#all",
+        "ainsof-capital#all",
+        "weed-detection-pipeline#all"
+      ],
+      "ranking": [
+        "git-mcp-server#all",
+        "skills#mcp",
+        "skills#git",
+        "skills#github-actions",
+        "ainsof-capital#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "clip-embeddings-kafka#all",
+        "governance-center-pwa#all",
+        "human-gated-translation#all"
+      ],
+      "tokens": 2094,
+      "ms": 15343
+    },
+    "d1-092": {
+      "candidates": [
+        "claims-trust-model#all",
+        "postgres-rls-backbone#all",
+        "ainsof-capital#all",
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all",
+        "human-gated-translation#all",
+        "faq#all",
+        "profile#all",
+        "skills#typescript",
+        "weed-detection-pipeline#all"
+      ],
+      "ranking": [
+        "profile#all",
+        "postgres-rls-backbone#all",
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "api-latency-582-to-40#all",
+        "human-gated-translation#all",
+        "claims-trust-model#all",
+        "faq#all",
+        "skills#typescript",
+        "weed-detection-pipeline#all"
+      ],
+      "tokens": 2140,
+      "ms": 16191
+    },
+    "d1-093": {
+      "candidates": [
+        "postgres-rls-backbone#all",
+        "ainsof-capital#all",
+        "profile#all",
+        "api-latency-582-to-40#all",
+        "claims-trust-model#all",
+        "human-gated-translation#all",
+        "git-mcp-server#all",
+        "plant-health-classification#all",
+        "vast-data-bootcamp#all",
+        "governance-center-pwa#all"
+      ],
+      "ranking": [
+        "profile#all",
+        "postgres-rls-backbone#all",
+        "ainsof-capital#all",
+        "api-latency-582-to-40#all",
+        "claims-trust-model#all",
+        "human-gated-translation#all",
+        "git-mcp-server#all",
+        "plant-health-classification#all",
+        "vast-data-bootcamp#all",
+        "governance-center-pwa#all"
+      ],
+      "tokens": 2662,
+      "ms": 19013
+    },
+    "d1-094": {
+      "candidates": [
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "postgres-rls-backbone#all",
+        "faq#all",
+        "human-gated-translation#all",
+        "plant-health-classification#all",
+        "education#all",
+        "git-mcp-server#all"
+      ],
+      "ranking": [
+        "governance-center-pwa#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "postgres-rls-backbone#all",
+        "api-latency-582-to-40#all",
+        "faq#all",
+        "git-mcp-server#all",
+        "human-gated-translation#all",
+        "plant-health-classification#all",
+        "education#all"
+      ],
+      "tokens": 2463,
+      "ms": 19560
+    },
+    "d1-096": {
+      "candidates": [
+        "ainsof-capital#all",
+        "postgres-rls-backbone#all",
+        "claims-trust-model#all",
+        "governance-center-pwa#all",
+        "api-latency-582-to-40#all",
+        "profile#all",
+        "skills#postgresql",
+        "clip-embeddings-kafka#all",
+        "human-gated-translation#all",
+        "git-mcp-server#all"
+      ],
+      "ranking": [
+        "postgres-rls-backbone#all",
+        "ainsof-capital#all",
+        "profile#all",
+        "claims-trust-model#all",
+        "governance-center-pwa#all",
+        "api-latency-582-to-40#all",
+        "skills#postgresql",
+        "clip-embeddings-kafka#all",
+        "human-gated-translation#all",
+        "git-mcp-server#all"
+      ],
+      "tokens": 2569,
+      "ms": 18040
     }
   }
 }

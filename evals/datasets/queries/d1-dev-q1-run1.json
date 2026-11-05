@@ -24,7 +24,7 @@
       }
     }
   },
-  "tokens": 17350,
+  "tokens": 20253,
   "queries": {
     "d1-001": {
       "query": "Sarah Halevy translation job schedule frequency",
@@ -224,6 +224,38 @@
     },
     "d1-085": {
       "query": "פלטפורמת ממשל הנתונים שבנתה פותרת איזו בעיה",
+      "alternatives": []
+    },
+    "d1-086": {
+      "query": "Sarah Halevy translation pipeline",
+      "alternatives": []
+    },
+    "d1-087": {
+      "query": "Sarah Halevy API optimization project reduced response time what went wrong",
+      "alternatives": []
+    },
+    "d1-088": {
+      "query": "Sarah Halevy trust model in claims contradictory sources",
+      "alternatives": []
+    },
+    "d1-089": {
+      "query": "Sarah Halevy Git MCP server",
+      "alternatives": []
+    },
+    "d1-092": {
+      "query": "How many database change scripts did Sarah Halevy write for the governance platform?",
+      "alternatives": []
+    },
+    "d1-093": {
+      "query": "RLS policies triggers database built by Sarah Halevy",
+      "alternatives": []
+    },
+    "d1-094": {
+      "query": "governance platform commits over how long",
+      "alternatives": []
+    },
+    "d1-096": {
+      "query": "How many database schemas does Sarah Halevy's Postgres backbone use?",
       "alternatives": []
     }
   }
