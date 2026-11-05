@@ -1,0 +1,12 @@
+# The actions in the workflows are pinned to commit SHAs (docs/09-security-privacy.md, T13).
+# Dependabot opens a PR when a newer release comes out, with the SHA and the version comment
+# both updated, so a pin never goes stale unseen.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
