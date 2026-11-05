@@ -126,3 +126,14 @@ def test_history_sits_between_the_system_prompt_and_the_new_message():
     run(provider, history=history)
     roles = [m["role"] for m in provider.calls[0]["messages"]]
     assert roles == ["system", "user", "assistant", "user"]
+
+
+def test_the_loop_enforces_citations_by_default():
+    provider = Scripted(
+        [call(1, "rag"), Finish("m")],
+        [TextDelta("built it [[rec#r"), TextDelta("ag]] and [[rec#other]]."), Finish("m")],
+    )
+    result, events = run(provider)
+    assert [d for e, d in events if e == "citation"] == [{"chunk_id": "rec#rag", "index": 1}]
+    assert "".join(d["text"] for e, d in events if e == "token") == "built it  and ."
+    assert result.cited == {"rec#rag": 1} and result.dropped == ["rec#other"]

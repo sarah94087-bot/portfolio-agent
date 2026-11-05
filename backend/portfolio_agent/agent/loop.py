@@ -6,16 +6,18 @@ the model has to answer with what it found instead of the loop cutting it off mi
 
 The loop does not know about SSE frames or HTTP. It reports through `emit(event, data)` with
 the event types of docs/05-architecture.md, section 5, and the text goes through a TextFilter,
-where the citation filter plugs in (section 6). Tools are called one at a time, in the order
-the model asked for them, so the trace reads top to bottom.
+the citation filter by default (agent/citations.py), so no caller skips it. Tools are called
+one at a time, in the order the model asked for them, so the trace reads top to bottom.
 """
 
 import json
 import time
-from collections.abc import Awaitable, Callable, Sequence
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
+from portfolio_agent.agent.citations import CitationFilter
+from portfolio_agent.agent.emit import Emit
 from portfolio_agent.providers.base import (
     Finish,
     Message,
@@ -29,8 +31,6 @@ from portfolio_agent.tools.registry import Registry
 MAX_ROUNDS = 4
 MAX_INVALID_ARGS = 1  # one invalid call goes back to the model; the second moves to the backup
 
-Emit = Callable[[str, dict[str, Any]], Awaitable[None]]
-
 
 class TextFilter(Protocol):
     async def feed(self, text: str, allowed: frozenset[str], emit: Emit) -> None: ...
@@ -38,7 +38,7 @@ class TextFilter(Protocol):
 
 
 class PassThrough:
-    """No filtering: every delta becomes a token event. The citation filter replaces it."""
+    """No filtering: every delta becomes a token event. For tests of the loop alone."""
 
     async def feed(self, text: str, allowed: frozenset[str], emit: Emit) -> None:
         await emit("token", {"text": text})
@@ -55,6 +55,8 @@ class TurnResult:
     usage: dict[str, int] = field(default_factory=dict)
     models: list[str] = field(default_factory=list)
     hit_max_rounds: bool = False
+    cited: dict[str, int] = field(default_factory=dict)  # chunk id -> source number
+    dropped: list[str] = field(default_factory=list)  # invalid ids the filter removed
 
 
 async def run_turn(
@@ -70,7 +72,7 @@ async def run_turn(
     text_filter: TextFilter | None = None,
     max_rounds: int = MAX_ROUNDS,
 ) -> TurnResult:
-    text_filter = text_filter or PassThrough()
+    text_filter = text_filter or CitationFilter()
     messages: list[Message] = [
         {"role": "system", "content": system_prompt},
         *history,
@@ -146,7 +148,10 @@ async def run_turn(
             hit_max = True  # the next round is the last, and it runs without tools
 
     await text_filter.flush(emit)
-    return TurnResult("".join(answer), frozenset(allowed), rounds, usage, models, hit_max)
+    return TurnResult(
+        "".join(answer), frozenset(allowed), rounds, usage, models, hit_max,
+        dict(getattr(text_filter, "numbers", {})), list(getattr(text_filter, "dropped", [])),
+    )
 
 
 def _parse(arguments: str) -> Any:
