@@ -65,7 +65,7 @@ def use(kb, monkeypatch):
         monkeypatch.setattr(chat, "DEPS", chat.Deps(
             database_url=lambda: DB_URL, provider=lambda quota: providers.pop(0),
             embedder=lambda: None, docs=lambda: kb, agent_enabled=lambda: enabled,
-            limits=lambda: limits or Limits(), table=TABLE,
+            limits=lambda: limits or Limits(), tracer=lambda: TRACES, table=TABLE,
         ))
         BROWSER["client"] = TestClient(app)  # one visitor per test, keeping its cookie
         with psycopg.connect(DB_URL, autocommit=True) as conn:
@@ -74,6 +74,22 @@ def use(kb, monkeypatch):
 
 
 BROWSER = {}
+
+
+class Traces:
+    """Stands in for the Langfuse exporter: keeps what would have been sent."""
+
+    environment = "test"
+
+    def __init__(self):
+        self.sent = []
+
+    async def send(self, body, client):
+        self.sent.append(body)
+        return True
+
+
+TRACES = Traces()
 
 
 def post(body, client=None):
@@ -314,3 +330,19 @@ def test_a_blocked_answer_is_not_cached(use):
     post({"message": "leak it", "idempotency_key": "key-block-1"})
     _, again = post({"message": "leak it", "idempotency_key": "key-block-2"}, TestClient(app))
     assert "cached" not in again[0][1] and text(again) == "Hi."
+
+
+def test_every_request_sends_one_trace_named_by_its_message(use):
+    TRACES.sent.clear()
+    use(Scripted([search("MCP"), Finish("m1", {"input_tokens": 50})],
+                 [TextDelta("Yes [[git-mcp-server#all]]. Mail x@y.io"), Finish("m1")]))
+    _, events = post({"message": "MCP? my mail is me@example.com",
+                      "idempotency_key": "key-trace-1"})
+    assert len(TRACES.sent) == 1
+    trace = json.dumps(TRACES.sent[0])
+    spans = TRACES.sent[0]["resourceSpans"][0]["scopeSpans"][0]["spans"]
+    assert spans[0]["traceId"] == events[0][1]["message_id"].replace("-", "")
+    assert [s["name"] for s in spans] == ["chat_turn", "round 1", "search_portfolio", "round 2"]
+    assert "me@example.com" not in trace and "x@y.io" not in trace
+    _, refused = post({"message": "x" * 1001, "idempotency_key": "key-trace-2"})
+    assert len(TRACES.sent) == 2 and "input_too_long" in json.dumps(TRACES.sent[1])

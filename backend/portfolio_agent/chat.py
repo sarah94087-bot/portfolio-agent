@@ -16,7 +16,7 @@ the message is saved, so a refused one leaves nothing behind (guards/quotas.py).
 A first question already answered under the same prompt and knowledge base is served from
 the response cache (db/cache.py): no model call, and it still works when every model is down.
 
-Not here yet, and next: the Langfuse export (docs/11-roadmap.md, M4).
+Every request ends with one trace to Langfuse (tracing.py), sent after `done`.
 """
 
 import asyncio
@@ -37,7 +37,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field
 
-from portfolio_agent import sse
+from portfolio_agent import sse, tracing
 from portfolio_agent.agent import prompt
 from portfolio_agent.agent.loop import run_turn
 from portfolio_agent.agent.transcript import Transcript, replay
@@ -74,6 +74,11 @@ def _router():
 
 
 @cache
+def _http() -> httpx.AsyncClient:
+    return httpx.AsyncClient()
+
+
+@cache
 def _docs() -> list[Doc]:
     return load()
 
@@ -88,6 +93,7 @@ class Deps:
     docs: Callable[[], list[Doc]] = _docs
     agent_enabled: Callable[[], bool] = lambda: Settings.from_env().agent_enabled
     limits: Callable[[], Limits] = Limits.from_env
+    tracer: Callable[[], Any] = tracing.Exporter.from_env  # None without Langfuse keys
     now: Callable[[], datetime] = lambda: datetime.now(UTC)
     table: str = "chunks"
 
@@ -134,13 +140,16 @@ class _Out:
     queue: asyncio.Queue
     started: float = field(default_factory=time.perf_counter)
     transcript: Transcript = field(default_factory=Transcript)
+    trace: tracing.Recorder = field(default_factory=tracing.Recorder)
     ttft_ms: int | None = None
+    dropped: list[str] = field(default_factory=list)
 
     async def emit(self, event: str, data: dict[str, Any] | None = None) -> None:
         data = data or {}
         if event == "token" and self.ttft_ms is None:
             self.ttft_ms = round((time.perf_counter() - self.started) * 1000)
         self.transcript.record(event, data)
+        self.trace.record(event, data)
         await self.queue.put(sse.encode(event, data))
 
     async def error(self, code: str, message: str, retryable: bool, **extra: Any) -> None:
@@ -156,6 +165,14 @@ async def _turn(req: ChatRequest, deps: Deps, caller: Caller, queue: asyncio.Que
     except Exception:  # anything unexpected still ends the stream with a code
         log.exception("chat turn failed")
         await out.error("internal", "Something went wrong on our side.", True)
+    try:  # after done, before the stream closes (tracing.py says why)
+        meta = next((d for _, e, d in out.trace.events if e == "meta"), {})
+        await tracing.export(out.trace, tracing.Turn(
+            message=req.message, answer=out.transcript.text, dropped=out.dropped,
+            conversation_id=meta.get("conversation_id"), message_id=meta.get("message_id"),
+        ), deps.tracer(), _http())
+    except Exception:
+        log.exception("trace export failed")
     finally:
         await queue.put(None)
 
@@ -225,6 +242,7 @@ async def _answer(req: ChatRequest, deps: Deps, caller: Caller, out: _Out) -> No
             "language": result.language, "rounds": result.rounds,
             "hit_max_rounds": result.hit_max_rounds, "switches": switches,
         }
+        out.dropped = result.dropped
         model = result.models[-1] if result.models else None
         if model:  # all of the turn's tokens go to the model that finished it; a switch is rare
             quota.spend(model, result.usage.get("input_tokens", 0)

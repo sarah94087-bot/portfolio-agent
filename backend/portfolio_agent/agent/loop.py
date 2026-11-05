@@ -120,6 +120,8 @@ async def run_turn(
                             "name": f"round {rounds}"})
         calls: list[ToolCall] = []
         round_text: list[str] = []
+        round_model: str | None = None
+        round_usage: dict[str, int] = {}
         mark, state = dict(shown), text_filter.checkpoint()
         async for event in provider.stream(messages, tools):
             if isinstance(event, TextDelta):
@@ -144,11 +146,14 @@ async def run_turn(
                 calls.append(event)
             elif isinstance(event, Finish):
                 models.append(event.model)
+                round_model = event.model
                 for key, value in event.usage.items():
                     usage[key] = usage.get(key, 0) + value
+                    round_usage[key] = round_usage.get(key, 0) + value
         await emit("step", {"step_id": llm_step, "kind": "llm", "status": "end",
                             "name": f"round {rounds}", "duration_ms": _ms(started),
-                            "summary": {"tool_calls": [c.name for c in calls]}})
+                            "summary": {"tool_calls": [c.name for c in calls],
+                                        "model": round_model, "usage": round_usage}})
         answer += round_text
 
         if getattr(text_filter, "blocked", None):
