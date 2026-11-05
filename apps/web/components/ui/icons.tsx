@@ -78,3 +78,34 @@ export const JobIcon = (p: IconProps) => (
     <path d="M6 3h8l4 4v14H6zM9 12h6M9 16h6" />
   </Svg>
 );
+
+// S2: the sources toggle, a spinner for the tool status, the fallback swap, close and retry.
+export const ChevronIcon = ({ size = 14, className = "" }: IconProps) => (
+  <Svg size={size} strokeWidth={1.6} className={className}>
+    <path d="M3 6l5 5 5-5" />
+  </Svg>
+);
+
+export const SpinnerIcon = ({ size = 16, className = "" }: IconProps) => (
+  <Svg size={size} strokeWidth={2} className={`text-accent motion-safe:animate-spin ${className}`}>
+    <path d="M8 2a6 6 0 1 0 6 6" />
+  </Svg>
+);
+
+export const SwapIcon = ({ size = 11, className = "" }: IconProps) => (
+  <Svg size={size} strokeWidth={1.8} className={className}>
+    <path d="M2 5h9l-2-2M14 11H5l2 2" />
+  </Svg>
+);
+
+export const CloseIcon = ({ size = 16, className = "" }: IconProps) => (
+  <Svg size={size} strokeWidth={1.7} className={className}>
+    <path d="M4 4l8 8M12 4l-8 8" />
+  </Svg>
+);
+
+export const RetryIcon = ({ size = 15, className = "" }: IconProps) => (
+  <Svg size={size} strokeWidth={1.7} className={className}>
+    <path d="M13 8a5 5 0 1 1-1.5-3.5M13 2.5v3h-3" />
+  </Svg>
+);
