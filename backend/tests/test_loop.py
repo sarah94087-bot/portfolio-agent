@@ -137,3 +137,36 @@ def test_the_loop_enforces_citations_by_default():
     assert [d for e, d in events if e == "citation"] == [{"chunk_id": "rec#rag", "index": 1}]
     assert "".join(d["text"] for e, d in events if e == "token") == "built it  and ."
     assert result.cited == {"rec#rag": 1} and result.dropped == ["rec#other"]
+
+
+class Switching(Scripted):
+    """A router-like provider: the first round restarts mid-answer, and fall_back is recorded."""
+
+    def __init__(self, *rounds):
+        super().__init__(*rounds)
+        self.fell_back = []
+
+    def fall_back(self, reason):
+        self.fell_back.append(reason)
+
+
+def test_a_restart_discards_the_round_and_tells_the_visitor_where_to_cut():
+    from portfolio_agent.providers.router import Restart
+
+    provider = Scripted([
+        TextDelta("half [[rec#x"), Restart("a", "b", "unavailable"),
+        TextDelta("whole answer"), Finish("b"),
+    ])
+    result, events = run(provider)
+    restart = [d for e, d in events if e == "step" and d["status"] == "restart"]
+    assert restart[0]["summary"] == {"failed": "a", "to": "b", "reason": "unavailable",
+                                     "replace_from": 0, "citations_from": 0}
+    assert result.text == "whole answer" and result.dropped == []
+
+
+def test_a_second_invalid_call_moves_to_the_next_model_instead_of_failing():
+    bad = ToolCall("c1", "search_portfolio", '{"q": "x"}')
+    provider = Switching([bad, Finish("a")], [bad, Finish("a")], [TextDelta("ok"), Finish("b")])
+    result, _ = run(provider)
+    assert provider.fell_back == ["invalid tool call: search_portfolio"]
+    assert result.text == "ok"

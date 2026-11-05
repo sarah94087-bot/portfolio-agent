@@ -26,6 +26,7 @@ from portfolio_agent.providers.base import (
     TextDelta,
     ToolCall,
 )
+from portfolio_agent.providers.router import Restart
 from portfolio_agent.tools.registry import Registry
 
 MAX_ROUNDS = 4
@@ -35,6 +36,8 @@ MAX_INVALID_ARGS = 1  # one invalid call goes back to the model; the second move
 class TextFilter(Protocol):
     async def feed(self, text: str, allowed: frozenset[str], emit: Emit) -> None: ...
     async def flush(self, emit: Emit) -> None: ...
+    def checkpoint(self) -> Any: ...
+    def rollback(self, state: Any) -> None: ...
 
 
 class PassThrough:
@@ -44,6 +47,12 @@ class PassThrough:
         await emit("token", {"text": text})
 
     async def flush(self, emit: Emit) -> None:
+        return None
+
+    def checkpoint(self) -> None:
+        return None
+
+    def rollback(self, state: None) -> None:
         return None
 
 
@@ -86,6 +95,15 @@ async def run_turn(
     step = 0
     rounds = 0
     hit_max = False
+    shown = {"chars": 0, "citations": 0}  # what the visitor has seen, to replace on a restart
+    fall_back = getattr(provider, "fall_back", None)
+
+    async def out(event: str, data: dict[str, Any]) -> None:
+        if event == "token":
+            shown["chars"] += len(data["text"])
+        elif event == "citation":
+            shown["citations"] += 1
+        await emit(event, data)
 
     for rounds in range(1, max_rounds + 1):
         last = rounds == max_rounds
@@ -97,10 +115,24 @@ async def run_turn(
                             "name": f"round {rounds}"})
         calls: list[ToolCall] = []
         round_text: list[str] = []
+        mark, state = dict(shown), text_filter.checkpoint()
         async for event in provider.stream(messages, tools):
             if isinstance(event, TextDelta):
                 round_text.append(event.text)
-                await text_filter.feed(event.text, frozenset(allowed), emit)
+                await text_filter.feed(event.text, frozenset(allowed), out)
+            elif isinstance(event, Restart):
+                # The model failed mid-answer and the next one starts this round over. The
+                # visitor is told, and the UI drops what this round showed (section 4).
+                round_text.clear()
+                calls.clear()
+                text_filter.rollback(state)
+                shown.update(mark)
+                await emit("step", {"step_id": llm_step, "kind": "llm", "status": "restart",
+                                    "name": f"round {rounds}",
+                                    "summary": {"failed": event.failed, "to": event.to,
+                                                "reason": event.reason,
+                                                "replace_from": mark["chars"],
+                                                "citations_from": mark["citations"]}})
             elif isinstance(event, ToolCall):
                 calls.append(event)
             elif isinstance(event, Finish):
@@ -137,7 +169,12 @@ async def run_turn(
             if result.invalid_args:
                 invalid += 1
                 if invalid > MAX_INVALID_ARGS:
-                    raise NeedsFallback(f"{call.name}: {result.error}")
+                    # The router moves the next rounds to the next model; without one, the
+                    # caller has to (section 1).
+                    if fall_back is None:
+                        raise NeedsFallback(f"{call.name}: {result.error}")
+                    fall_back(f"invalid tool call: {call.name}")
+                    invalid = 0
             allowed |= result.chunk_ids
             await emit("step", {"step_id": sid, "kind": "tool_result", "status": "end",
                                 "name": call.name, "summary": result.trace_view,
@@ -147,7 +184,7 @@ async def run_turn(
         if rounds == max_rounds - 1:
             hit_max = True  # the next round is the last, and it runs without tools
 
-    await text_filter.flush(emit)
+    await text_filter.flush(out)
     return TurnResult(
         "".join(answer), frozenset(allowed), rounds, usage, models, hit_max,
         dict(getattr(text_filter, "numbers", {})), list(getattr(text_filter, "dropped", [])),

@@ -67,6 +67,17 @@ class CitationFilter:
             await self._text(self._buf, emit)
         self._buf = ""
 
+    def checkpoint(self) -> tuple[dict[str, int], int, str]:
+        return dict(self.numbers), len(self.dropped), self._buf
+
+    def rollback(self, state: tuple[dict[str, int], int, str]) -> None:
+        """Back to a checkpoint, when a round is answered over by another model. Numbers given
+        in the discarded text are taken back, so the sources stay numbered 1, 2, 3."""
+        numbers, dropped, buf = state
+        self.numbers = dict(numbers)
+        del self.dropped[dropped:]
+        self._buf = buf
+
     async def _cite(self, inner: str, allowed: frozenset[str], emit: Emit) -> None:
         ids = [i for i in SEPARATORS.split(inner.strip()) if i]
         if not ids:
