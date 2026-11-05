@@ -35,6 +35,7 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
   const conversationId = useRef<string | undefined>(undefined);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const lastQuestion = useRef<HTMLDivElement>(null);
+  const pageLang = lang === "he" ? "he" : "en";
   const busy = turns.some((t) => t.status === "sending" || t.status === "streaming");
 
   function update(next: Turn) {
@@ -48,11 +49,11 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
     setValue("");
     setMode("question");
     requestAnimationFrame(() => lastQuestion.current?.scrollIntoView({ block: "start", behavior: "smooth" }));
-    void run(turn, update, { conversationId: conversationId.current });
+    void run(turn, update, { conversationId: conversationId.current, lang: pageLang });
   }
 
   function retry(turn: Turn) {
-    void retryTurn(turn, update, { conversationId: conversationId.current });
+    void retryTurn(turn, update, { conversationId: conversationId.current, lang: pageLang });
   }
 
   function pick(index: number) {

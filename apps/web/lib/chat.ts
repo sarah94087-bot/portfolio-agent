@@ -198,6 +198,7 @@ export type Send = {
   url?: string;
   conversationId?: string;
   companySlug?: string;
+  lang?: "he" | "en"; // the page's: record titles in `sources` come in it
   signal?: AbortSignal;
   stream?: typeof streamEvents; // tests pass recorded events
 };
@@ -206,7 +207,7 @@ export type Send = {
 export async function run(
   turn: Turn,
   onChange: (t: Turn) => void,
-  { url = "/api/chat", conversationId, companySlug, signal, stream = streamEvents }: Send = {},
+  { url = "/api/chat", conversationId, companySlug, lang, signal, stream = streamEvents }: Send = {},
 ): Promise<Turn> {
   // A retry starts as `sending` with no error, and keeps the old parts until `meta`.
   let current: Turn = { ...turn, status: "sending", error: undefined };
@@ -215,6 +216,7 @@ export async function run(
     idempotency_key: turn.key,
     ...(conversationId ? { conversation_id: conversationId } : {}),
     ...(companySlug ? { company_slug: companySlug } : {}),
+    ...(lang ? { lang } : {}),
   });
   try {
     await stream(

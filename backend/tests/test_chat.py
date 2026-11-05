@@ -185,6 +185,19 @@ def test_a_question_resent_after_a_drop_is_saved_once_and_counted_once(use):
     assert roles == ["user", "assistant"]
 
 
+def test_record_titles_come_in_the_page_s_language_also_on_a_replay(use):
+    use(Scripted([search("human approval MCP server"), Finish("m1")],
+                 [TextDelta("Yes [[git-mcp-server#all]]."), Finish("m1")]))
+    body = {"message": "MCP?", "idempotency_key": "key-lang-1", "lang": "he"}
+    _, events = post(body)
+    title = next(d for e, d in events if e == "sources")["sources"][0]["record_title"]
+    assert title.startswith("grounded-git-mcp: שרת MCP")
+    _, replayed = post({**body, "lang": "en"})  # the same message, read on the English page
+    title = next(d for e, d in replayed if e == "sources")["sources"][0]["record_title"]
+    assert title.startswith("grounded-git-mcp: a local Git MCP server")
+    assert post({**body, "idempotency_key": "key-lang-2", "lang": "fr"})[0] == 422
+
+
 def test_the_next_turn_sees_the_history_and_may_cite_what_was_retrieved_before(use):
     first = Scripted([search("MCP"), Finish("m")],
                      [TextDelta("Yes [[git-mcp-server#all]]."), Finish("m")])

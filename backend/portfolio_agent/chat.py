@@ -28,7 +28,7 @@ from collections.abc import AsyncIterator, Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from functools import cache
-from typing import Any
+from typing import Any, Literal
 from uuid import UUID
 
 import httpx
@@ -66,6 +66,9 @@ class ChatRequest(BaseModel):
     conversation_id: UUID | None = None
     company_slug: str | None = Field(default=None, max_length=64)
     idempotency_key: str = Field(min_length=8, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
+    # The page's language: record titles in `sources` come in it. The answer's own language
+    # follows the question (US-11.1), not this.
+    lang: Literal["he", "en"] = "en"
 
 
 @cache
@@ -144,6 +147,7 @@ class _Out:
     trace: tracing.Recorder = field(default_factory=tracing.Recorder)
     ttft_ms: int | None = None
     dropped: list[str] = field(default_factory=list)
+    lang: str = "en"  # the page's, for record titles
 
     async def emit(self, event: str, data: dict[str, Any] | None = None) -> None:
         data = data or {}
@@ -160,7 +164,7 @@ class _Out:
 
 
 async def _turn(req: ChatRequest, deps: Deps, caller: Caller, queue: asyncio.Queue) -> None:
-    out = _Out(queue)
+    out = _Out(queue, lang=req.lang)
     try:
         await _answer(req, deps, caller, out)
     except Exception:  # anything unexpected still ends the stream with a code
@@ -314,8 +318,11 @@ async def _replay(conn: psycopg.Connection, stored: db.StoredAnswer, deps: Deps,
 
 async def _sources(conn: psycopg.Connection, cited: list[str], docs: list[Doc], deps: Deps,
                    out: _Out) -> None:
-    titles = {d.record.id: getattr(getattr(d.record, "title", None), "en", d.record.id)
-              for d in docs}
+    def title(d: Doc) -> str:
+        t = getattr(d.record, "title", None)
+        return getattr(t, out.lang, None) or getattr(t, "en", None) or d.record.id
+
+    titles = {d.record.id: title(d) for d in docs}
     rows = db.chunk_sources(conn, cited, deps.table)
     await out.emit("sources", {"sources": [
         {"chunk_id": cid, "record_title": titles.get(rid, rid),

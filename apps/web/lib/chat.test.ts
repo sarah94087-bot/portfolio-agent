@@ -133,9 +133,9 @@ test("retry sends the same key and conversation, keeps the old text until meta, 
 test("a first message sends no conversation id; HTTP failure is a disconnect, never a throw", async () => {
   const failing = recorded([], true);
   const t = await run(newTurn("שאלה", "key-abcdef"), () => {}, { stream: failing.stream,
-    companySlug: "acme" });
+    companySlug: "acme", lang: "he" });
   assert.deepEqual(failing.calls[0].body, { message: "שאלה", idempotency_key: "key-abcdef",
-    company_slug: "acme" });
+    company_slug: "acme", lang: "he" });
   assert.equal(t.error?.code, "disconnected");
 });
 
