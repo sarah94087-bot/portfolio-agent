@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>S6 · Contact flow (EN)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+.light{--surface:#F5F0EB;--surface-raised:#FFFBF8;--surface-sunken:#EDE4DE;--text:#151313;--text-muted:#5B5450;--border:#DCD2CB;--border-input:#8A8079;--border-strong:#151313;--accent:#C1121F;--on-accent:#fff;--focus:#C1121F;--tint-rose:#F6D3D1;--on-rose:#7A0B18;--fallback:#1F1B19;--fallback-bg:#DDD8D4;--danger:#151313;--danger-bg:#E6DFDA}
+.dark{--surface:#100E0E;--surface-raised:#1A1717;--surface-sunken:#0A0909;--text:#F3EDE8;--text-muted:#B5ABA6;--border:#3A3230;--border-input:#7C716C;--border-strong:#F3EDE8;--accent:#FF5C63;--on-accent:#1A0506;--focus:#FF5C63;--tint-rose:#4A1519;--on-rose:#FFC9CC;--fallback:#E4DDD8;--fallback-bg:#2B2725;--danger:#F3EDE8;--danger-bg:#2A2523}
+.mono{font-family:'IBM Plex Mono','Assistant',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button,input,textarea{font-family:inherit}
+.p{background:var(--surface-raised);border:1.5px solid var(--border-strong);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px;box-sizing:border-box}
+.k{font-size:12px;color:var(--text-muted);margin:0 0 8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 16px;border-radius:10px;font-size:14.5px;font-weight:700;border:1.5px solid var(--border-strong);background:transparent;color:var(--text);cursor:pointer}
+.pri{background:var(--accent);color:var(--on-accent);border-color:transparent}
+.f{display:flex;flex-direction:column;gap:4px;font-size:13.5px;font-weight:700}
+.in{border:1px solid var(--border-input);border-radius:8px;background:var(--surface);color:var(--text);padding:9px 12px;font-size:15px;font-weight:400}
+h3{margin:0;font-size:17px;font-weight:800}
+p{margin:0}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+</style>
+</helmet>
+<div class="{{themeClass}}" dir="ltr" lang="en" style="width:1440px;box-sizing:border-box;background:var(--surface);color:var(--text);font-family:'Assistant',sans-serif;padding:40px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px 24px;align-items:start">
+
+<section>
+<p class="k mono">1 · suggested</p>
+<div class="p">
+<p style="font-size:17px;line-height:1.75">If you want to continue with Sarah directly, you can leave her a message or download her CV.</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="btn pri">Leave Sarah a message</button><button type="button" class="btn">Download CV</button></div>
+</div>
+</section>
+
+<section>
+<p class="k mono">2 · drafted</p>
+<form class="p" aria-labelledby="d">
+<h3 id="d">Message draft</h3>
+<label class="f">Text (editable)<textarea class="in" rows="5" dir="auto" style="resize:none;line-height:1.6">Hi Sarah, I spoke with your agent about Project A (sample) and the fit for a Backend role. I still have a question about Go experience. Happy to talk.</textarea></label>
+<label class="f">Name<input class="in" value="Dana Cohen (sample)"></label>
+<label class="f">Reply address<input class="in" dir="ltr" style="text-align:start" value="dana@example.com"></label>
+<div aria-hidden="true" style="border:1.5px dashed var(--border-input);border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.55;color:var(--text-muted)"><b class="mono">honeypot</b> · <span class="mono">input name="website" tabindex="-1" autocomplete="off"</span> hidden with position:absolute; inset-inline-start:-9999px. Never shown to the user. If filled in, the request is silently rejected.</div>
+<button type="button" class="btn pri">Continue to confirm</button>
+</form>
+</section>
+
+<section>
+<p class="k mono">3 · confirm</p>
+<div class="p">
+<h3>Confirm and send?</h3>
+<dl style="margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px;line-height:1.55"><dt style="color:var(--text-muted)">To</dt><dd style="margin:0">Sarah</dd><dt style="color:var(--text-muted)">From</dt><dd style="margin:0">Dana Cohen · <span class="mono" style="font-size:13px">dana@example.com</span></dd><dt style="color:var(--text-muted)">Message</dt><dd style="margin:0">Hi Sarah, I spoke with your agent about Project A…</dd></dl>
+<p style="background:var(--surface-sunken);border-radius:8px;padding:8px 12px;font-size:13px;line-height:1.55">The message is sent only when you click this button. Nothing written in the chat is sent to Sarah on its own.</p>
+<div style="display:flex;gap:10px"><button type="button" class="btn pri">Send to Sarah</button><button type="button" class="btn" style="border-color:var(--border)">Back to editing</button></div>
+</div>
+</section>
+
+<section>
+<p class="k mono">4 · sent</p>
+<div class="p" role="status">
+<span style="width:40px;height:40px;border-radius:999px;background:var(--tint-rose);color:var(--on-rose);display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4.5"/></svg></span>
+<h3>Message sent</h3>
+<p style="font-size:15px;line-height:1.65;color:var(--text-muted)">Sarah will receive it and reply to <span class="mono" style="font-size:13.5px">dana@example.com</span>. You have one message left today.</p>
+<button type="button" class="btn" style="align-self:flex-start">Back to the conversation</button>
+</div>
+</section>
+
+<section>
+<p class="k mono">5 · failed</p>
+<div class="p" role="alert" style="border-color:var(--danger)">
+<h3 style="color:var(--danger)">Sending failed</h3>
+<p style="font-size:15px;line-height:1.65">Your message is still saved here. You can try again, or copy it and send it another way.</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="btn pri">Try again</button><button type="button" class="btn">Copy text</button></div>
+</div>
+</section>
+
+<section>
+<p class="k mono">6 · rate-limited</p>
+<div class="p" role="status">
+<div style="display:flex;align-items:center;gap:10px"><h3>You reached today's message limit</h3></div>
+<p style="font-size:15px;line-height:1.65">You can send up to 2 messages a day. <span class="mono" style="background:var(--fallback-bg);color:var(--fallback);border-radius:6px;padding:0 8px;font-size:13px">2 / 2</span> used. You can try again tomorrow, or download the CV.</p>
+<button type="button" class="btn" style="align-self:flex-start">Download CV</button>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1440,"height":1250}}'>
+class Component extends DCLogic {
+renderVals() { return { themeClass: this.props.theme === 'dark' ? 'dark' : 'light' }; }
+}
+</script>
+</body>
+</html>

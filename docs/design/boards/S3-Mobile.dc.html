@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>S3 · Mobile drawer (dark)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+:root{--surface:#100E0E;--surface-raised:#1A1717;--surface-sunken:#0A0909;--text:#F3EDE8;--text-muted:#B5ABA6;--border:#3A3230;--border-strong:#F3EDE8;--accent:#FF5C63;--on-accent:#1A0506;--tint-rose:#4A1519;--on-rose:#FFC9CC;--tint-stone:#2B2725;--on-stone:#E4DDD8;--tint-ink:#7A0B18;--on-ink:#FFD9D6}
+.mono{font-family:'IBM Plex Mono','Assistant',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.cite{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding-inline:4px;box-sizing:border-box;margin-inline:3px;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;vertical-align:2px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.chip{display:flex;justify-content:space-between;font-size:12px;background:var(--surface-sunken);border-radius:6px;padding:4px 8px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</helmet>
+<div dir="rtl" style="position:relative;width:375px;height:812px;overflow:hidden;background:var(--surface);color:var(--text);font-family:'Assistant',sans-serif">
+
+<header style="display:flex;align-items:center;gap:8px;padding-inline:16px;height:56px;border-block-end:1px solid var(--border);box-sizing:border-box">
+<span aria-hidden="true" style="width:9px;height:9px;background:var(--accent);border-radius:2px"></span>
+<span style="font-size:16px;font-weight:800">הסוכן של שרה</span>
+<span style="background:var(--accent);color:var(--on-accent);border-radius:6px;padding:1px 8px;font-size:12px;font-weight:700">AI</span>
+<span style="margin-inline-start:auto;font-size:13px;font-weight:700;border:1px solid var(--border);border-radius:8px;padding:4px 9px">עב | EN</span>
+<button type="button" aria-label="תפריט" style="width:40px;height:40px;border:0;background:transparent;color:var(--text);font-size:18px">⋯</button>
+</header>
+
+<div style="padding:16px;display:flex;flex-direction:column;gap:14px">
+<div dir="auto" style="align-self:flex-start;background:var(--tint-ink);color:var(--on-ink);border-radius:16px;padding:9px 14px;font-size:16px;font-weight:600">מה הפרויקט הכי מורכב שלה?</div>
+<p style="margin:0;font-size:17px;line-height:1.75">הפרויקט המורכב ביותר בתיק הוא פרויקט א׳ (שם לדוגמה).<span class="cite" style="background:var(--tint-rose);color:var(--on-rose)">1</span> היא השתמשה ב-<bdi class="mono" style="font-size:15px">pgvector</bdi> עם <bdi class="mono" style="font-size:15px">RRF</bdi>…</p>
+</div>
+
+<div aria-hidden="true" style="position:absolute;inset:56px 0 0 0;background:transparent;pointer-events:none"></div>
+
+<section role="dialog" aria-label="איך נבנתה התשובה" style="position:absolute;inset-inline:0;inset-block-end:0;height:540px;box-sizing:border-box;background:var(--surface-raised);border-start-start-radius:18px;border-start-end-radius:18px;border-block-start:1.5px solid var(--border-strong);box-shadow:0 -10px 32px rgba(0,0,0,.5);overflow:hidden">
+<div style="display:flex;justify-content:center;padding-block:8px 4px"><span style="width:40px;height:4px;border-radius:2px;background:var(--text-muted)"></span></div>
+<div style="display:flex;align-items:center;gap:8px;padding:6px 16px 12px;border-block-end:1px solid var(--border)">
+<div><h2 style="margin:0;font-size:17px;font-weight:800">איך נבנתה התשובה</h2><p class="mono" style="margin:1px 0 0;font-size:11.5px;color:var(--text-muted)">2 צעדים · 1.4 שנ׳ · 1,820 טוקנים</p></div>
+<button type="button" aria-label="סגירה" style="margin-inline-start:auto;width:44px;height:44px;border:0;background:transparent;color:var(--text);font-size:16px">✕</button>
+</div>
+<div style="padding:0 16px;overflow:hidden">
+<h3 style="margin:14px 0 6px;font-size:13.5px;font-weight:800">ציר זמן</h3>
+<ol style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:13px">
+<li style="display:flex;gap:10px"><span class="mono" style="color:var(--accent)">1</span><span style="flex:1">קריאת מודל</span><span class="mono" style="color:var(--text-muted)">0.42 שנ׳</span></li>
+<li style="display:flex;gap:10px"><span class="mono" style="color:var(--accent)">2</span><span style="flex:1">כלי · <bdi class="mono" style="font-size:12px">search_portfolio</bdi></span><span class="mono" style="color:var(--text-muted)">0.31 שנ׳</span></li>
+<li style="display:flex;gap:10px"><span class="mono" style="color:var(--accent)">3</span><span style="flex:1">תשובה</span><span class="mono" style="color:var(--text-muted)">0.67 שנ׳</span></li>
+</ol>
+<h3 style="margin:16px 0 4px;font-size:13.5px;font-weight:800">מועמדים מהאחזור · 8 מתוך 20</h3>
+<p style="margin:0 0 8px;font-size:12px;color:var(--text-muted)">בנייד הטבלה הופכת לכרטיסים. ערכי דוגמה.</p>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div class="card" style="border-color:var(--accent)">
+<div style="display:flex;align-items:center;gap:8px;margin-block-end:6px"><span class="mono" style="background:var(--accent);color:var(--on-accent);font-size:11px;font-weight:700;border-radius:4px;padding:0 6px;line-height:18px">✓ נבחר · ציטוט 1</span><span class="mono" style="font-size:11.5px;color:var(--text-muted);margin-inline-start:auto">#1 · c14</span></div>
+<p style="margin:0 0 8px;font-size:13.5px;line-height:1.5">השכבה משלבת חיפוש לקסיקלי ווקטורי…</p>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px" class="mono"><span class="chip"><span>lex</span><b>12.4</b></span><span class="chip"><span>vec</span><b>0.81</b></span><span class="chip"><span>rrf</span><b>.031</b></span><span class="chip"><span>rr</span><b>0.91</b></span></div>
+</div>
+<div class="card">
+<div style="display:flex;align-items:center;gap:8px;margin-block-end:6px"><span class="mono" style="border:1px solid var(--border);color:var(--text-muted);font-size:11px;border-radius:4px;padding:0 6px;line-height:18px">לא נבחר</span><span class="mono" style="font-size:11.5px;color:var(--text-muted);margin-inline-start:auto">#4 · c09</span></div>
+<p style="margin:0 0 8px;font-size:13.5px;line-height:1.5;color:var(--text-muted)">תור הודעות ותזמון משימות…</p>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px" class="mono"><span class="chip"><span>lex</span><b>8.3</b></span><span class="chip"><span>vec</span><b>0.62</b></span><span class="chip"><span>rrf</span><b>.024</b></span><span class="chip"><span>rr</span><b>0.61</b></span></div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":375,"height":812}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

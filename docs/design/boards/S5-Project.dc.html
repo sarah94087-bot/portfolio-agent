@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>S5 · Project card</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+.light{--surface:#F5F0EB;--surface-raised:#FFFBF8;--surface-sunken:#EDE4DE;--text:#151313;--text-muted:#5B5450;--border:#DCD2CB;--border-input:#8A8079;--border-strong:#151313;--accent:#C1121F;--on-accent:#fff;--focus:#C1121F;--tint-rose:#F6D3D1;--on-rose:#7A0B18;--tint-stone:#DDD8D4;--on-stone:#1F1B19;--tint-salmon:#FBCDBE;--on-salmon:#6B1A0B}
+.dark{--surface:#100E0E;--surface-raised:#1A1717;--surface-sunken:#0A0909;--text:#F3EDE8;--text-muted:#B5ABA6;--border:#3A3230;--border-input:#7C716C;--border-strong:#F3EDE8;--accent:#FF5C63;--on-accent:#1A0506;--focus:#FF5C63;--tint-rose:#4A1519;--on-rose:#FFC9CC;--tint-stone:#2B2725;--on-stone:#E4DDD8;--tint-salmon:#4A2216;--on-salmon:#FFC9B5}
+.mono{font-family:'IBM Plex Mono','Assistant',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button{font-family:inherit;cursor:pointer}
+a{color:var(--accent)}
+.chip{display:inline-block;background:var(--surface-sunken);border:1px solid var(--border);border-radius:6px;padding:2px 9px;font-family:'IBM Plex Mono',monospace;font-size:12.5px}
+.met{border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.node{position:absolute;box-sizing:border-box;display:flex;align-items:center;justify-content:center;text-align:center;font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;line-height:1.3;border-radius:8px;border:1.5px solid var(--accent);padding:4px 8px}
+.ln{position:absolute;background:var(--text)}
+.ah{position:absolute;width:0;height:0}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+</style>
+</helmet>
+<div class="{{themeClass}}" dir="{{dir}}" lang="{{lang}}" style="width:{{w}}px;box-sizing:border-box;background:var(--surface);color:var(--text);font-family:'Assistant',sans-serif;padding:{{pad}};display:flex;flex-direction:column;gap:22px;align-items:center">
+<div style="width:100%;max-width:700px;display:flex;flex-direction:column;gap:22px">
+
+<article style="background:var(--surface-raised);border:1.5px solid var(--border-strong);border-radius:16px;padding:{{cpad}};display:flex;flex-direction:column;gap:16px">
+<header>
+<span class="mono" style="font-size:11.5px;color:var(--text-muted)">{{t.kicker}}</span>
+<h2 style="margin:4px 0 0;font-size:22px;line-height:1.3;font-weight:800">{{t.title}}</h2>
+<dl style="margin:10px 0 0;display:grid;grid-template-columns:auto 1fr;column-gap:16px;row-gap:4px;font-size:14px"><dt style="color:var(--text-muted)">{{t.roleL}}</dt><dd style="margin:0">{{t.role}}</dd><dt style="color:var(--text-muted)">{{t.periodL}}</dt><dd class="mono" style="margin:0;font-size:13px">{{t.period}}</dd></dl>
+</header>
+<div><h3 style="margin:0 0 8px;font-size:13px;color:var(--text-muted);font-weight:700">{{t.stack}}</h3><div style="display:flex;flex-wrap:wrap;gap:6px"><span class="chip">Python</span><span class="chip">PostgreSQL</span><span class="chip">pgvector</span><span class="chip">Next.js</span><span class="chip">gpt-oss-120b</span></div></div>
+<div><h3 style="margin:0 0 8px;font-size:13px;color:var(--text-muted);font-weight:700">{{t.metrics}}</h3>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div class="met" style="border-color:var(--accent)"><button type="button" aria-expanded="true" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;font-family:'Assistant',sans-serif;font-size:15px"><span class="mono" style="font-size:20px;font-weight:500">0.96</span><span style="flex:1">Recall@5 <span style="color:var(--text-muted);font-size:13px">({{t.sample}})</span></span><span style="color:var(--accent);font-size:13px;font-weight:700">{{t.how}} ▴</span></button><p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--text-muted);padding-block-start:6px;border-block-start:1px solid var(--border)">{{t.howText}}</p></div>
+<div class="met"><button type="button" aria-expanded="false" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;font-family:'Assistant',sans-serif;font-size:15px"><span class="mono" style="font-size:20px;font-weight:500">1.4 s</span><span style="flex:1">{{t.m2}} <span style="color:var(--text-muted);font-size:13px">({{t.sample}})</span></span><span style="color:var(--accent);font-size:13px;font-weight:700">{{t.how}} ▾</span></button></div>
+<div class="met"><button type="button" aria-expanded="false" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;font-family:'Assistant',sans-serif;font-size:15px"><span class="mono" style="font-size:20px;font-weight:500">[X%]</span><span style="flex:1">{{t.m3}} <span style="color:var(--text-muted);font-size:13px">({{t.placeholder}})</span></span><span style="color:var(--accent);font-size:13px;font-weight:700">{{t.how}} ▾</span></button></div>
+</div></div>
+<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:14px;font-weight:600"><span style="color:var(--text-muted);font-weight:400">{{t.sources}}</span><a href="#"><span class="cite" style="display:inline-block;background:var(--tint-rose);color:var(--on-rose);border-radius:6px;padding:0 6px;font-family:'IBM Plex Mono',monospace;font-size:12px">1</span> {{t.s1}}</a><a href="#"><span style="display:inline-block;background:var(--tint-stone);color:var(--on-stone);border-radius:6px;padding:0 6px;font-family:'IBM Plex Mono',monospace;font-size:12px">2</span> {{t.s2}}</a><a href="#"><span style="display:inline-block;background:var(--tint-salmon);color:var(--on-salmon);border-radius:6px;padding:0 6px;font-family:'IBM Plex Mono',monospace;font-size:12px">3</span> {{t.s3}}</a></div>
+
+<figure style="margin:0;border-block-start:1px solid var(--border);padding-block-start:14px">
+<figcaption style="display:flex;align-items:center;gap:10px;margin-block-end:10px"><span style="font-size:14px;font-weight:800">{{t.diag}}</span><span class="mono" style="font-size:11.5px;color:var(--text-muted)">Mermaid · EN · LTR</span>
+<span style="margin-inline-start:auto;display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;font-size:13px;font-weight:700"><button type="button" aria-pressed="true" style="border:0;background:var(--text);color:var(--surface);padding:5px 12px">{{t.tDiagram}}</button><button type="button" aria-pressed="false" style="border:0;background:transparent;color:var(--text);padding:5px 12px">{{t.tText}}</button></span></figcaption>
+<div dir="ltr" lang="en" role="img" aria-label="Architecture diagram: Client to API route to agent loop; agent loop calls search_portfolio on Postgres with pgvector and the LLM provider." style="position:relative;height:{{dh}}px;background:var(--surface-raised);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+<sc-if value="{{wide}}">
+<div class="node" style="left:20px;top:78px;width:112px;height:44px;background:var(--surface-sunken);border-color:var(--border-input);color:var(--text)">Client</div>
+<div class="ln" style="left:132px;top:99px;width:30px;height:1.5px"></div><div class="ah" style="left:158px;top:94px;border-left:8px solid var(--text);border-top:5.5px solid transparent;border-bottom:5.5px solid transparent"></div>
+<div class="node" style="left:166px;top:78px;width:120px;height:44px;background:var(--tint-stone);border-color:var(--on-stone);color:var(--on-stone)">API route</div>
+<div class="ln" style="left:286px;top:99px;width:30px;height:1.5px"></div><div class="ah" style="left:312px;top:94px;border-left:8px solid var(--text);border-top:5.5px solid transparent;border-bottom:5.5px solid transparent"></div>
+<div class="node" style="left:320px;top:78px;width:130px;height:44px;background:var(--tint-rose);color:var(--on-rose);font-weight:600">Agent loop</div>
+<div class="ln" style="left:450px;top:99px;width:30px;height:1.5px"></div><div class="ah" style="left:476px;top:94px;border-left:8px solid var(--text);border-top:5.5px solid transparent;border-bottom:5.5px solid transparent"></div>
+<div class="node mono" style="left:484px;top:78px;width:170px;height:44px;background:var(--tint-salmon);border-color:var(--on-salmon);color:var(--on-salmon);font-size:12.5px">search_portfolio</div>
+<div class="ln" style="left:385px;top:122px;width:1.5px;height:36px"></div><div class="ah" style="left:380px;top:152px;border-top:8px solid var(--text);border-left:5.5px solid transparent;border-right:5.5px solid transparent"></div>
+<div class="node" style="left:320px;top:160px;width:130px;height:44px;background:var(--surface-sunken);border-color:var(--border-input);color:var(--text)">LLM provider</div>
+<div class="ln" style="left:569px;top:122px;width:1.5px;height:36px"></div><div class="ah" style="left:564px;top:152px;border-top:8px solid var(--text);border-left:5.5px solid transparent;border-right:5.5px solid transparent"></div>
+<div class="node" style="left:484px;top:160px;width:170px;height:44px;background:var(--surface-sunken);border-color:var(--border-input);color:var(--text)">Postgres + pgvector</div>
+</sc-if>
+<sc-if value="{{narrow}}">
+<div class="node" style="left:16px;top:16px;width:100px;height:38px;background:var(--surface-sunken);border-color:var(--border-input);color:var(--text)">Client</div>
+<div class="ln" style="left:66px;top:54px;width:1.5px;height:18px"></div>
+<div class="node" style="left:16px;top:74px;width:100px;height:38px;background:var(--tint-stone);border-color:var(--on-stone);color:var(--on-stone)">API route</div>
+<div class="ln" style="left:66px;top:112px;width:1.5px;height:18px"></div>
+<div class="node" style="left:16px;top:132px;width:120px;height:38px;background:var(--tint-rose);color:var(--on-rose);font-weight:600">Agent loop</div>
+<div class="ln" style="left:136px;top:150px;width:28px;height:1.5px"></div>
+<div class="node mono" style="left:166px;top:132px;width:150px;height:38px;background:var(--tint-salmon);border-color:var(--on-salmon);color:var(--on-salmon);font-size:12px">search_portfolio</div>
+<div class="ln" style="left:66px;top:170px;width:1.5px;height:18px"></div>
+<div class="node" style="left:16px;top:190px;width:130px;height:38px;background:var(--surface-sunken);border-color:var(--border-input);color:var(--text)">LLM provider</div>
+</sc-if>
+</div>
+<p style="margin:8px 0 0;font-size:12.5px;line-height:1.6;color:var(--text-muted)">{{t.diagNote}}</p>
+<details open style="margin-block-start:10px;background:var(--surface-sunken);border-radius:10px;padding:10px 14px;font-size:14px;line-height:1.7"><summary style="cursor:pointer;font-weight:700">{{t.altTitle}}</summary><span dir="ltr" lang="en" style="display:block;text-align:start;font-family:'IBM Plex Sans',sans-serif">The client sends a question to the API route. The API route starts the agent loop. The agent loop calls the LLM provider and the search_portfolio tool. search_portfolio queries Postgres with pgvector.</span></details>
+</figure>
+</article>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"lang":{"editor":"enum","options":["he","en"],"default":"he"},"layout":{"editor":"enum","options":["desktop","mobile"],"default":"desktop"},"$preview":{"width":1040,"height":1500}}'>
+class Component extends DCLogic {
+renderVals() {
+const he = (this.props.lang || 'he') !== 'en';
+const mobile = this.props.layout === 'mobile';
+const theme = this.props.theme === 'dark' ? 'dark' : 'light';
+const T = he ? {
+ kicker:'כרטיס פרויקט · placeholder', title:'פרויקט א׳: צינור לביקורת אנושית של תרגום מכונה (שם לדוגמה)', roleL:'התפקיד של שרה', role:'תכנון ומימוש שכבת האחזור והדירוג (דוגמה)', periodL:'תקופה', period:'2024 – 2025 [דוגמה]',
+ stack:'טכנולוגיות', metrics:'מדדים', sample:'ערך לדוגמה', placeholder:'placeholder', how:'איך נמדד', howText:'הערכה על 200 שאילתות מסומנות ידנית (ערך לדוגמה). בדקנו אם הקטע הנכון נמצא ב-5 התוצאות הראשונות, לפני ואחרי הוספת rerank.',
+ m2:'זמן תגובה, p95', m3:'קיצור זמן ביקורת', sources:'מקורות:', s1:'סקירה', s2:'אחזור ודירוג', s3:'ארכיטקטורה',
+ diag:'ארכיטקטורה', tDiagram:'תרשים', tText:'טקסט', diagNote:'התרשים נוצר מנתונים ב-Mermaid, תמיד באנגלית ובכיוון LTR, גם בממשק עברי.', altTitle:'חלופה טקסטואלית לקורא מסך'
+} : {
+ kicker:'Project card · placeholder', title:'Project A: human-review pipeline for machine translation (sample name)', roleL:"Sarah's role", role:'Designed and built the retrieval and ranking layer (sample)', periodL:'Period', period:'2024 – 2025 [sample]',
+ stack:'Tech stack', metrics:'Metrics', sample:'sample value', placeholder:'placeholder', how:'How measured', howText:'Evaluated on 200 hand-labelled queries (sample value). We checked whether the right chunk appears in the top 5, before and after adding rerank.',
+ m2:'Response time, p95', m3:'Review-time reduction', sources:'Sources:', s1:'Overview', s2:'Retrieval and ranking', s3:'Architecture',
+ diag:'Architecture', tDiagram:'Diagram', tText:'Text', diagNote:'Generated from data with Mermaid, always English and LTR, even inside a Hebrew UI.', altTitle:'Text alternative for screen readers'
+};
+return { themeClass:theme, dir:he?'rtl':'ltr', lang:he?'he':'en', t:T, w:mobile?375:1040, pad:mobile?'16px':'40px', cpad:mobile?'16px':'28px', dh:mobile?244:236, wide:!mobile, narrow:mobile };
+}
+}
+</script>
+</body>
+</html>

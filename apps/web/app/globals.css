@@ -1,26 +1,98 @@
 @import "tailwindcss";
+@import "./tokens.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/* Map the tokens into Tailwind so `bg-surface text-text border-border` work and switch in dark. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-border: var(--border);
+  --color-border-input: var(--border-input);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
+  --color-focus: var(--focus);
+  --color-tint-rose: var(--tint-rose);
+  --color-on-rose: var(--on-rose);
+  --color-tint-stone: var(--tint-stone);
+  --color-on-stone: var(--on-stone);
+  --color-tint-salmon: var(--tint-salmon);
+  --color-on-salmon: var(--on-salmon);
+  --color-tint-ink: var(--tint-ink);
+  --color-on-ink: var(--on-ink);
+  --color-match-strong: var(--match-strong);
+  --color-match-strong-bg: var(--match-strong-bg);
+  --color-match-partial: var(--match-partial);
+  --color-match-partial-bg: var(--match-partial-bg);
+  --color-match-gap: var(--match-gap);
+  --color-match-gap-bg: var(--match-gap-bg);
+  --color-fallback: var(--fallback);
+  --color-fallback-bg: var(--fallback-bg);
+  --color-removed: var(--removed);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-mark-1: var(--mark-1);
+  --color-mark-2: var(--mark-2);
+  --color-mark-3: var(--mark-3);
+  --color-mark-4: var(--mark-4);
+  --color-badge-plate: var(--badge-plate);
+  --color-badge-plate-on-accent: var(--badge-plate-on-accent);
+
+  --font-sans: var(--font-assistant), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --text-body: var(--fs-body);
+  --text-body--line-height: var(--lh-body);
+  --text-ui: var(--fs-ui);
+  --text-ui--line-height: var(--lh-ui);
+  --text-small: var(--fs-small);
+  --text-small--line-height: var(--lh-small);
+  --text-trace: var(--fs-trace);
+  --text-h2: var(--fs-h2);
+  --text-h1: var(--fs-h1);
+
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+
+  --shadow-pop: var(--shadow-pop);
+  --container-measure: var(--measure);
+  --ease-standard: var(--ease);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--font-sans);
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Numbers, model ids, tool names and scores: columns line up. */
+  .mono,
+  code {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  /* Direction icons (send arrow, chevrons) are drawn pointing to inline-end in LTR. */
+  [dir="rtl"] .icon-dir {
+    transform: scaleX(-1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }

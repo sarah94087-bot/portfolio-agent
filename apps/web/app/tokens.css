@@ -1,0 +1,83 @@
+/*
+ * Design tokens, copied from the Claude Design board "DS · Tokens" (direction A).
+ * See docs/design/README.md. Components never hardcode colors or sizes: they read these
+ * through the Tailwind theme in globals.css.
+ *
+ * Contrast (measured in the design): text 16.4:1, muted 6.6:1, accent on surface 5.5:1,
+ * on-accent 6.2:1 in light; all pairs ≥ 6.4:1 in dark.
+ */
+:root {
+  --surface: #F5F0EB; --surface-raised: #FFFBF8; --surface-sunken: #EDE4DE;
+  --text: #151313; --text-muted: #5B5450;
+  --border: #DCD2CB; --border-input: #8A8079; --border-strong: #151313;
+  --accent: #C1121F; --accent-hover: #9E0E19; --on-accent: #FFFFFF; --focus: #C1121F;
+
+  /* Tints: one per citation source and starter-question category. */
+  --tint-rose: #F6D3D1; --on-rose: #7A0B18;
+  --tint-stone: #DDD8D4; --on-stone: #1F1B19;
+  --tint-salmon: #FBCDBE; --on-salmon: #6B1A0B;
+  --tint-ink: #151313; --on-ink: #F5F0EB;
+
+  /* Semantic. A gap is neutral and dashed, never red: red is the brand. */
+  --match-strong: #F5F0EB; --match-strong-bg: #151313;
+  --match-partial: #6B1A0B; --match-partial-bg: #FBCDBE;
+  --match-gap: #4A4440; --match-gap-bg: #E6DFDA;
+  --fallback: #1F1B19; --fallback-bg: #DDD8D4; --removed: #5B5450;
+  --danger: #151313; --danger-bg: #E6DFDA; /* destructive actions and real errors only */
+
+  /* The 2×2 logo mark. In dark, the ink square turns light so it stays visible. */
+  --mark-1: #E8A3A0; --mark-2: #151313; --mark-3: #8A8079; --mark-4: var(--accent);
+
+  /* Starter-card badge: a translucent plate behind the icon. */
+  --badge-plate: rgb(255 255 255 / .7); --badge-plate-on-accent: rgb(255 255 255 / .18);
+
+  --shadow-pop: 0 10px 28px rgb(31 29 25 / .16);
+
+  --fs-body: 17px; --lh-body: 1.65;
+  --fs-ui: 15px; --lh-ui: 1.5;
+  --fs-small: 13px; --lh-small: 1.5;
+  --fs-trace: 12.5px;
+  --fs-h2: 24px; --fs-h1: 40px;
+
+  --r-sm: 6px; --r-md: 10px; --r-lg: 14px;
+  --measure: 700px;
+
+  --dur-fast: 120ms; --dur-base: 200ms; --dur-panel: 280ms;
+  --ease: cubic-bezier(.2, 0, 0, 1);
+}
+
+/* Hebrew without niqqud is visually denser: slightly larger, taller lines. */
+:lang(he) {
+  --fs-body: 18px; --lh-body: 1.8;
+  --fs-ui: 15.5px; --lh-ui: 1.55;
+  --fs-small: 13.5px; --lh-small: 1.55;
+  --fs-h2: 26px; --fs-h1: 44px;
+}
+/* An English island inside a Hebrew page (a diagram, a quoted posting) gets Latin metrics back. */
+:lang(en) {
+  --fs-body: 17px; --lh-body: 1.65;
+  --fs-ui: 15px; --lh-ui: 1.5;
+  --fs-small: 13px; --lh-small: 1.5;
+  --fs-h2: 24px; --fs-h1: 40px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface: #100E0E; --surface-raised: #1A1717; --surface-sunken: #0A0909;
+    --text: #F3EDE8; --text-muted: #B5ABA6;
+    --border: #3A3230; --border-input: #7C716C; --border-strong: #F3EDE8;
+    --accent: #FF5C63; --accent-hover: #FF8086; --on-accent: #1A0506; --focus: #FF5C63;
+    --tint-rose: #4A1519; --on-rose: #FFC9CC;
+    --tint-stone: #2B2725; --on-stone: #E4DDD8;
+    --tint-salmon: #4A2216; --on-salmon: #FFC9B5;
+    --tint-ink: #7A0B18; --on-ink: #FFD9D6;
+    --match-strong: #151313; --match-strong-bg: #F3EDE8;
+    --match-partial: #FFC9B5; --match-partial-bg: #4A2216;
+    --match-gap: #CFC6C1; --match-gap-bg: #2A2523;
+    --fallback: #E4DDD8; --fallback-bg: #2B2725; --removed: #B5ABA6;
+    --danger: #F3EDE8; --danger-bg: #2A2523;
+    --mark-2: #F3EDE8;
+    --badge-plate: rgb(0 0 0 / .28); --badge-plate-on-accent: rgb(255 255 255 / .3);
+    --shadow-pop: 0 10px 28px rgb(0 0 0 / .5);
+  }
+}

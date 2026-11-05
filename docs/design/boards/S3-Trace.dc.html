@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>S3 · Trace panel</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+.light{--surface:#F5F0EB;--surface-raised:#FFFBF8;--surface-sunken:#EDE4DE;--text:#151313;--text-muted:#5B5450;--border:#DCD2CB;--border-input:#8A8079;--border-strong:#151313;--accent:#C1121F;--on-accent:#fff;--focus:#C1121F;--tint-rose:#F6D3D1;--on-rose:#7A0B18;--tint-stone:#DDD8D4;--on-stone:#1F1B19;--tint-salmon:#FBCDBE;--on-salmon:#6B1A0B;--tint-ink:#151313;--on-ink:#F5F0EB;--match-gap-bg:#E6DFDA;--match-gap:#4A4440;--shadow-pop:0 10px 28px rgba(31,29,25,.16)}
+.dark{--surface:#100E0E;--surface-raised:#1A1717;--surface-sunken:#0A0909;--text:#F3EDE8;--text-muted:#B5ABA6;--border:#3A3230;--border-input:#7C716C;--border-strong:#F3EDE8;--accent:#FF5C63;--on-accent:#1A0506;--focus:#FF5C63;--tint-rose:#4A1519;--on-rose:#FFC9CC;--tint-stone:#2B2725;--on-stone:#E4DDD8;--tint-salmon:#4A2216;--on-salmon:#FFC9B5;--tint-ink:#7A0B18;--on-ink:#FFD9D6;--match-gap-bg:#2A2523;--match-gap:#CFC6C1;--shadow-pop:0 10px 28px rgba(0,0,0,.5)}
+.mono{font-family:'IBM Plex Mono','Assistant',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button{font-family:inherit;cursor:pointer}
+a{color:var(--accent)}
+.cite{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding-inline:4px;box-sizing:border-box;margin-inline:3px;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;text-decoration:none;vertical-align:2px}
+.c1{background:var(--tint-rose);color:var(--on-rose)}
+.c2{background:var(--tint-stone);color:var(--on-stone)}
+.c3{background:var(--tint-salmon);color:var(--on-salmon)}
+.sec{padding-block:18px;border-block-end:1px solid var(--border)}
+.sec h3{margin:0 0 4px;font-size:14px;font-weight:800;letter-spacing:.01em}
+.sub{margin:0 0 10px;font-size:12.5px;color:var(--text-muted);line-height:1.5}
+th{font-size:11px;font-weight:600;color:var(--text-muted);text-align:start;padding:5px 6px;border-block-end:1px solid var(--border-strong)}
+td{font-size:11.5px;padding:7px 6px;border-block-end:1px solid var(--border);vertical-align:top}
+.num{text-align:end}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+</style>
+</helmet>
+<div class="{{themeClass}}" dir="{{dir}}" lang="{{lang}}" style="width:1440px;height:2060px;box-sizing:border-box;background:var(--surface);color:var(--text);font-family:'Assistant',sans-serif;display:flex;flex-direction:column">
+
+<header style="display:flex;align-items:center;gap:16px;padding-inline:32px;height:64px;flex:none;box-sizing:border-box;border-block-end:1px solid var(--border)">
+<div style="display:flex;align-items:center;gap:12px">
+<span aria-hidden="true" style="display:grid;grid-template-columns:repeat(2,9px);gap:2px"><i style="width:9px;height:9px;border-radius:2px;background:#E8A3A0"></i><i style="width:9px;height:9px;border-radius:2px;background:#151313"></i><i style="width:9px;height:9px;border-radius:2px;background:#8A8079"></i><i style="width:9px;height:9px;border-radius:2px;background:var(--accent)"></i></span>
+<span style="font-size:18px;font-weight:800">{{t.name}}</span>
+<span style="background:var(--accent);color:var(--on-accent);border-radius:6px;padding:2px 9px;font-size:13px;font-weight:700">{{t.ai}}</span>
+</div>
+<nav style="margin-inline-start:auto;display:flex;align-items:center;gap:20px;font-size:15px" aria-label="main">
+<a href="#" style="color:var(--text-muted);text-decoration:none">{{t.how}}</a>
+<a href="#" style="color:var(--text-muted);text-decoration:none">{{t.quality}}</a>
+<span style="display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;font-size:14px;font-weight:700"><span style="padding:6px 12px;{{t.togHe}}">עב</span><span style="padding:6px 12px;{{t.togEn}}">EN</span></span>
+<span style="border:1.5px solid var(--border-strong);border-radius:8px;padding:6px 14px;font-size:14px;font-weight:700">{{t.cv}}</span>
+</nav>
+</header>
+
+<div style="flex:1;display:flex;min-height:0">
+
+<main style="flex:1;min-width:0;display:flex;justify-content:center;padding:36px 32px">
+<div style="width:700px;max-width:100%;display:flex;flex-direction:column;gap:30px">
+<div dir="auto" style="align-self:flex-start;background:var(--tint-ink);color:var(--on-ink);border-radius:16px;padding:11px 18px;font-size:var(--fs,18px);font-weight:600;line-height:1.6">{{t.q}}</div>
+<article>
+<div style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text-muted);margin-block-end:12px"><span aria-hidden="true" style="width:8px;height:8px;background:var(--accent);border-radius:2px"></span>{{t.name}}</div>
+<p dir="auto" style="margin:0 0 12px;font-size:{{bodyFs}};line-height:{{bodyLh}};white-space:pre-wrap"><sc-for list="{{segs}}" as="s" hint-placeholder-count="12"><sc-if value="{{s.isT}}"><span>{{s.v}}</span></sc-if><sc-if value="{{s.isM}}"><bdi class="mono" style="font-size:.9em">{{s.v}}</bdi></sc-if><sc-if value="{{s.isC}}"><a class="cite {{s.cls}}" href="#" aria-label="{{s.al}}">{{s.v}}</a></sc-if></sc-for></p>
+<div class="mono" style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-muted);padding-block:10px;border-block:1px solid var(--border)">
+<span>{{t.l1}}</span><span aria-hidden="true">·</span><span>{{t.l2}}</span><span aria-hidden="true">·</span><span>{{t.l3}}</span><span aria-hidden="true">·</span><span>gpt-oss-120b</span><span aria-hidden="true">·</span><span>{{t.l4}}</span>
+<button type="button" aria-expanded="true" style="margin-inline-start:auto;border:0;background:var(--surface-sunken);color:var(--accent);font-family:'Assistant',sans-serif;font-size:13px;font-weight:700;border-radius:6px;padding:4px 10px">{{t.detail}} ▴</button>
+</div>
+</article>
+</div>
+</main>
+
+<aside aria-label="{{t.panelTitle}}" style="width:460px;flex:none;box-sizing:border-box;background:var(--surface-raised);border-inline-start:1px solid var(--border-strong);padding:0 22px 40px;overflow:hidden">
+
+<div style="display:flex;align-items:center;gap:10px;padding-block:18px;border-block-end:1px solid var(--border)">
+<div>
+<h2 style="margin:0;font-size:18px;font-weight:800">{{t.panelTitle}}</h2>
+<p class="mono" style="margin:2px 0 0;font-size:12px;color:var(--text-muted)">{{t.panelSub}}</p>
+</div>
+<button type="button" aria-label="{{t.close}}" style="margin-inline-start:auto;width:36px;height:36px;border:1px solid var(--border);background:transparent;color:var(--text);border-radius:8px"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M2 2l10 10M12 2 2 12"/></svg></button>
+</div>
+
+<section class="sec" aria-labelledby="h-tl">
+<h3 id="h-tl">{{t.hTimeline}}</h3>
+<p class="sub">{{t.subTimeline}}</p>
+<ol style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0">
+<sc-for list="{{steps}}" as="st" hint-placeholder-count="4">
+<li style="display:grid;grid-template-columns:26px 1fr;column-gap:10px;padding-block:8px">
+<span class="mono" style="width:24px;height:24px;border-radius:999px;background:var(--text);color:var(--surface);font-size:11px;display:flex;align-items:center;justify-content:center;margin-block-start:1px">{{st.n}}</span>
+<div>
+<h4 style="margin:0;display:flex;align-items:baseline;gap:8px;font-size:14px;font-weight:700"><span>{{st.name}}</span><span class="mono" style="margin-inline-start:auto;font-size:12px;font-weight:500;color:var(--text-muted)">{{st.ms}}</span></h4>
+<p style="margin:2px 0 0;font-size:13px;line-height:1.55;color:var(--text-muted)">{{st.text}}</p>
+</div>
+</li>
+</sc-for>
+</ol>
+</section>
+
+<section class="sec" aria-labelledby="h-md">
+<h3 id="h-md">{{t.hDecision}}</h3>
+<p style="margin:6px 0 8px;font-size:13.5px;line-height:1.6">{{t.decision}}</p>
+<code dir="ltr" class="mono" style="display:block;text-align:start;background:var(--surface-sunken);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:12.5px">search_portfolio(query="human review machine translation")</code>
+</section>
+
+<section class="sec" aria-labelledby="h-rt">
+<h3 id="h-rt">{{t.hRetrieval}}</h3>
+<p class="sub">{{t.subRetrieval}}</p>
+<table style="width:100%;border-collapse:collapse;table-layout:fixed">
+<caption style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">{{t.hRetrieval}}</caption>
+<colgroup><col style="width:22px"><col><col style="width:44px"><col style="width:44px"><col style="width:50px"><col style="width:56px"></colgroup>
+<thead><tr><th scope="col">#</th><th scope="col">{{t.cExcerpt}}</th><th scope="col" class="num">{{t.cLex}}</th><th scope="col" class="num">{{t.cVec}}</th><th scope="col" class="num">RRF</th><th scope="col" class="num" aria-sort="descending">{{t.cRerank}} ↓</th></tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+<tr id="{{r.id}}" style="{{r.trStyle}}">
+<td class="mono" style="color:var(--text-muted)">{{r.n}}</td>
+<td><div style="display:flex;gap:5px;align-items:flex-start"><sc-if value="{{r.sel}}"><span class="mono" title="{{t.selected}}" style="flex:none;font-size:10.5px;font-weight:700;background:var(--accent);color:var(--on-accent);border-radius:4px;padding:0 4px;line-height:16px;margin-block-start:1px">✓ {{r.cite}}</span></sc-if><span dir="auto" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;font-weight:{{r.fw}}">{{r.ex}}</span></div></td>
+<td class="mono num">{{r.lex}}</td><td class="mono num">{{r.vec}}</td><td class="mono num">{{r.rrf}}</td><td class="mono num" style="font-weight:700">{{r.rr}}</td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+<p class="sub" style="margin-block:8px 0">{{t.moreRows}} <button type="button" style="border:0;background:none;color:var(--accent);font-weight:700;font-size:12.5px;text-decoration:underline;padding:0">{{t.showAll}}</button></p>
+</section>
+
+<section class="sec" aria-labelledby="h-wf">
+<h3 id="h-wf">{{t.hWaterfall}}</h3>
+<p class="sub">{{t.subWaterfall}}</p>
+<div role="img" aria-label="{{t.wfAria}}" style="display:flex;flex-direction:column;gap:7px">
+<sc-for list="{{bars}}" as="b" hint-placeholder-count="4">
+<div style="display:grid;grid-template-columns:104px 1fr;gap:10px;align-items:center;font-size:12px">
+<span>{{b.name}}</span>
+<div style="display:flex;align-items:center;gap:8px"><div style="flex:1;display:flex;height:16px;background:var(--surface-sunken);border-radius:4px;overflow:hidden"><span style="display:block;margin-inline-start:{{b.off}}px;width:{{b.w}}px;background:{{b.col}};border-radius:3px"></span></div><span class="mono" style="width:44px;text-align:end;color:var(--text-muted)">{{b.ms}}</span></div>
+</div>
+</sc-for>
+</div>
+<p class="mono" style="margin:8px 0 0;font-size:12px;color:var(--text-muted)">{{t.total}} 1,400 ms</p>
+</section>
+
+<section class="sec" aria-labelledby="h-tk">
+<h3 id="h-tk">{{t.hTokens}}</h3>
+<table style="width:100%;border-collapse:collapse;margin-block-start:6px">
+<thead><tr><th scope="col">{{t.cCall}}</th><th scope="col" class="num">{{t.cIn}}</th><th scope="col" class="num">{{t.cOut}}</th></tr></thead>
+<tbody>
+<tr><td>{{t.call1}}</td><td class="mono num">940</td><td class="mono num">38</td></tr>
+<tr><td>{{t.call2}}</td><td class="mono num">760</td><td class="mono num">82</td></tr>
+<tr><td style="font-weight:700">{{t.total}}</td><td class="mono num" style="font-weight:700">1,700</td><td class="mono num" style="font-weight:700">120</td></tr>
+</tbody></table>
+</section>
+
+<section class="sec" aria-labelledby="h-pv">
+<h3 id="h-pv">{{t.hProv}}</h3>
+<dl style="margin:8px 0 0;display:grid;grid-template-columns:auto 1fr;column-gap:16px;row-gap:6px;font-size:13px">
+<dt style="color:var(--text-muted)">{{t.pModel}}</dt><dd class="mono" style="margin:0">gpt-oss-120b</dd>
+<dt style="color:var(--text-muted)">{{t.pPrompt}}</dt><dd class="mono" style="margin:0"><a href="#">prompts/agent@v14</a></dd>
+<dt style="color:var(--text-muted)">{{t.pKb}}</dt><dd class="mono" style="margin:0"><a href="#">kb@a3f9c21</a></dd>
+</dl>
+<p class="sub" style="margin:6px 0 0">{{t.sampleNote}}</p>
+</section>
+
+<section aria-labelledby="h-ev" style="padding-block-start:18px">
+<h3 id="h-ev" style="margin:0 0 6px;font-size:14px;font-weight:800">{{t.hEvents}}</h3>
+<p style="margin:0;font-size:13.5px;color:var(--text-muted);line-height:1.6;padding:10px 12px;background:var(--surface-sunken);border-radius:8px">{{t.noEvents}}</p>
+</section>
+
+</aside>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"lang":{"editor":"enum","options":["he","en"],"default":"he"},"$preview":{"width":1440,"height":2060}}'>
+class Component extends DCLogic {
+renderVals() {
+const he = (this.props.lang || 'he') !== 'en';
+const theme = this.props.theme === 'dark' ? 'dark' : 'light';
+const T = he ? {
+ name:'הסוכן של שרה', ai:'סוכן AI', how:'איך זה עובד', quality:'איכות', cv:'הורדת קו״ח', togHe:'background:var(--text);color:var(--surface)', togEn:'',
+ q:'מה הפרויקט הכי מורכב שלה?', l1:'2 צעדים', l2:'1.4 שנ׳', l3:'1,820 טוקנים', l4:'3 מקורות', detail:'פירוט',
+ panelTitle:'איך נבנתה התשובה', panelSub:'תשובה 1 · gpt-oss-120b', close:'סגירת הפאנל',
+ hTimeline:'ציר זמן', subTimeline:'כל צעד שרץ, לפי הסדר.', hDecision:'החלטת המודל',
+ decision:'המודל בחר לקרוא ל-search_portfolio עם השאילתה human review machine translation.',
+ hRetrieval:'מועמדים מהאחזור', subRetrieval:'ערכי דוגמה. ממוין לפי rerank. ✓ מסמן קטע שנבחר, והמספר הוא מספר הציטוט.',
+ cExcerpt:'קטע', cLex:'לקסיקלי', cVec:'וקטורי', cRerank:'rerank', selected:'נבחר', moreRows:'מוצגים 8 מתוך 20.', showAll:'הצג את כולם',
+ hWaterfall:'חלוקת זמן', subWaterfall:'הזמן זורם בכיוון הקריאה. כל שורה מציגה גם את הערך במספר.', wfAria:'חלוקת זמן: המתנה למסד 60 אלפיות, אחזור 310, זמן לטוקן ראשון 740, יצירה 660, סה״כ 1,400',
+ total:'סה״כ', hTokens:'טוקנים', cCall:'קריאה', cIn:'קלט', cOut:'פלט', call1:'1 · החלטה', call2:'2 · ניסוח תשובה',
+ hProv:'מקור התשובה', pModel:'מודל', pPrompt:'גרסת פרומפט', pKb:'קומיט בסיס ידע', sampleNote:'שני הקישורים האחרונים פותחים את GitHub. ערכים לדוגמה.',
+ hEvents:'אירועים', noEvents:'לא התרחשו אירועים בתשובה הזו: בלי מודל גיבוי, בלי הסרת ציטוטים, ולא הוגשה מהמטמון.'
+} : {
+ name:"Sarah's agent", ai:'AI agent', how:'How it works', quality:'Quality', cv:'Download CV', togHe:'', togEn:'background:var(--text);color:var(--surface)',
+ q:"What's her most complex project?", l1:'2 steps', l2:'1.4 s', l3:'1,820 tokens', l4:'3 sources', detail:'Details',
+ panelTitle:'How this answer was built', panelSub:'Answer 1 · gpt-oss-120b', close:'Close panel',
+ hTimeline:'Timeline', subTimeline:'Every step that ran, in order.', hDecision:'Model decision',
+ decision:'The model chose to call search_portfolio with the query human review machine translation.',
+ hRetrieval:'Retrieval candidates', subRetrieval:'Sample values. Sorted by rerank. ✓ marks a selected chunk; the number is its citation.',
+ cExcerpt:'Excerpt', cLex:'Lexical', cVec:'Vector', cRerank:'Rerank', selected:'Selected', moreRows:'Showing 8 of 20.', showAll:'Show all',
+ hWaterfall:'Latency', subWaterfall:'Time flows in reading direction. Every row also states its value as a number.', wfAria:'Latency: database wait 60 ms, retrieval 310, time to first token 740, generation 660, total 1,400',
+ total:'Total', hTokens:'Tokens', cCall:'Call', cIn:'Input', cOut:'Output', call1:'1 · Decision', call2:'2 · Answer',
+ hProv:'Provenance', pModel:'Model', pPrompt:'Prompt version', pKb:'Knowledge-base commit', sampleNote:'The last two link to GitHub. Sample values.',
+ hEvents:'Events', noEvents:'Nothing happened in this answer: no fallback model, no removed citation, not served from cache.'
+};
+const segs = he ? [
+ {k:'t',v:'הפרויקט המורכב ביותר בתיק הוא פרויקט א׳, צינור לביקורת אנושית של תרגום מכונה (שם וערכים לדוגמה). '},{k:'c',n:1,al:'מקור 1'},
+ {k:'t',v:' שרה הייתה אחראית על האחזור והדירוג: היא השתמשה ב-'},{k:'m',v:'pgvector'},{k:'t',v:' עם '},{k:'m',v:'RRF'},{k:'t',v:' ו-'},{k:'m',v:'rerank'},{k:'t',v:', וה-'},{k:'m',v:'Recall@5'},{k:'t',v:' עלה ל-'},{k:'m',v:'0.96'},{k:'t',v:' (ערך לדוגמה).'},{k:'c',n:2,al:'מקור 2'},
+ {k:'t',v:' הצינור שמר מעקב מלא אחרי כל החלטה.'},{k:'c',n:3,al:'מקור 3'}
+] : [
+ {k:'t',v:'The most complex project is Project A, a human-review pipeline for machine translation (sample name and values). '},{k:'c',n:1,al:'Source 1'},
+ {k:'t',v:' Sarah owned retrieval and ranking: she used '},{k:'m',v:'pgvector'},{k:'t',v:' with '},{k:'m',v:'RRF'},{k:'t',v:' and '},{k:'m',v:'rerank'},{k:'t',v:', and '},{k:'m',v:'Recall@5'},{k:'t',v:' rose to '},{k:'m',v:'0.96'},{k:'t',v:' (sample value).'},{k:'c',n:2,al:'Source 2'},
+ {k:'t',v:' The pipeline kept a full trace of every decision.'},{k:'c',n:3,al:'Source 3'}
+];
+const segsOut = segs.map(s => ({ isT:s.k==='t', isM:s.k==='m', isC:s.k==='c', v: s.k==='c'? String(s.n): s.v, cls:'c'+(s.n||1), al:s.al||'' }));
+const steps = he ? [
+ {n:1,name:'קריאת מודל',ms:'0.42 שנ׳',text:'המודל קיבל את השאלה והחליט לחפש בתיק.'},
+ {n:2,name:'קריאת כלי · search_portfolio',ms:'0.31 שנ׳',text:'חיפוש לקסיקלי ווקטורי, מיזוג ב-RRF ודירוג מחדש.'},
+ {n:3,name:'תוצאת כלי',ms:'20 מועמדים',text:'נבחרו 3 קטעים להקשר, מתוך 20.'},
+ {n:4,name:'תשובה',ms:'0.67 שנ׳',text:'המודל ניסח את התשובה וצירף 3 ציטוטים.'}
+] : [
+ {n:1,name:'Model call',ms:'0.42 s',text:'The model read the question and decided to search the portfolio.'},
+ {n:2,name:'Tool call · search_portfolio',ms:'0.31 s',text:'Lexical and vector search, merged with RRF, then reranked.'},
+ {n:3,name:'Tool result',ms:'20 candidates',text:'3 chunks were selected as context out of 20.'},
+ {n:4,name:'Answer',ms:'0.67 s',text:'The model wrote the answer and attached 3 citations.'}
+];
+const ex = he ? ['השכבה משלבת חיפוש לקסיקלי ווקטורי…','צינור לביקורת אנושית של תרגום…','מעקב מלא אחרי כל החלטה…','תור הודעות ותזמון משימות…','הגדרות CI ופריסה…','מטריקות איכות ותהליך הערכה…','הערות על סביבת פיתוח מקומית…','רקע על ההשכלה…']
+ : ['The layer combines lexical and vector search…','A human-review pipeline for machine translation…','Full trace of every decision…','Message queue and task scheduling…','CI and deployment settings…','Quality metrics and evaluation process…','Notes on the local dev environment…','Background on education…'];
+const data = [
+ ['c14','12.4','0.81','0.031','0.91',1],['c03','9.8','0.77','0.029','0.88',2],['c21','7.1','0.74','0.027','0.84',3],
+ ['c09','8.3','0.62','0.024','0.61',0],['c33','0.0','0.58','0.019','0.44',0],['c17','6.2','0.55','0.018','0.40',0],['c40','1.1','0.51','0.015','0.22',0],['c52','0.0','0.47','0.012','0.10',0]];
+const rows = data.map((d,i) => ({ id:'t-row-'+d[0].slice(1), n:i+1, ex:ex[i], lex:d[1], vec:d[2], rrf:d[3], rr:d[4], sel:d[5]>0, cite:d[5], fw: d[5]?'600':'400',
+  trStyle: d[5] ? 'background:var(--tint-rose);' + (i===0?'outline:2px solid var(--accent);outline-offset:-2px;':'') : '' }));
+const k = 400/1400;
+const bars = he ? [
+ {name:'המתנה למסד',s:0,d:60,col:'var(--match-gap)'},{name:'אחזור',s:60,d:310,col:'var(--on-rose)'},{name:'עד טוקן ראשון',s:0,d:740,col:'var(--on-stone)'},{name:'יצירה',s:740,d:660,col:'var(--on-salmon)'}
+] : [
+ {name:'Database wait',s:0,d:60,col:'var(--match-gap)'},{name:'Retrieval',s:60,d:310,col:'var(--on-rose)'},{name:'Time to first token',s:0,d:740,col:'var(--on-stone)'},{name:'Generation',s:740,d:660,col:'var(--on-salmon)'}
+];
+const barsOut = bars.map(b => ({ name:b.name, off:Math.round(b.s*k*0.62), w:Math.max(3,Math.round(b.d*k*0.62)), col:b.col, ms:b.d+' ms' }));
+return { themeClass:theme, dir: he?'rtl':'ltr', lang: he?'he':'en', t:T, segs:segsOut, steps, rows, bars:barsOut,
+  bodyFs: he?'18px':'17px', bodyLh: he?'1.8':'1.65' };
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>S1 · Welcome (EN, light)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+.mono{font-family:'IBM Plex Mono','Assistant',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button{font-family:inherit;cursor:pointer}
+a{color:#C1121F}
+.card{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:16px 18px 18px;border-radius:14px;font-family:'Assistant',sans-serif;font-size:19px;line-height:1.4;font-weight:700;color:#151313}
+.badge{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center}
+:focus-visible{outline:2px solid #C1121F;outline-offset:2px}
+</style>
+</helmet>
+<div dir="ltr" style="width:1040px;height:820px;box-sizing:border-box;background:#F5F0EB;color:#151313;font-family:'Assistant',sans-serif;display:flex;flex-direction:column">
+
+<header style="display:flex;align-items:center;gap:16px;padding-inline:40px;height:68px;box-sizing:border-box;border-block-end:3px solid #C1121F">
+<div style="display:flex;align-items:center;gap:12px">
+<span aria-hidden="true" style="display:grid;grid-template-columns:repeat(2,9px);gap:2px"><i style="width:9px;height:9px;border-radius:2px;background:#E8A3A0"></i><i style="width:9px;height:9px;border-radius:2px;background:#151313"></i><i style="width:9px;height:9px;border-radius:2px;background:#8A8079"></i><i style="width:9px;height:9px;border-radius:2px;background:#C1121F"></i></span>
+<span style="font-size:18px;font-weight:800">Sarah's agent</span>
+<span style="background:#C1121F;color:#fff;border-radius:6px;padding:2px 9px;font-size:13px;font-weight:700">AI agent</span>
+</div>
+<nav aria-label="Main navigation" style="margin-inline-start:auto;display:flex;align-items:center;gap:20px;font-size:15px">
+<a href="#" style="color:#5B5450;text-decoration:none">How it works</a>
+<a href="#" style="color:#5B5450;text-decoration:none">Quality</a>
+<div role="group" aria-label="Language" style="display:flex;border:1px solid #DCD2CB;border-radius:8px;overflow:hidden">
+<button type="button" aria-pressed="true" style="border:0;background:#151313;color:#F5F0EB;padding:6px 12px;font-size:14px;font-weight:700">EN</button>
+<button type="button" aria-pressed="false" style="border:0;background:transparent;color:#151313;padding:6px 12px;font-size:14px;font-weight:700">עב</button>
+</div>
+<button type="button" style="display:flex;align-items:center;gap:8px;border:1.5px solid #151313;background:transparent;color:#151313;border-radius:8px;padding:6px 14px;font-size:14px;font-weight:700">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8M4.5 7 8 10.5 11.5 7M3 13.5h10"/></svg>Download CV</button>
+<button type="button" aria-label="More actions" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:0;background:transparent;color:#151313;border-radius:8px">
+<svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor" aria-hidden="true"><circle cx="9" cy="3.5" r="1.5"/><circle cx="9" cy="9" r="1.5"/><circle cx="9" cy="14.5" r="1.5"/></svg></button>
+</nav>
+</header>
+
+<main style="flex:1;display:flex;flex-direction:column;align-items:center;padding-block-start:48px">
+<div style="width:700px;display:flex;flex-direction:column">
+
+<p style="margin:0 0 12px;font-size:14px;font-weight:700;color:#C1121F">Answers from the portfolio of Sarah Halevi</p>
+<h1 style="margin:0;font-size:44px;line-height:1.3;font-weight:800;letter-spacing:-0.01em">I'm an AI agent, <span style="background:#151313;color:#F5F0EB;padding-inline:8px;border-radius:6px;box-decoration-break:clone">not Sarah.</span><br>I only answer from what's in her portfolio.</h1>
+<p style="margin:16px 0 0;font-size:19px;line-height:1.75;color:#5B5450">Every claim has a source you can open, and you can inspect how the answer was built. If I don't have information on something, I'll say so.</p>
+
+<div style="margin-block-start:28px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+<button type="button" class="card" style="background:#151313;color:#F5F0EB">
+<span class="badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7A0B18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></span>What is she strongest at?</button>
+<button type="button" class="card" style="background:#DDD8D4">
+<span class="badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1F1B19" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5zM3 13l9 5 9-5M3 17.5l9 5 9-5" transform="translate(0 -1)"/></svg></span>What's her most complex project?</button>
+<button type="button" class="card" style="background:#FBCDBE">
+<span class="badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B1A0B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg></span>How does she approach a new engineering problem?</button>
+<button type="button" class="card" style="background:#C1121F;color:#fff">
+<span class="badge" style="background:rgba(255,255,255,.18)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6zM9 12h6M9 16h6"/></svg></span>I have a job posting, check the fit</button>
+</div>
+
+<div style="margin-block-start:24px;background:#FFFBF8;border:1.5px solid #151313;border-radius:14px;padding:14px 16px 12px;display:flex;flex-direction:column;gap:10px">
+<label for="q-a1" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Question about Sarah's experience</label>
+<textarea id="q-a1" dir="auto" rows="2" placeholder="Ask about Sarah's experience…" style="border:0;background:transparent;resize:none;font-family:'Assistant',sans-serif;font-size:19px;line-height:1.7;color:#151313;outline-offset:6px"></textarea>
+<div style="display:flex;align-items:center;gap:12px">
+<button type="button" style="display:flex;align-items:center;gap:8px;border:1px solid #DCD2CB;background:transparent;color:#151313;border-radius:8px;padding:7px 12px;font-size:14px;font-weight:700">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 2h5.5L12 4.5V14H4z"/><path d="M6 8h4M6 11h4"/></svg>Paste a job posting</button>
+<button type="button" aria-label="Send" style="margin-inline-start:auto;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:0;border-radius:10px;background:#C1121F;color:#fff">
+<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8h11M9 4l4 4-4 4"/></svg></button>
+</div>
+</div>
+
+<p style="margin:16px 0 0;font-size:14px;line-height:1.6;color:#5B5450">Conversations are stored for 30 days and pass through external model providers. <a href="#">Privacy policy</a></p>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1040,"height":820}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

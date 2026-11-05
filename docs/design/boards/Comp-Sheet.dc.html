@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>DS · Components</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+.light{--surface:#F5F0EB;--surface-raised:#FFFBF8;--surface-sunken:#EDE4DE;--text:#151313;--text-muted:#5B5450;--border:#DCD2CB;--border-input:#8A8079;--border-strong:#151313;--accent:#C1121F;--accent-hover:#9E0E19;--on-accent:#fff;--focus:#C1121F;--tint-rose:#F6D3D1;--on-rose:#7A0B18;--tint-stone:#DDD8D4;--on-stone:#1F1B19;--tint-salmon:#FBCDBE;--on-salmon:#6B1A0B;--tint-ink:#151313;--on-ink:#F5F0EB;--match-strong:#F5F0EB;--match-strong-bg:#151313;--match-partial:#6B1A0B;--match-partial-bg:#FBCDBE;--match-gap:#4A4440;--match-gap-bg:#E6DFDA;--fallback:#1F1B19;--fallback-bg:#DDD8D4;--removed:#5B5450;--danger:#151313;--danger-bg:#E6DFDA;--on-danger:#fff;--shadow-pop:0 10px 28px rgba(31,29,25,.16)}
+.dark{--surface:#100E0E;--surface-raised:#1A1717;--surface-sunken:#0A0909;--text:#F3EDE8;--text-muted:#B5ABA6;--border:#3A3230;--border-input:#7C716C;--border-strong:#F3EDE8;--accent:#FF5C63;--accent-hover:#FF8086;--on-accent:#1A0506;--focus:#FF5C63;--tint-rose:#4A1519;--on-rose:#FFC9CC;--tint-stone:#2B2725;--on-stone:#E4DDD8;--tint-salmon:#4A2216;--on-salmon:#FFC9B5;--tint-ink:#7A0B18;--on-ink:#FFD9D6;--match-strong:#151313;--match-strong-bg:#F3EDE8;--match-partial:#FFC9B5;--match-partial-bg:#4A2216;--match-gap:#CFC6C1;--match-gap-bg:#2A2523;--fallback:#E4DDD8;--fallback-bg:#2B2725;--removed:#B5ABA6;--danger:#F3EDE8;--danger-bg:#2A2523;--on-danger:#151313;--shadow-pop:0 10px 28px rgba(0,0,0,.5)}
+.mono{font-family:'IBM Plex Mono','Assistant',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button,input,textarea{font-family:inherit}
+h3{margin:0 0 10px;font-size:15px;font-weight:800;color:var(--text)}
+.sec{padding-block:18px;border-block-start:1px solid var(--border)}
+.lbl{font-size:11.5px;color:var(--text-muted)}
+.cell{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.cite{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding-inline:4px;box-sizing:border-box;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500}
+.tag{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700}
+@keyframes blink{50%{opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.caret{display:inline-block;width:2px;height:1.1em;background:var(--accent);vertical-align:-3px;margin-inline-start:2px;animation:blink 1s steps(2) infinite}
+.spin{animation:spin .8s linear infinite}
+@media (prefers-reduced-motion:reduce){.caret,.spin{animation:none}}
+</style>
+</helmet>
+<div class="{{themeClass}}" dir="rtl" style="width:820px;box-sizing:border-box;background:var(--surface);color:var(--text);font-family:'Assistant',sans-serif;padding:28px 32px 36px">
+
+<p style="margin:0 0 4px;font-size:13px;font-weight:700;color:var(--accent)">רכיבים · {{themeLabel}}</p>
+<h2 style="margin:0 0 6px;font-size:28px;font-weight:800">אינוונטר רכיבים</h2>
+<p class="lbl" style="margin:0 0 6px">כל מצב כאן מצויר עם אותם tokens. hover / active מדומים במחלקות, בקוד אמיתי הם :hover ו-:active.</p>
+
+<div class="sec">
+<h3>כפתורים · variants × states</h3>
+<div style="display:grid;grid-template-columns:78px repeat(6,minmax(0,1fr));gap:8px 6px;align-items:center">
+<span></span><span class="lbl">default</span><span class="lbl">hover</span><span class="lbl">focus</span><span class="lbl">active</span><span class="lbl">disabled</span><span class="lbl">loading</span>
+<sc-for list="{{btnRows}}" as="row" hint-placeholder-count="5">
+<span class="lbl mono">{{row.name}}</span>
+<sc-for list="{{row.cells}}" as="c" hint-placeholder-count="6">
+<button type="button" style="{{c.style}}">{{c.text}}</button>
+</sc-for>
+</sc-for>
+</div>
+</div>
+
+<div class="sec">
+<h3>צ'יפים ותגיות</h3>
+<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-block-end:12px">
+<button type="button" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--tint-rose);color:var(--on-rose);border-radius:14px;padding:12px 16px;font-size:15px;font-weight:700">שאלת פתיחה (starter)</button>
+<button type="button" style="border:1.5px solid var(--border-strong);background:var(--surface-raised);color:var(--text);border-radius:999px;padding:7px 14px;font-size:14px;font-weight:700">שאלת המשך (follow-up)</button>
+<span class="mono" style="background:var(--surface-sunken);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:2px 8px;font-size:12px">pgvector</span>
+<span class="mono" style="background:var(--surface-sunken);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:2px 8px;font-size:12px">Next.js</span>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+<span class="tag" style="background:var(--tint-rose);color:var(--on-rose)"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4.5"/></svg>מהמטמון</span>
+<span class="tag" style="background:var(--fallback-bg);color:var(--fallback)"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h9l-2-2M14 11H5l2 2"/></svg>מודל גיבוי</span>
+<span class="tag" style="border:1px dashed var(--removed);color:var(--removed)"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 8h10"/></svg>ציטוט הוסר</span>
+<span class="tag" style="background:var(--text);color:var(--surface)">חובה</span>
+<span class="tag" style="border:1px solid var(--border-input);color:var(--text-muted)">יתרון</span>
+<span class="tag" style="background:var(--surface-sunken);color:var(--text-muted);border:1px solid var(--border)">מופיע בקורות החיים בלבד</span>
+</div>
+</div>
+
+<div class="sec">
+<h3>עוצמת התאמה · תווית + צורה + מספר</h3>
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+<span style="display:inline-flex;align-items:center;gap:8px;background:var(--match-strong-bg);color:var(--match-strong);border-radius:8px;padding:5px 12px;font-size:14px;font-weight:700"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="M4.8 8.2 7 10.4l4.2-4.6" stroke="var(--match-strong-bg)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>חזקה <span class="mono" style="font-size:12px;font-weight:500">3/3</span></span>
+<span style="display:inline-flex;align-items:center;gap:8px;background:var(--match-partial-bg);color:var(--match-partial);border-radius:8px;padding:5px 12px;font-size:14px;font-weight:700"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 1.8a6.2 6.2 0 0 1 0 12.4z" fill="currentColor"/></svg>חלקית <span class="mono" style="font-size:12px;font-weight:500">2/3</span></span>
+<span style="display:inline-flex;align-items:center;gap:8px;background:var(--match-gap-bg);color:var(--match-gap);border:1px dashed var(--match-gap);border-radius:8px;padding:4px 12px;font-size:14px;font-weight:700"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2.4 2.2"/></svg>אין עדות <span class="mono" style="font-size:12px;font-weight:500">0/3</span></span>
+</div>
+</div>
+
+<div class="sec">
+<h3>ציטוט, תנועה והודעות</h3>
+<div style="display:flex;gap:8px;align-items:center;margin-block-end:14px">
+<span class="cite" style="background:var(--tint-rose);color:var(--on-rose)">1</span>
+<span class="cite" style="background:var(--tint-stone);color:var(--on-stone);outline:2px solid var(--focus);outline-offset:2px">2</span>
+<span class="cite" style="background:var(--tint-salmon);color:var(--on-salmon)">3</span>
+<span class="cite" style="background:var(--on-stone);color:var(--tint-stone)">2</span>
+<span class="lbl">default · focus · hover/פתוח (הפוך)</span>
+</div>
+<div class="mono" style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-muted);padding-block:9px;border-block:1px solid var(--border);margin-block-end:14px"><span>2 צעדים</span><span aria-hidden="true">·</span><span>1.4 שנ׳</span><span aria-hidden="true">·</span><span>1,820 טוקנים</span><span aria-hidden="true">·</span><span>gpt-oss-120b</span><span aria-hidden="true">·</span><span>3 מקורות</span><span style="margin-inline-start:auto;color:var(--accent);font-family:'Assistant',sans-serif;font-weight:700">פירוט ▾</span></div>
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="align-self:flex-start;background:var(--tint-ink);color:var(--on-ink);border-radius:16px;padding:9px 16px;font-size:16px;font-weight:600">הודעת משתמש</div>
+<div>
+<p class="lbl" style="margin:0 0 4px">תשובה בסטרימינג</p>
+<p style="margin:0;font-size:17px;line-height:1.8">שרה הייתה אחראית על שכבת האחזור<span class="caret"></span></p>
+</div>
+<div>
+<p class="lbl" style="margin:0 0 4px">סטטוס כלי חי (aria-live=polite, פעם אחת להודעה)</p>
+<p role="status" style="margin:0;display:flex;align-items:center;gap:10px;font-size:15px;color:var(--text-muted)"><svg class="spin" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 2a6 6 0 1 0 6 6"/></svg>מחפש בתיק הפרויקטים…</p>
+</div>
+<div style="display:flex;align-items:center;gap:10px;background:var(--danger-bg);color:var(--danger);border-radius:12px;padding:10px 14px;font-size:15px;font-weight:600">הודעת שגיאה · אירעה תקלה בחיבור</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="height:12px;width:85%;border-radius:6px;background:var(--surface-sunken)"></div><div style="height:12px;width:92%;border-radius:6px;background:var(--surface-sunken)"></div><div style="height:12px;width:55%;border-radius:6px;background:var(--surface-sunken)"></div>
+<span class="lbl">skeleton · בלי shimmer, רק פעימת אטימות איטית שמכובדת reduced-motion</span>
+</div>
+</div>
+</div>
+
+<div class="sec">
+<h3>Composer · normal / job / near limit / over limit / disabled</h3>
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:center;gap:10px;background:var(--surface-raised);border:1.5px solid var(--border-strong);border-radius:14px;padding:8px 10px"><span style="flex:1;font-size:15px;color:var(--text-muted)">שאלו משהו…</span><span style="width:36px;height:36px;border-radius:10px;background:var(--accent);color:var(--on-accent);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 8H3M7 4 3 8l4 4"/></svg></span></div>
+<div style="background:var(--surface-raised);border:1.5px solid var(--accent);border-radius:14px;padding:10px 12px;font-size:14px"><div style="display:flex;align-items:center;gap:8px"><span class="tag" style="background:var(--accent);color:var(--on-accent)">מצב משרה</span><span class="lbl">הטקסט מטופל כנתונים בלבד, לא כהוראות</span><span class="mono lbl" style="margin-inline-start:auto">412 / 8,000</span></div></div>
+<div style="display:flex;align-items:center;gap:10px;background:var(--surface-raised);border:1.5px solid var(--border-strong);border-radius:14px;padding:8px 10px"><span style="flex:1;font-size:15px">…</span><span class="mono" style="font-size:12.5px;color:var(--fallback);font-weight:500">962 / 1,000</span><span style="width:36px;height:36px;border-radius:10px;background:var(--accent);color:var(--on-accent)"></span></div>
+<div><div style="display:flex;align-items:center;gap:10px;background:var(--surface-raised);border:1.5px solid var(--danger);border-radius:14px;padding:8px 10px"><span style="flex:1;font-size:15px">…</span><span class="mono" style="font-size:12.5px;color:var(--danger);font-weight:500">1,043 / 1,000</span><span style="width:36px;height:36px;border-radius:10px;background:var(--surface-sunken);color:var(--text-muted)"></span></div><p role="alert" style="margin:6px 4px 0;font-size:13.5px;color:var(--danger)">השאלה ארוכה ב-43 תווים. אפשר לקצר, או להעביר למצב הדבקת משרה (עד 8,000).</p></div>
+<div style="display:flex;align-items:center;gap:10px;background:var(--surface-sunken);border:1.5px solid var(--border);border-radius:14px;padding:8px 10px;opacity:.75"><span style="flex:1;font-size:15px;color:var(--text-muted)">הסוכן עונה…</span><span style="width:36px;height:36px;border-radius:10px;background:var(--border)"></span></div>
+</div>
+</div>
+
+<div class="sec">
+<h3>פידבק · dialog · toast · שפה · פוקוס</h3>
+<div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+<div style="background:var(--surface-raised);border:1px solid var(--border);border-radius:12px;padding:12px 14px;width:300px;font-size:14px">
+<div style="display:flex;gap:8px;align-items:center;margin-block-end:8px"><span style="width:32px;height:32px;border:1px solid var(--border);border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--text-muted)">↑</span><span style="width:32px;height:32px;border:1.5px solid var(--text);border-radius:999px;display:flex;align-items:center;justify-content:center;background:var(--surface-sunken)">↓</span><span class="lbl">אפשר לספר מה לא עבד</span></div>
+<div style="border:1px solid var(--border-input);border-radius:8px;padding:8px 10px;color:var(--text-muted);min-height:36px">הערה (אופציונלי)…</div>
+<div class="mono lbl" style="text-align:end;margin-block:4px">0 / 300</div>
+<label style="display:flex;gap:8px;align-items:center;font-size:14px"><span style="width:18px;height:18px;border:1.5px solid var(--border-strong);border-radius:4px;display:inline-block"></span>זה ניסיון באתגר</label>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;flex:1;min-width:230px">
+<div role="status" style="display:flex;align-items:center;gap:10px;background:var(--text);color:var(--surface);border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;box-shadow:var(--shadow-pop)">השיחה נמחקה</div>
+<div style="display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;align-self:flex-start"><span style="background:var(--text);color:var(--surface);padding:6px 12px;font-size:14px;font-weight:700">עב</span><span style="padding:6px 12px;font-size:14px;font-weight:700">EN</span></div>
+<div style="display:flex;align-items:center;gap:10px"><span style="display:inline-block;padding:7px 14px;border:1.5px solid var(--border-strong);border-radius:8px;outline:2px solid var(--focus);outline-offset:2px;font-size:14px;font-weight:700">טבעת פוקוס</span><span class="lbl mono">2px · offset 2px</span></div>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":820,"height":2100}}'>
+class Component extends DCLogic {
+renderVals() {
+const theme = this.props.theme === 'dark' ? 'dark' : 'light';
+const base = 'display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;padding:0 6px;border-radius:10px;font-size:13px;font-weight:700;border:1.5px solid transparent;cursor:pointer;width:100%;box-sizing:border-box;';
+const variants = {
+  primary:     { bg:'var(--accent)', fg:'var(--on-accent)', bd:'transparent', hov:'var(--accent-hover)' },
+  secondary:   { bg:'transparent', fg:'var(--text)', bd:'var(--border-strong)', hov:'var(--surface-sunken)' },
+  ghost:       { bg:'transparent', fg:'var(--accent)', bd:'transparent', hov:'var(--surface-sunken)' },
+  destructive: { bg:'var(--danger)', fg:'var(--on-danger)', bd:'transparent', hov:'var(--danger)' },
+  icon:        { bg:'transparent', fg:'var(--text)', bd:'var(--border)', hov:'var(--surface-sunken)' }
+};
+const btnRows = Object.keys(variants).map(name => {
+  const v = variants[name];
+  const mk = (extra, text) => ({ style: base + 'background:' + v.bg + ';color:' + v.fg + ';border-color:' + v.bd + ';' + extra, text });
+  const t = name === 'icon' ? '⋯' : (name === 'destructive' ? 'מחיקה' : 'שליחה');
+  return { name, cells: [
+    mk('', t),
+    mk('background:' + v.hov + ';' + (name==='destructive' ? 'filter:brightness(.92);' : ''), t),
+    mk('outline:2px solid var(--focus);outline-offset:2px;', t),
+    mk('background:' + v.hov + ';transform:translateY(1px);filter:brightness(.94);', t),
+    mk('background:var(--surface-sunken);color:var(--text-muted);border-color:var(--border);cursor:not-allowed;', t),
+    mk('pointer-events:none;opacity:.85;', name==='icon' ? '◌' : '◌ …')
+  ]};
+});
+return { themeClass: theme, themeLabel: theme === 'dark' ? 'כהה' : 'בהיר', btnRows };
+}
+}
+</script>
+</body>
+</html>

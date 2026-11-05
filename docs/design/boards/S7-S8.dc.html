@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>S7 · S8 · Quota, errors, delete</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+.light{--surface:#F5F0EB;--surface-raised:#FFFBF8;--surface-sunken:#EDE4DE;--text:#151313;--text-muted:#5B5450;--border:#DCD2CB;--border-input:#8A8079;--border-strong:#151313;--accent:#C1121F;--on-accent:#fff;--focus:#C1121F;--tint-rose:#F6D3D1;--on-rose:#7A0B18;--tint-salmon:#FBCDBE;--on-salmon:#6B1A0B;--tint-ink:#151313;--on-ink:#F5F0EB;--danger:#151313;--danger-bg:#E6DFDA;--on-danger:#fff}
+.dark{--surface:#100E0E;--surface-raised:#1A1717;--surface-sunken:#0A0909;--text:#F3EDE8;--text-muted:#B5ABA6;--border:#3A3230;--border-input:#7C716C;--border-strong:#F3EDE8;--accent:#FF5C63;--on-accent:#1A0506;--focus:#FF5C63;--tint-rose:#4A1519;--on-rose:#FFC9CC;--tint-salmon:#4A2216;--on-salmon:#FFC9B5;--tint-ink:#7A0B18;--on-ink:#FFD9D6;--danger:#F3EDE8;--danger-bg:#2A2523;--on-danger:#151313}
+.mono{font-family:'IBM Plex Mono','Assistant',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button,textarea{font-family:inherit}
+.k{margin:0 0 10px;font-size:12px;color:var(--text-muted)}
+.stage{background:var(--surface);border:1px dashed var(--border-input);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:16px}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:0 16px;border-radius:10px;font-size:14.5px;font-weight:700;border:1.5px solid var(--border-strong);background:transparent;color:var(--text);cursor:pointer}
+.pri{background:var(--accent);color:var(--on-accent);border-color:transparent}
+.um{align-self:flex-start;background:var(--tint-ink);color:var(--on-ink);border-radius:16px;padding:10px 16px;font-size:17px;font-weight:600}
+h2,h3,p{margin:0}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+</style>
+</helmet>
+<div class="{{themeClass}}" dir="rtl" lang="he" style="width:1560px;box-sizing:border-box;background:var(--surface);color:var(--text);font-family:'Assistant',sans-serif;padding:40px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;align-items:start">
+
+<section style="grid-column:1 / -1">
+<p class="k mono">S7 · מכסת מודלים מוצתה (מצב עמוד)</p>
+<div class="stage" style="align-items:center;padding-block:56px">
+<div style="max-width:560px;display:flex;flex-direction:column;gap:16px;align-items:flex-start">
+<span aria-hidden="true" style="width:44px;height:44px;border-radius:12px;background:var(--tint-salmon);color:var(--on-salmon);display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+<h2 style="font-size:30px;line-height:1.3;font-weight:800">הסוכן נח כרגע</h2>
+<p style="font-size:18px;line-height:1.75;color:var(--text-muted)">מכסות המודלים החינמיות להיום נוצלו, ולכן אני לא יכול לענות. הן מתאפסות בערך בעוד <span class="mono" style="color:var(--text);font-size:16px">5 שעות</span> (בסביבות 03:00, דוגמה).</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="btn pri">הורדת קו״ח</button><button type="button" class="btn">להשאיר הודעה לשרה</button></div>
+<p style="font-size:13.5px;color:var(--text-muted)">השיחה שלך נשמרת למשך 30 יום, ואפשר לחזור אליה אחר כך.</p>
+</div>
+</div>
+</section>
+
+<section>
+<p class="k mono">S7 · גרסת מגבלה לכל מבקר: שאר המבקרים לא מושפעים</p>
+<div class="stage">
+<div style="display:flex;gap:12px;align-items:flex-start;background:var(--tint-salmon);color:var(--on-salmon);border-radius:12px;padding:12px 16px"><span style="font-size:15px;line-height:1.65"><b>הגעת למגבלת השאלות להיום.</b> זה חל רק עליך. כל שאר המבקרים ממשיכים כרגיל. אפשר לחזור מחר, או להוריד את קורות החיים.</span></div>
+<div style="display:flex;align-items:center;gap:10px;background:var(--surface-sunken);border:1.5px solid var(--border);border-radius:14px;padding:8px 10px;opacity:.8"><span style="flex:1;font-size:15px;color:var(--text-muted)">המגבלה הושגה</span><span class="mono" style="font-size:12.5px;color:var(--text-muted)">20 / 20</span><span style="width:36px;height:36px;border-radius:10px;background:var(--border)"></span></div>
+</div>
+</section>
+
+<section>
+<p class="k mono">S8 · החיבור נותק באמצע. הטקסט שהגיע נשאר</p>
+<div class="stage">
+<div class="um">מה הפרויקט הכי מורכב שלה?</div>
+<p dir="auto" style="font-size:18px;line-height:1.8">הפרויקט המורכב ביותר בתיק הוא פרויקט א׳, צינור לביקורת אנושית של תרגום מכונה. שרה הייתה אחראית על שכבת האחזור והדירוג, וה-<bdi class="mono" style="font-size:16px">Recall@5</bdi> עלה…</p>
+<div role="alert" style="display:flex;align-items:center;gap:12px;background:var(--surface-sunken);border:1px solid var(--border-input);border-radius:10px;padding:10px 14px;font-size:14.5px"><span style="flex:1">החיבור נותק לפני שהתשובה הסתיימה.</span><button type="button" class="btn pri" style="min-height:36px">נסה שוב</button></div>
+</div>
+</section>
+
+<section>
+<p class="k mono">S8 · שגיאה כללית</p>
+<div class="stage">
+<div role="alert" style="background:var(--danger-bg);color:var(--danger);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px"><b style="font-size:16px">משהו השתבש</b><span style="font-size:14.5px;line-height:1.6;color:var(--text)">לא הצלחתי לענות על השאלה. זו תקלה אצלנו ולא אצלך. אפשר לנסות שוב.</span><div><button type="button" class="btn pri" style="min-height:36px">נסה שוב</button></div></div>
+</div>
+</section>
+
+<section>
+<p class="k mono">S8 · קלט ארוך מדי (נחסם ב-composer)</p>
+<div class="stage">
+<div style="display:flex;align-items:center;gap:10px;background:var(--surface-raised);border:1.5px solid var(--danger);border-radius:14px;padding:8px 10px"><span style="flex:1;font-size:15px">שאלה ארוכה מאוד…</span><span class="mono" style="font-size:12.5px;color:var(--danger);font-weight:500">1,043 / 1,000</span><span aria-disabled="true" style="width:36px;height:36px;border-radius:10px;background:var(--surface-sunken);color:var(--text-muted);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 8H3M7 4 3 8l4 4"/></svg></span></div>
+<p role="alert" style="font-size:13.5px;color:var(--danger);line-height:1.55">השאלה ארוכה ב-43 תווים מהמותר. אפשר לקצר, או לעבור למצב הדבקת משרה (עד 8,000 תווים).</p>
+<div style="display:flex;align-items:center;gap:10px;background:var(--surface-raised);border:1.5px solid var(--danger);border-radius:14px;padding:8px 10px"><span class="mono" style="flex:1;font-size:13px;color:var(--text-muted)">[משרה, 8,000+ תווים]</span><span class="mono" style="font-size:12.5px;color:var(--danger);font-weight:500">8,211 / 8,000</span></div>
+<p role="alert" style="font-size:13.5px;color:var(--danger)">הטקסט ארוך ב-211 תווים. אפשר להשמיט את הקטעים הלא רלוונטיים.</p>
+</div>
+</section>
+
+<section>
+<p class="k mono">מחיקת שיחה · דיאלוג אישור</p>
+<div class="stage" style="background:rgba(31,29,25,.5);align-items:center;padding-block:40px">
+<div role="alertdialog" aria-labelledby="dd" style="width:440px;background:var(--surface-raised);border:1.5px solid var(--border-strong);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 28px rgba(0,0,0,.3)">
+<h3 id="dd" style="font-size:20px;font-weight:800">למחוק את השיחה?</h3>
+<p style="font-size:15px;line-height:1.65;color:var(--text-muted)">ההודעות, צעדי העקבות והפידבק יימחקו מיד והמסך יתנקה. אי אפשר לשחזר.</p>
+<div style="display:flex;gap:10px;justify-content:flex-start"><button type="button" class="btn" style="background:var(--danger);color:var(--on-danger);border-color:transparent">מחיקה</button><button type="button" class="btn" style="border-color:var(--border-input)">ביטול</button></div>
+</div>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1560,"height":1750}}'>
+class Component extends DCLogic {
+renderVals() { return { themeClass: this.props.theme === 'dark' ? 'dark' : 'light' }; }
+}
+</script>
+</body>
+</html>

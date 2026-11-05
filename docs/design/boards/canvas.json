@@ -1,0 +1,329 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-05T07:45:00Z"
+  },
+  "title": "Sarah's Agent – Chat UI",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 6500,
+      "w": 1040,
+      "h": 820,
+      "title": "A · S1 Welcome (HE, light)"
+    },
+    "A-S2.dc.html": {
+      "x": 2320,
+      "y": 6500,
+      "w": 1040,
+      "h": 1420,
+      "title": "A · S2 Conversation (HE, light)"
+    },
+    "B-S1.dc.html": {
+      "x": 0,
+      "y": 21420,
+      "w": 1040,
+      "h": 820,
+      "title": "B · S1 Welcome (HE, light)"
+    },
+    "B-S2.dc.html": {
+      "x": 1160,
+      "y": 21420,
+      "w": 1040,
+      "h": 1420,
+      "title": "B · S2 Conversation (HE, light)"
+    },
+    "DS-Tokens.dc.html": {
+      "x": 0,
+      "y": 3820,
+      "w": 1600,
+      "h": 2260,
+      "title": "DS · Tokens"
+    },
+    "Comp-Sheet.dc.html": {
+      "x": 1720,
+      "y": 3820,
+      "w": 820,
+      "h": 2100,
+      "title": "DS · Components (light)"
+    },
+    "Comp-Dark.dc.html": {
+      "x": 2660,
+      "y": 3820,
+      "w": 820,
+      "h": 2100,
+      "title": "DS · Components (dark)"
+    },
+    "S3-Trace.dc.html": {
+      "x": 0,
+      "y": 10260,
+      "w": 1440,
+      "h": 2060,
+      "title": "S3 · Trace panel (HE, light)"
+    },
+    "S3-Trace-EN-Dark.dc.html": {
+      "x": 1560,
+      "y": 10260,
+      "w": 1440,
+      "h": 2060,
+      "title": "S3 · Trace panel (EN, dark)"
+    },
+    "S3-Tablet.dc.html": {
+      "x": 3120,
+      "y": 10260,
+      "w": 768,
+      "h": 1080
+    },
+    "S3-Mobile.dc.html": {
+      "x": 4008,
+      "y": 10260,
+      "w": 375,
+      "h": 812
+    },
+    "S4-Report.dc.html": {
+      "x": 0,
+      "y": 12740,
+      "w": 1040,
+      "h": 2500
+    },
+    "S4-Mobile-EN-Dark.dc.html": {
+      "x": 2320,
+      "y": 12740,
+      "w": 375,
+      "h": 1900
+    },
+    "S4-Print.dc.html": {
+      "x": 2815,
+      "y": 12740,
+      "w": 794,
+      "h": 1123
+    },
+    "S5-Project.dc.html": {
+      "x": 0,
+      "y": 15660,
+      "w": 1040,
+      "h": 1500
+    },
+    "S5-Mobile-EN-Dark.dc.html": {
+      "x": 2320,
+      "y": 15660,
+      "w": 375,
+      "h": 1250
+    },
+    "S6-Contact.dc.html": {
+      "x": 0,
+      "y": 17580,
+      "w": 1440,
+      "h": 1250
+    },
+    "S6-Contact-Dark.dc.html": {
+      "x": 1560,
+      "y": 17580,
+      "w": 1440,
+      "h": 1250
+    },
+    "S2-States.dc.html": {
+      "x": 0,
+      "y": 8340,
+      "w": 1560,
+      "h": 1500
+    },
+    "S2-States-Dark.dc.html": {
+      "x": 1680,
+      "y": 8340,
+      "w": 1560,
+      "h": 1500
+    },
+    "S7-S8.dc.html": {
+      "x": 0,
+      "y": 19250,
+      "w": 1560,
+      "h": 1750
+    },
+    "S7-S8-Dark.dc.html": {
+      "x": 1680,
+      "y": 19250,
+      "w": 1560,
+      "h": 1750
+    },
+    "S1-Company.dc.html": {
+      "x": 3480,
+      "y": 6500,
+      "w": 1040,
+      "h": 820
+    },
+    "S1-Mobile-EN-Dark.dc.html": {
+      "x": 4640,
+      "y": 6500,
+      "w": 375,
+      "h": 812
+    },
+    "S2-Mobile.dc.html": {
+      "x": 5135,
+      "y": 6500,
+      "w": 375,
+      "h": 900
+    },
+    "Handoff.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 3400
+    },
+    "S1-EN.dc.html": {
+      "x": 1160,
+      "y": 6500,
+      "w": 1040,
+      "h": 820
+    },
+    "S4-EN.dc.html": {
+      "x": 1160,
+      "y": 12740,
+      "w": 1040,
+      "h": 2500
+    },
+    "S5-EN.dc.html": {
+      "x": 1160,
+      "y": 15660,
+      "w": 1040,
+      "h": 1500
+    },
+    "S6-Contact-EN.dc.html": {
+      "x": 3120,
+      "y": 17580,
+      "w": 1440,
+      "h": 1250
+    },
+    "S6-Contact-EN-Dark.dc.html": {
+      "x": 4680,
+      "y": 17580,
+      "w": 1440,
+      "h": 1250
+    },
+    "S7-S8-EN.dc.html": {
+      "x": 3360,
+      "y": 19250,
+      "w": 1560,
+      "h": 1750
+    },
+    "S7-S8-EN-Dark.dc.html": {
+      "x": 5040,
+      "y": 19250,
+      "w": 1560,
+      "h": 1750
+    }
+  },
+  "order": [
+    "Handoff.dc.html",
+    "DS-Tokens.dc.html",
+    "Comp-Sheet.dc.html",
+    "Comp-Dark.dc.html",
+    "Main.dc.html",
+    "S1-EN.dc.html",
+    "A-S2.dc.html",
+    "S1-Company.dc.html",
+    "S1-Mobile-EN-Dark.dc.html",
+    "S2-Mobile.dc.html",
+    "S2-States.dc.html",
+    "S2-States-Dark.dc.html",
+    "S3-Trace.dc.html",
+    "S3-Trace-EN-Dark.dc.html",
+    "S3-Tablet.dc.html",
+    "S3-Mobile.dc.html",
+    "S4-Report.dc.html",
+    "S4-EN.dc.html",
+    "S4-Mobile-EN-Dark.dc.html",
+    "S4-Print.dc.html",
+    "S5-Project.dc.html",
+    "S5-EN.dc.html",
+    "S5-Mobile-EN-Dark.dc.html",
+    "S6-Contact.dc.html",
+    "S6-Contact-Dark.dc.html",
+    "S6-Contact-EN.dc.html",
+    "S6-Contact-EN-Dark.dc.html",
+    "S7-S8.dc.html",
+    "S7-S8-Dark.dc.html",
+    "S7-S8-EN.dc.html",
+    "S7-S8-EN-Dark.dc.html",
+    "B-S1.dc.html",
+    "B-S2.dc.html"
+  ],
+  "notes": {
+    "row0": {
+      "x": 0,
+      "y": -300,
+      "text": "רציונל והנחיות מימוש",
+      "kind": "title1",
+      "maxW": 1280
+    },
+    "row1": {
+      "x": 0,
+      "y": 3520,
+      "text": "מערכת עיצוב · tokens ורכיבים",
+      "kind": "title1",
+      "maxW": 3480
+    },
+    "row2": {
+      "x": 0,
+      "y": 6200,
+      "text": "S1 · S2 · כיוון A (הנבחר) ווריאנטים",
+      "kind": "title1",
+      "maxW": 5510
+    },
+    "row3": {
+      "x": 0,
+      "y": 8040,
+      "text": "S2 · מצבי שיחה (בהיר, כהה)",
+      "kind": "title1",
+      "maxW": 3240
+    },
+    "row4": {
+      "x": 0,
+      "y": 9960,
+      "text": "S3 · פאנל עקבות",
+      "kind": "title1",
+      "maxW": 4383
+    },
+    "row5": {
+      "x": 0,
+      "y": 12440,
+      "text": "S4 · התאמה למשרה",
+      "kind": "title1",
+      "maxW": 3609
+    },
+    "row6": {
+      "x": 0,
+      "y": 15360,
+      "text": "S5 · כרטיס פרויקט ודיאגרמה",
+      "kind": "title1",
+      "maxW": 2695
+    },
+    "row7": {
+      "x": 0,
+      "y": 17280,
+      "text": "S6 · יצירת קשר",
+      "kind": "title1",
+      "maxW": 6120
+    },
+    "row8": {
+      "x": 0,
+      "y": 18950,
+      "text": "S7 · S8 · מכסה, שגיאות, מחיקה",
+      "kind": "title1",
+      "maxW": 6600
+    },
+    "row9": {
+      "x": 0,
+      "y": 21120,
+      "text": "ארכיון · כיוון B (לא נבחר)",
+      "kind": "title1",
+      "maxW": 2200
+    }
+  },
+  "designSystems": []
+}

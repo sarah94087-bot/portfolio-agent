@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Rationale and handoff</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+.mono{font-family:'IBM Plex Mono','Assistant',monospace;font-variant-numeric:tabular-nums}
+h2{margin:0 0 12px;font-size:24px;font-weight:800}
+h3{margin:18px 0 6px;font-size:16px;font-weight:800}
+p,li{font-size:16px;line-height:1.75}
+p{margin:0 0 10px}
+ul{margin:0 0 10px;padding-inline-start:22px}
+pre{margin:0;direction:ltr;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.6;background:#151313;color:#F3EDE8;border-radius:12px;padding:18px;white-space:pre-wrap}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:start;padding:8px 10px;border-block-end:1.5px solid #151313;font-size:12.5px;color:#5B5450}
+td{padding:9px 10px;border-block-end:1px solid #DCD2CB;vertical-align:top;line-height:1.55}
+.tag{display:inline-block;background:#F6D3D1;color:#7A0B18;border-radius:6px;padding:0 8px;font-weight:700;font-size:12.5px}
+</style>
+</helmet>
+<div dir="rtl" style="width:1280px;box-sizing:border-box;background:#F5F0EB;color:#151313;font-family:'Assistant',sans-serif;padding:56px 64px;display:flex;flex-direction:column;gap:40px">
+
+<header>
+<p class="mono" style="font-size:13px;color:#C1121F;font-weight:700">רציונל והנחיות מימוש</p>
+<h1 style="margin:0;font-size:44px;font-weight:800">למה זה נראה ככה, ואיך לבנות את זה</h1>
+</header>
+
+<section>
+<h2>החלטות מפתח</h2>
+<h3>למה Assistant (ו-Plex Mono)</h3>
+<p>אות לטינית ואות עברית שנשרטו יחד נראות כמו משפחה אחת, וזה מה שהופך את שתי השפות לשוות ערך. בהודעות עם מונחים טכניים בתוך משפט עברי אין "קפיצת פונט". Assistant הוא variable (400–800), חינמי, ומוטמע עצמית דרך next/font. Plex Mono מקבל רק מספרים, מזהי מודל, שמות כלים וציונים, עם tabular-nums כדי שעמודות ישתרו. גוף עברי מוגדר 18/1.8 ולטיני 17/1.65, כי עברית בלי ניקוד צפופה ויזואלית ונקראת טוב יותר עם שורה גבוהה.</p>
+<h3>למה אדום ושחור</h3>
+<p>הכיוון נבחר כדי להיות דומיננטי ולא מתנצל: שחור-פחם לטקסט ולמשטחים כבדים, ואדום ארגמן (#C1121F) כצבע המותג היחיד. האדום מגיע ל-5.5:1 על הנייר ול-6.2:1 מתחת לטקסט לבן. הוא משמש לפעולה ראשית, קישורים, פוקוס, הפס העליון והתגית "סוכן AI". שחור מקבל את הודעת המשתמש, את סימון ההדגשה בכותרת ואת "התאמה חזקה". הגוונים הנוספים הם משפחה חמה סביב אותו אדום: ורוד-אדום, אבן וסלמון. לכל אחד תפקיד: צבע לכל מקור ציטוט וקטגוריה לשאלות הפתיחה.</p>
+<p><b>מחיר שחשוב להכיר:</b> אדום בדרך כלל משדר שגיאה. כדי שהוא לא יתפרש כך, הפערים ושגיאות נשארים אפורים-ניטרליים (מקווקו), ופעולות הרסניות ושגיאות הן שחורות. מה שמבדיל אותן מהמותג הוא הצורה והמילה, לא הצבע.</p>
+<h3>באיזה צד נפתח פאנל העקבות</h3>
+<p><b>בצד inline-end: משמאל בעברית, מימין באנגלית.</b> המסמך מבקש "ימין", אבל זו הנחה של LTR. בעברית הקריאה מתחילה מימין, ופאנל שם היה דוחף את התשובה לצד ומשבש את נקודת העיגון של העין. הפאנל הוא תוכן משני, ולכן הוא שייך לצד הסוף. כשהוא פתוח בדסקטופ (1100px ומעלה) העמודה נשארת 700px. בין 768 ל-1099 הוא נפתח מעל השיחה ברוחב 400px, ומתחת ל-768 הוא מגירה תחתונה. אם תעדיפי ימין פיזי בשתי השפות, זה שינוי של שורה אחת: <span class="mono">order</span> בקונטיינר.</p>
+<h3>איך פערים מעוצבים ולמה</h3>
+<p>פער הוא מידע, לא שגיאה. הוא מופיע ראשון בדוח, בקופסה ניטרלית (אפור-חם) עם מסגרת מקווקוות וניסוח מכבד: "זה מה שלא מצאתי בתיק, לא בהכרח מה שאין לשרה". למרות שהמותג אדום, אין אדום בפערים: הם אפורים ומקווקווים. שחור שמור למחיקה ולשגיאות אמיתיות. עוצמת התאמה מוצגת כשלושה דברים יחד: צורה (עיגול מלא, חצי, מקווקו), מילה, ומספר כשיש. גם בהדפסה בשחור-לבן ההבדל ברור.</p>
+<h3>איך העיצוב נשאר כן</h3>
+<ul>
+<li>תשובת "אין לי מידע" נראית כמו כל תשובה אחרת, עם הצעה ליצור קשר, לא כשגיאה.</li>
+<li>ערכים שמופיעים בתיק הדוגמה מסומנים "דוגמה" או placeholder, ואין מדד שנראה אמיתי.</li>
+<li>עקבות מציגים רק מה שקרה בפועל: אין פרומפט מערכת ואין "מחשבות" של המודל.</li>
+<li>ציטוט שהוסר ומודל גיבוי הם תגיות גלויות ולא נעלמות.</li>
+<li>הסוכן מציג את עצמו כ-AI בכותרת, בפתיחה ובדוח, ו-<span class="mono">הדוח</span> אומר שהוא לא נכתב על ידי שרה.</li>
+</ul>
+<h3>נגישות</h3>
+<p>כל זוגות הצבעים נמדדו (ראו DS · Tokens): טקסט 6.4:1 ומעלה בשתי ערכות. טבעת פוקוס 2px עם offset. ציונים תמיד כמספר או כתווית. <b>מיקום ה-aria-live:</b> אזור <span class="mono">role="status"</span> יחיד בראש בלוק התשובה. בזמן הסטרימינג הוא מכיל רק את סטטוס הכלי ("מחפש בתיק…"), והטקסט המוזרם עצמו הוא <span class="mono">aria-hidden</span>. כשהסטרימינג נגמר, הטקסט המלא נכנס לאזור פעם אחת, ולכן הקורא מקבל הודעה אחת ולא טוקן-טוקן. תנועה: סמן מהבהב, החלקת פאנל וצעד חדש בציר זמן בלבד, וכולן מושבתות ב-prefers-reduced-motion.</p>
+</section>
+
+<section>
+<h2>הנחיות מימוש ל-Next.js + Tailwind v4</h2>
+<h3>מבנה קבצים</h3>
+<pre>app/
+  layout.tsx            // &lt;html lang dir&gt; לפי locale, next/font: Assistant + IBM Plex Mono
+  globals.css           // @import "tailwindcss"; @import "./tokens.css"; @theme inline { ... }
+  tokens.css            // הקובץ מ-DS · Tokens (:root + prefers-color-scheme + :lang(he))
+  [locale]/page.tsx     // S1  ·  [locale]/c/[slug]/page.tsx  // S1 חברה
+components/
+  chat/ Message.tsx  Citation.tsx  CitationPopover.tsx  SourcesList.tsx  TraceLine.tsx  Composer.tsx  Feedback.tsx
+  trace/ TracePanel.tsx  Timeline.tsx  RetrievalTable.tsx  Waterfall.tsx  TokensTable.tsx  Provenance.tsx  Events.tsx
+  match/ JobMatchCard.tsx  StrengthBadge.tsx  GapsBox.tsx
+  ui/ Button.tsx  Chip.tsx  Tag.tsx  Dialog.tsx  Drawer.tsx  Toast.tsx  Header.tsx  LangToggle.tsx  Skeleton.tsx
+  project/ ProjectCard.tsx  DiagramFrame.tsx  // DiagramFrame: dir="ltr" lang="en" קבוע</pre>
+<p style="margin-block-start:10px">ב-Tailwind v4 ממפים tokens בעזרת <span class="mono">@theme inline { --color-surface: var(--surface); --color-accent: var(--accent); ... }</span>, כך ש-<span class="mono">bg-surface text-text border-border</span> עובדים ומתחלפים לבד בכהה.</p>
+
+<h3>רכיבים: props ומצבים</h3>
+<table>
+<thead><tr><th>רכיב</th><th>props עיקריים</th><th>מצבים</th></tr></thead>
+<tbody>
+<tr><td class="mono">Button</td><td class="mono">variant: primary|secondary|ghost|destructive|icon · loading · disabled</td><td>default, hover, focus-visible, active, disabled, loading</td></tr>
+<tr><td class="mono">Chip</td><td class="mono">kind: starter|followup|tech|tag · tone: rose|stone|salmon|ink|neutral</td><td>default, hover, focus, disabled</td></tr>
+<tr><td class="mono">Message</td><td class="mono">role: user|agent · status: sending|streaming|done|error|dropped · tags[]</td><td>sending, streaming, done, error, dropped</td></tr>
+<tr><td class="mono">Citation</td><td class="mono">n · source · open · onOpen</td><td>default, focus, open (הפוך)</td></tr>
+<tr><td class="mono">CitationPopover</td><td class="mono">source{record,section,excerpt,traceRowId} · (sheet במובייל)</td><td>closed, open</td></tr>
+<tr><td class="mono">TraceLine</td><td class="mono">steps, ms, tokens, model, sources, tags[] · expanded</td><td>collapsed, expanded</td></tr>
+<tr><td class="mono">RetrievalTable</td><td class="mono">rows[] · sortKey · selectedIds · highlightId</td><td>table (≥768) / cards (&lt;768)</td></tr>
+<tr><td class="mono">Waterfall</td><td class="mono">segments[{name,startMs,durMs}] · totalMs</td><td>מיושר לכיוון הקריאה (margin-inline-start)</td></tr>
+<tr><td class="mono">Composer</td><td class="mono">mode: question|job · value · limit (1000|8000) · disabled</td><td>normal, job, near-limit (≥92%), over-limit, disabled</td></tr>
+<tr><td class="mono">StrengthBadge</td><td class="mono">level: strong|partial|none · score?</td><td>תמיד צורה + מילה</td></tr>
+<tr><td class="mono">JobMatchCard</td><td class="mono">role · overall: high|partial|low · requirements[] · gaps · summary</td><td>loading (4 שלבים), ready</td></tr>
+<tr><td class="mono">ContactFlow</td><td class="mono">state: suggested|drafted|confirm|sent|failed|rateLimited</td><td>6 מצבים; honeypot מוסתר</td></tr>
+<tr><td class="mono">Dialog / Drawer / Toast</td><td class="mono">open · onClose · variant: destructive</td><td>focus-trap, Esc, החזרת פוקוס</td></tr>
+</tbody></table>
+
+<h3>דברים שדורשים זהירות ב-RTL</h3>
+<ul>
+<li>רק מאפיינים לוגיים: <span class="mono">margin-inline-start</span>, <span class="mono">padding-inline</span>, <span class="mono">inset-inline-end</span>, <span class="mono">border-inline-start</span>, <span class="mono">text-align:start</span>. ב-Tailwind: <span class="mono">ms-*</span>, <span class="mono">pe-*</span>, <span class="mono">start-0</span>. יוצא דופן יחיד: הציור הפנימי של דיאגרמת Mermaid, שהוא LTR קבוע.</li>
+<li>אייקונים עם כיוון (חץ שליחה, שברונים, "איך זה נמצא?") צריכים <span class="mono">[dir=rtl] .icon-dir { transform: scaleX(-1) }</span>. הציור בדוגמאות כבר משמאל לימין-סוף, כלומר חץ שמצביע ל-inline-end.</li>
+<li>כל הודעה עם <span class="mono">dir="auto"</span>. מונחים טכניים עטופים ב-<span class="mono">&lt;bdi&gt;</span> עם מחלקת mono, כדי ש-<span class="mono">Recall@5</span>, <span class="mono">0.96</span> ו-<span class="mono">ב-pgvector</span> לא יתהפכו.</li>
+<li>שדות אימייל, URL וקוד: <span class="mono">dir="ltr"</span> עם <span class="mono">text-align:start</span>.</li>
+<li>ה-waterfall משתמש ב-<span class="mono">margin-inline-start</span> לזמן ההתחלה, ולכן הזמן זורם בכיוון הקריאה בשתי השפות.</li>
+<li>חיתוך טקסט בטבלה: <span class="mono">text-overflow:ellipsis</span> עם <span class="mono">dir="auto"</span> בתא, לא על הטבלה.</li>
+<li>תחתית ה-composer בנייד: <span class="mono">padding-block-end: env(safe-area-inset-bottom)</span>.</li>
+</ul>
+
+<h3>Mermaid: themeVariables ממופים ל-tokens</h3>
+<pre>// בהיר                                                    // כהה (מוחלף לפי prefers-color-scheme ואתחול מחדש)
+mermaid.initialize({ theme:'base', themeVariables:{          { background:'#1A1717', primaryColor:'#4A1519',
+  fontFamily:'IBM Plex Sans, Assistant, sans-serif',          primaryTextColor:'#FFC9CC', primaryBorderColor:'#FF5C63',
+  fontSize:'14px',                                            secondaryColor:'#2B2725', tertiaryColor:'#4A2216',
+  background:'#FFFBF8',            // --surface-raised        lineColor:'#F3EDE8', textColor:'#F3EDE8',
+  primaryColor:'#F6D3D1',          // --tint-rose             nodeBorder:'#FF5C63', clusterBkg:'#100E0E',
+  primaryTextColor:'#7A0B18',      // --on-rose               clusterBorder:'#3A3230', edgeLabelBackground:'#1A1717',
+  primaryBorderColor:'#C1121F',    // --accent                noteBkgColor:'#0A0909' } }
+  secondaryColor:'#DDD8D4',        // --tint-stone
+  tertiaryColor:'#FBCDBE',         // --tint-salmon
+  lineColor:'#151313', textColor:'#151313',   // --text
+  nodeBorder:'#C1121F', clusterBkg:'#F5F0EB', // --surface
+  clusterBorder:'#DCD2CB',         // --border
+  edgeLabelBackground:'#FFFBF8', noteBkgColor:'#EDE4DE' } });
+// הקונטיינר: &lt;figure dir="ltr" lang="en"&gt; + &lt;details&gt; עם חלופה טקסטואלית. ה-SVG הוא role="img" עם aria-label.</pre>
+<h3>סדר עבודה מומלץ</h3>
+<ul><li>tokens.css ופונטים → Button/Chip/Tag → Message + Citation + TraceLine → Composer → TracePanel → JobMatchCard → ContactFlow, מכסה ושגיאות → בדיקת axe בשתי ערכות ובשתי שפות.</li>
+<li>חשוב: כל הטקסטים בדוגמאות הם placeholder. אל תעתיקי מספרים מהעיצוב לתוכן אמיתי.</li></ul>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":3400}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

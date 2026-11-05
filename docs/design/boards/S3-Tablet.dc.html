@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>S3 · 768px overlay panel</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+:root{--surface:#F5F0EB;--surface-raised:#FFFBF8;--surface-sunken:#EDE4DE;--text:#151313;--text-muted:#5B5450;--border:#DCD2CB;--border-strong:#151313;--accent:#C1121F;--on-accent:#fff;--tint-rose:#F6D3D1;--on-rose:#7A0B18;--tint-stone:#DDD8D4;--on-stone:#1F1B19;--tint-ink:#151313;--on-ink:#F5F0EB;--fallback:#1F1B19;--fallback-bg:#DDD8D4;--removed:#5B5450}
+.mono{font-family:'IBM Plex Mono','Assistant',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.cite{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding-inline:4px;box-sizing:border-box;margin-inline:3px;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;vertical-align:2px}
+.sec{padding-block:14px;border-block-end:1px solid var(--border)}
+.sec h3{margin:0 0 4px;font-size:14px;font-weight:800}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@keyframes slidein{from{transform:translateX(-24px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</helmet>
+<div dir="rtl" style="position:relative;width:768px;height:1080px;overflow:hidden;background:var(--surface);color:var(--text);font-family:'Assistant',sans-serif">
+
+<header style="display:flex;align-items:center;gap:12px;padding-inline:20px;height:60px;border-block-end:1px solid var(--border);box-sizing:border-box">
+<span aria-hidden="true" style="width:10px;height:10px;background:var(--accent);border-radius:2px"></span>
+<span style="font-size:17px;font-weight:800">הסוכן של שרה</span>
+<span style="background:var(--accent);color:var(--on-accent);border-radius:6px;padding:2px 9px;font-size:12.5px;font-weight:700">סוכן AI</span>
+<span style="margin-inline-start:auto;font-size:14px;font-weight:700;border:1px solid var(--border);border-radius:8px;padding:5px 11px">עב | EN</span>
+<span aria-hidden="true" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center">⋯</span>
+</header>
+
+<main style="padding:28px 24px;display:flex;flex-direction:column;gap:24px">
+<div dir="auto" style="align-self:flex-start;background:var(--tint-ink);color:var(--on-ink);border-radius:16px;padding:10px 16px;font-size:17px;font-weight:600">ומה היה הכי קשה שם?</div>
+<article>
+<p style="margin:0 0 10px;font-size:18px;line-height:1.8">לפי התיעוד, הקושי המרכזי היה האיזון בין זמן תגובה לאיכות הדירוג: ה-<bdi class="mono" style="font-size:16px">rerank</bdi> הוסיף כ-<bdi class="mono" style="font-size:16px">300ms</bdi> (ערך לדוגמה) לכל שאילתה.<span class="cite" style="background:var(--tint-stone);color:var(--on-stone)">1</span></p>
+<div class="mono" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);padding-block:9px;border-block:1px solid var(--border)">
+<span>3 צעדים · 2.9 שנ׳ · 2,140 טוקנים · gpt-oss-20b</span>
+<span style="display:inline-flex;gap:5px;background:var(--fallback-bg);color:var(--fallback);border-radius:999px;padding:1px 9px;font-family:'Assistant',sans-serif;font-size:12px;font-weight:700">מודל גיבוי</span>
+<span style="display:inline-flex;gap:5px;border:1px dashed var(--removed);color:var(--removed);border-radius:999px;padding:0 9px;font-family:'Assistant',sans-serif;font-size:12px;font-weight:700">ציטוט הוסר</span>
+</div>
+</article>
+</main>
+
+<aside aria-label="איך נבנתה התשובה" style="position:absolute;inset-block:60px 0;inset-inline-end:0;width:400px;box-sizing:border-box;background:var(--surface-raised);border-inline-start:1.5px solid var(--border-strong);box-shadow:-12px 0 32px rgba(31,29,25,.16);padding:0 20px;overflow:hidden;animation:slidein 280ms cubic-bezier(.2,0,0,1)">
+<div style="display:flex;align-items:center;gap:10px;padding-block:16px;border-block-end:1px solid var(--border)">
+<div><h2 style="margin:0;font-size:17px;font-weight:800">איך נבנתה התשובה</h2><p class="mono" style="margin:2px 0 0;font-size:12px;color:var(--text-muted)">תשובה 2 · gpt-oss-20b</p></div>
+<button type="button" aria-label="סגירת הפאנל" style="margin-inline-start:auto;width:36px;height:36px;border:1px solid var(--border);background:transparent;border-radius:8px">✕</button>
+</div>
+
+<section class="sec" aria-labelledby="t-e"><h3 id="t-e">אירועים</h3>
+<p style="margin:0 0 10px;font-size:12.5px;color:var(--text-muted)">רק פעולות שקרו בפועל.</p>
+<ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px">
+<li style="display:grid;grid-template-columns:auto 1fr;gap:10px;background:var(--fallback-bg);color:var(--fallback);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.55"><b>מודל גיבוי</b><span>gpt-oss-120b לא ענה תוך 8 שנ׳, והבקשה נשלחה ל-<bdi class="mono" style="font-size:12px">gpt-oss-20b</bdi>.</span></li>
+<li style="display:grid;grid-template-columns:auto 1fr;gap:10px;border:1px dashed var(--removed);color:var(--text);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.55"><b style="color:var(--removed)">ציטוט הוסר</b><span>הציטוט [2] לא נמצא בקטעים שנשלפו, ולכן הוסר לפני שהתשובה הוצגה.</span></li>
+</ul></section>
+
+<section class="sec" aria-labelledby="t-t"><h3 id="t-t">ציר זמן</h3>
+<ol style="list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:2px">
+<li style="display:grid;grid-template-columns:24px 1fr;gap:10px;padding-block:6px"><span class="mono" style="width:22px;height:22px;border-radius:999px;background:var(--text);color:var(--surface);font-size:11px;display:flex;align-items:center;justify-content:center">1</span><div><h4 style="margin:0;font-size:13.5px;display:flex;gap:8px"><span>קריאת מודל · נכשלה</span><span class="mono" style="margin-inline-start:auto;font-size:12px;font-weight:500;color:var(--text-muted)">8.0 שנ׳</span></h4><p style="margin:2px 0 0;font-size:12.5px;color:var(--text-muted)">אין תשובה מהמודל הראשי, נחתך בזמן.</p></div></li>
+<li style="display:grid;grid-template-columns:24px 1fr;gap:10px;padding-block:6px"><span class="mono" style="width:22px;height:22px;border-radius:999px;background:var(--text);color:var(--surface);font-size:11px;display:flex;align-items:center;justify-content:center">2</span><div><h4 style="margin:0;font-size:13.5px;display:flex;gap:8px"><span>קריאת מודל · גיבוי</span><span class="mono" style="margin-inline-start:auto;font-size:12px;font-weight:500;color:var(--text-muted)">0.9 שנ׳</span></h4><p style="margin:2px 0 0;font-size:12.5px;color:var(--text-muted)">gpt-oss-20b קרא ל-search_portfolio.</p></div></li>
+<li style="display:grid;grid-template-columns:24px 1fr;gap:10px;padding-block:6px"><span class="mono" style="width:22px;height:22px;border-radius:999px;background:var(--text);color:var(--surface);font-size:11px;display:flex;align-items:center;justify-content:center">3</span><div><h4 style="margin:0;font-size:13.5px;display:flex;gap:8px"><span>תשובה</span><span class="mono" style="margin-inline-start:auto;font-size:12px;font-weight:500;color:var(--text-muted)">2.0 שנ׳</span></h4><p style="margin:2px 0 0;font-size:12.5px;color:var(--text-muted)">ניסוח התשובה ובדיקת ציטוטים.</p></div></li>
+</ol></section>
+
+<section class="sec"><h3>ועוד סעיפים</h3><p style="margin:0;font-size:13px;line-height:1.6;color:var(--text-muted)">החלטת המודל, טבלת מועמדים, חלוקת זמן, טוקנים ומקור התשובה זהים למבנה בדסקטופ, בגלילה אנכית בתוך הפאנל.</p></section>
+</aside>
+<div aria-hidden="true" style="position:absolute;inset-inline-start:24px;inset-block-end:24px;width:300px;font-size:12.5px;line-height:1.55;color:var(--text-muted);background:var(--surface-sunken);border-radius:10px;padding:10px 12px">768px: הפאנל נפתח מעל השיחה מצד הסוף ברוחב 400px, בלי לכסות את הכותרת. מ-1100px ומעלה הוא דוחף את השיחה. מתחת ל-768px הוא הופך למגירה תחתונה.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":768,"height":1080}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

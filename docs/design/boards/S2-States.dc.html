@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>S2 · Conversation states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+.light{--surface:#F5F0EB;--surface-raised:#FFFBF8;--surface-sunken:#EDE4DE;--text:#151313;--text-muted:#5B5450;--border:#DCD2CB;--border-input:#8A8079;--border-strong:#151313;--accent:#C1121F;--on-accent:#fff;--focus:#C1121F;--tint-rose:#F6D3D1;--on-rose:#7A0B18;--tint-stone:#DDD8D4;--on-stone:#1F1B19;--tint-ink:#151313;--on-ink:#F5F0EB;--match-gap-bg:#E6DFDA;--match-gap:#4A4440}
+.dark{--surface:#100E0E;--surface-raised:#1A1717;--surface-sunken:#0A0909;--text:#F3EDE8;--text-muted:#B5ABA6;--border:#3A3230;--border-input:#7C716C;--border-strong:#F3EDE8;--accent:#FF5C63;--on-accent:#1A0506;--focus:#FF5C63;--tint-rose:#4A1519;--on-rose:#FFC9CC;--tint-stone:#2B2725;--on-stone:#E4DDD8;--tint-ink:#7A0B18;--on-ink:#FFD9D6;--match-gap-bg:#2A2523;--match-gap:#CFC6C1}
+.mono{font-family:'IBM Plex Mono','Assistant',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button,textarea{font-family:inherit}
+.k{margin:0 0 10px;font-size:12px;color:var(--text-muted)}
+.stage{background:var(--surface);border:1px dashed var(--border-input);border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:16px}
+.um{align-self:flex-start;background:var(--tint-ink);color:var(--on-ink);border-radius:16px;padding:10px 16px;font-size:17px;font-weight:600;line-height:1.6}
+.who{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text-muted)}
+.chip{border:1.5px solid var(--border-strong);background:var(--surface-raised);color:var(--text);border-radius:999px;padding:8px 16px;font-size:15px;font-weight:700}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:0 14px;border-radius:10px;font-size:14px;font-weight:700;border:1.5px solid var(--border-strong);background:transparent;color:var(--text)}
+@keyframes blink{50%{opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.caret{display:inline-block;width:2px;height:1.1em;background:var(--accent);vertical-align:-3px;margin-inline-start:2px;animation:blink 1s steps(2) infinite}
+.spin{animation:spin .8s linear infinite}
+@media (prefers-reduced-motion:reduce){.caret,.spin{animation:none}}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+</style>
+</helmet>
+<div class="{{themeClass}}" dir="rtl" lang="he" style="width:1560px;box-sizing:border-box;background:var(--surface);color:var(--text);font-family:'Assistant',sans-serif;padding:40px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;align-items:start">
+
+<div style="display:flex;flex-direction:column;gap:28px">
+<section>
+<p class="k mono">a · רגע השליחה, לפני שהגיע טקסט</p>
+<div class="stage">
+<div class="um">איך היא ניגשת לבעיה הנדסית חדשה?</div>
+<div role="status" class="who" style="font-weight:600"><svg class="spin" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 2a6 6 0 1 0 6 6"/></svg>הסוכן חושב…</div>
+</div>
+</section>
+
+<section>
+<p class="k mono">b · כלי רץ, ואז טקסט עם סמן. ה-aria-live הוא אזור status אחד, שמתעדכן פעם אחת בסיום</p>
+<div class="stage">
+<div class="um">איך היא ניגשת לבעיה הנדסית חדשה?</div>
+<div class="who"><span aria-hidden="true" style="width:8px;height:8px;background:var(--accent);border-radius:2px"></span>הסוכן של שרה</div>
+<p role="status" style="margin:0;display:flex;align-items:center;gap:10px;font-size:15px;color:var(--text-muted)"><svg class="spin" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 2a6 6 0 1 0 6 6"/></svg>מחפש בתיק הפרויקטים…</p>
+<p dir="auto" aria-hidden="true" style="margin:0;font-size:18px;line-height:1.8">לפי התיעוד, שרה מתחילה מהגדרת הבעיה ומהמדד שבו היא תימדד, ורק אחר כך בוחרת בכלי<span class="caret"></span></p>
+<p class="mono" style="margin:0;font-size:12px;color:var(--text-muted)">הטקסט המוזרם מסומן aria-hidden. הקורא מקבל את התשובה המלאה פעם אחת, כשהסטרימינג נגמר.</p>
+</div>
+</section>
+
+<section>
+<p class="k mono">c · "אין לי מידע על זה": תשובה רגילה ומכובדת</p>
+<div class="stage">
+<div class="um">האם שרה עבדה פעם עם Rust?</div>
+<div class="who"><span aria-hidden="true" style="width:8px;height:8px;background:var(--accent);border-radius:2px"></span>הסוכן של שרה</div>
+<p dir="auto" style="margin:0;font-size:18px;line-height:1.8">אין לי מידע על ניסיון של שרה ב-<bdi class="mono" style="font-size:16px">Rust</bdi>. חיפשתי בתיק ולא מצאתי אזכור, ולכן אני לא רוצה לנחש. אפשר לשאול אותה ישירות.</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="btn" style="background:var(--accent);color:var(--on-accent);border-color:transparent">להשאיר הודעה לשרה</button><button type="button" class="btn">הורדת קו״ח</button></div>
+<div class="mono" style="display:flex;gap:10px;font-size:13px;color:var(--text-muted);padding-block:9px;border-block:1px solid var(--border)"><span>2 צעדים</span><span aria-hidden="true">·</span><span>1.1 שנ׳</span><span aria-hidden="true">·</span><span>1,340 טוקנים</span><span aria-hidden="true">·</span><span>gpt-oss-120b</span><span aria-hidden="true">·</span><span>0 מקורות</span><span style="margin-inline-start:auto;color:var(--accent);font-family:'Assistant',sans-serif;font-weight:700">פירוט ▾</span></div>
+</div>
+</section>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:28px">
+<section>
+<p class="k mono">d · בקשה שלא קשורה: קצרה, מנומסת, מכוונת חזרה</p>
+<div class="stage">
+<div class="um">כתוב לי שיר</div>
+<div class="who"><span aria-hidden="true" style="width:8px;height:8px;background:var(--accent);border-radius:2px"></span>הסוכן של שרה</div>
+<p dir="auto" style="margin:0;font-size:18px;line-height:1.8">שירים הם לא התחום שלי. אני עונה רק על שאלות לגבי הניסיון וההנדסה של שרה. אפשר לשאול, למשל, על הפרויקט המורכב ביותר שלה.</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="chip">מה הפרויקט הכי מורכב שלה?</button><button type="button" class="chip">על מה היא עובדת הכי טוב?</button></div>
+</div>
+</section>
+
+<section>
+<p class="k mono">e · פידבק 👎 מורחב (אחרי שהתשובה הסתיימה)</p>
+<div class="stage">
+<div style="display:flex;align-items:center;gap:8px"><span style="width:36px;height:36px;border:1px solid var(--border);border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--text-muted)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 11v9H4v-9zM7 11l4-7a2 2 0 0 1 2 2v3h5.2a2 2 0 0 1 2 2.3l-1.2 6a2 2 0 0 1-2 1.7H7"/></svg></span><span aria-pressed="true" style="width:36px;height:36px;border:1.5px solid var(--text);background:var(--surface-sunken);border-radius:999px;display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform:rotate(180deg)"><path d="M7 11v9H4v-9zM7 11l4-7a2 2 0 0 1 2 2v3h5.2a2 2 0 0 1 2 2.3l-1.2 6a2 2 0 0 1-2 1.7H7"/></svg></span><span style="font-size:14px;color:var(--text-muted)">תודה. אפשר להוסיף פירוט.</span></div>
+<div style="background:var(--surface-raised);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px">
+<label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700">מה לא עבד? (אופציונלי)<textarea rows="3" dir="auto" style="border:1px solid var(--border-input);border-radius:8px;background:var(--surface);color:var(--text);padding:9px 12px;font-size:15px;font-weight:400;resize:none">התשובה לא ציינה שהמספר הוא ערך לדוגמה.</textarea></label>
+<div class="mono" style="text-align:end;font-size:12px;color:var(--text-muted)">46 / 300</div>
+<label style="display:flex;align-items:center;gap:10px;font-size:14.5px"><span style="width:20px;height:20px;border:1.5px solid var(--border-strong);border-radius:5px;background:var(--accent);color:var(--on-accent);display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4.5"/></svg></span>זה ניסיון באתגר</label>
+<p style="margin:0;font-size:12.5px;color:var(--text-muted);line-height:1.55">מוזמנים לנסות לגרום לסוכן לשקר. דיווחים עוברים דרך הכפתור הזה.</p>
+<div style="display:flex;gap:10px"><button type="button" class="btn" style="background:var(--accent);color:var(--on-accent);border-color:transparent">שליחת דיווח</button><button type="button" class="btn" style="border-color:var(--border)">ביטול</button></div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1560,"height":1500}}'>
+class Component extends DCLogic {
+renderVals() { return { themeClass: this.props.theme === 'dark' ? 'dark' : 'light' }; }
+}
+</script>
+</body>
+</html>

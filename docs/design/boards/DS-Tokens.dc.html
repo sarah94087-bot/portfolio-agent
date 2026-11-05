@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>DS · Tokens</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+.mono{font-family:'IBM Plex Mono','Assistant',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+h2{margin:0 0 14px;font-size:22px;font-weight:800}
+.row{display:grid;grid-template-columns:200px 1fr 1fr;gap:10px;align-items:center;padding-block:6px;border-block-end:1px solid #DCD2CB;font-size:13px}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:8px;border-radius:8px;padding:8px 12px;font-weight:700;font-size:14px;border:1px solid rgba(0,0,0,.12)}
+pre{margin:0;direction:ltr;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.6;background:#151313;color:#F3EDE8;border-radius:12px;padding:20px;white-space:pre-wrap}
+</style>
+</helmet>
+<div dir="rtl" style="width:1600px;height:2260px;box-sizing:border-box;background:#F5F0EB;color:#151313;font-family:'Assistant',sans-serif;padding:56px 64px;display:flex;flex-direction:column;gap:44px">
+
+<header>
+<p style="margin:0 0 8px;font-size:14px;font-weight:700;color:#C1121F">מערכת עיצוב · tokens</p>
+<h1 style="margin:0;font-size:44px;font-weight:800">צבעים, טיפוגרפיה, מרווחים ותנועה</h1>
+<p style="margin:12px 0 0;font-size:18px;line-height:1.7;color:#5B5450;max-width:900px">הכול CSS custom properties על :root, עם סט כהה תחת prefers-color-scheme. יחס הניגודיות נמדד בפועל לכל זוג, ומופיע לצד כל שורה (AA דורש 4.5:1 לטקסט, 3:1 לרכיבי ממשק).</p>
+</header>
+
+<section>
+<h2>צבעים · בהיר / כהה · יחס ניגודיות</h2>
+<div class="row" style="font-weight:700;color:#5B5450"><span>token (רקע / טקסט)</span><span>בהיר</span><span>כהה</span></div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="14">
+<div class="row">
+<span class="mono">{{r.name}}</span>
+<div class="sw" style="background:{{r.lbg}};color:{{r.lfg}}"><span>{{r.label}}</span><span class="mono">{{r.lhex}} · {{r.lcr}}:1</span></div>
+<div class="sw" style="background:{{r.dbg}};color:{{r.dfg}}"><span>{{r.label}}</span><span class="mono">{{r.dhex}} · {{r.dcr}}:1</span></div>
+</div>
+</sc-for>
+<p style="margin:14px 0 0;font-size:14px;line-height:1.7;color:#5B5450">גבולות של רכיבי קלט: <span class="mono">--border-input</span> בבהיר <span class="mono">#8A8079</span> (3.75:1 על surface-raised), בכהה <span class="mono">#7C716C</span> (4.06:1). פוקוס: טבעת 2px של <span class="mono">--focus</span> עם offset של 2px, 5.5:1 בבהיר ו-6.4:1 בכהה. כל ציון התאמה מוצג גם כמספר או כתווית ולא רק בצבע.</p>
+</section>
+
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px">
+
+<section>
+<h2>טיפוגרפיה · Assistant + IBM Plex Mono</h2>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px">
+<div dir="rtl" lang="he" style="background:#FFFBF8;border:1px solid #DCD2CB;border-radius:14px;padding:18px 20px">
+<p class="mono" style="margin:0 0 8px;font-size:12px;color:#5B5450">he · 18px / 1.8 · weight 400</p>
+<p style="margin:0;font-size:18px;line-height:1.8">הפרויקט המורכב ביותר בתיק משלב חיפוש לקסיקלי ווקטורי, ו-<bdi class="mono" style="font-size:16px">Recall@5</bdi> עלה ל-<bdi class="mono" style="font-size:16px">0.96</bdi> (דוגמה).</p>
+</div>
+<div dir="ltr" lang="en" style="background:#FFFBF8;border:1px solid #DCD2CB;border-radius:14px;padding:18px 20px">
+<p class="mono" style="margin:0 0 8px;font-size:12px;color:#5B5450">en · 17px / 1.65 · weight 400</p>
+<p style="margin:0;font-size:17px;line-height:1.65">The most complex project combines lexical and vector search, and <span class="mono" style="font-size:15.5px">Recall@5</span> rose to <span class="mono" style="font-size:15.5px">0.96</span> (sample).</p>
+</div>
+</div>
+<div style="margin-block-start:16px;background:#FFFBF8;border:1px solid #DCD2CB;border-radius:14px;padding:18px 20px">
+<p dir="rtl" lang="he" style="margin:0;font-size:18px;line-height:1.9">השתמשתי ב-<bdi class="mono" style="font-size:16px">pgvector</bdi> עם <bdi class="mono" style="font-size:16px">RRF</bdi> ו-<bdi class="mono" style="font-size:16px">rerank</bdi>, וה-<bdi class="mono" style="font-size:16px">Recall@5</bdi> עלה ל-<bdi class="mono" style="font-size:16px">0.96</bdi>. הקריאה ל-<bdi class="mono" style="font-size:16px">search_portfolio</bdi> לקחה <bdi class="mono" style="font-size:16px">1.4</bdi> שנ׳.</p>
+<p class="mono" style="margin:10px 0 0;font-size:12px;color:#5B5450">מונו בתוך <bdi>…</bdi> + tabular-nums: מונע היפוך סדר במקטעי לטינית ומספרים</p>
+</div>
+<table style="margin-block-start:16px;width:100%;border-collapse:collapse;font-size:13px">
+<tr style="text-align:start;color:#5B5450"><th style="text-align:start;padding:6px 0">token</th><th style="text-align:start">LTR</th><th style="text-align:start">עברית</th><th style="text-align:start">שימוש</th></tr>
+<tr style="border-block-start:1px solid #DCD2CB"><td class="mono" style="padding:7px 0">--fs-body</td><td class="mono">17 / 1.65</td><td class="mono">18 / 1.8</td><td>גוף תשובה</td></tr>
+<tr style="border-block-start:1px solid #DCD2CB"><td class="mono" style="padding:7px 0">--fs-ui</td><td class="mono">15 / 1.5</td><td class="mono">15.5 / 1.55</td><td>כפתורים, צ'יפים</td></tr>
+<tr style="border-block-start:1px solid #DCD2CB"><td class="mono" style="padding:7px 0">--fs-small</td><td class="mono">13 / 1.5</td><td class="mono">13.5 / 1.55</td><td>מטא, פרטיות</td></tr>
+<tr style="border-block-start:1px solid #DCD2CB"><td class="mono" style="padding:7px 0">--fs-trace</td><td class="mono">12.5 / 1.5</td><td class="mono">12.5 / 1.5</td><td>טבלת עקבות (מונו)</td></tr>
+<tr style="border-block-start:1px solid #DCD2CB"><td class="mono" style="padding:7px 0">--fs-h2 / h1</td><td class="mono">24 / 40</td><td class="mono">26 / 44</td><td>כותרות</td></tr>
+</table>
+<p style="margin:14px 0 0;font-size:14px;line-height:1.7;color:#5B5450"><b>למה Assistant:</b> הלטינית שלו נגזרת מ-Source Sans והעברית נשרטה יחד איתה, אז גובה האות ועובי הקו תואמים ולא מרגישים שפה מתורגמת. הוא variable (400–800), חינמי, וניתן להטמעה עצמית. Plex Mono מקבל רק מספרים, מזהי מודל ושמות כלים, עם tabular-nums.</p>
+</section>
+
+<section>
+<h2>מרווחים, רדיוסים, צללים ותנועה</h2>
+<div style="display:flex;align-items:flex-end;gap:10px;margin-block-end:18px">
+<sc-for list="{{space}}" as="s" hint-placeholder-count="9">
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="display:block;width:{{s.px}}px;height:{{s.px}}px;background:#C1121F;border-radius:2px"></span><span class="mono" style="font-size:11px;color:#5B5450">{{s.n}}</span></div>
+</sc-for>
+</div>
+<p class="mono" style="margin:0 0 18px;font-size:12px;color:#5B5450">--space-1..9: 4 8 12 16 24 32 48 64 96 (px)</p>
+<div style="display:flex;gap:14px;margin-block-end:18px">
+<div style="width:90px;height:60px;border:1.5px solid #151313;border-radius:6px;display:flex;align-items:center;justify-content:center" class="mono"><span style="font-size:12px">r-sm 6</span></div>
+<div style="width:90px;height:60px;border:1.5px solid #151313;border-radius:10px;display:flex;align-items:center;justify-content:center" class="mono"><span style="font-size:12px">r-md 10</span></div>
+<div style="width:90px;height:60px;border:1.5px solid #151313;border-radius:14px;display:flex;align-items:center;justify-content:center" class="mono"><span style="font-size:12px">r-lg 14</span></div>
+<div style="width:90px;height:60px;border:1.5px solid #151313;border-radius:999px;display:flex;align-items:center;justify-content:center" class="mono"><span style="font-size:12px">r-pill</span></div>
+</div>
+<div style="display:flex;gap:18px;margin-block-end:22px">
+<div style="width:140px;height:70px;background:#FFFBF8;border-radius:14px;box-shadow:0 10px 28px rgba(31,29,25,.16);display:flex;align-items:center;justify-content:center" class="mono"><span style="font-size:12px">--shadow-pop</span></div>
+<div style="width:140px;height:70px;background:#FFFBF8;border-radius:14px;border:1px solid #DCD2CB;display:flex;align-items:center;justify-content:center" class="mono"><span style="font-size:12px">ללא צל (ברירת מחדל)</span></div>
+</div>
+<table style="width:100%;border-collapse:collapse;font-size:13px">
+<tr style="color:#5B5450"><th style="text-align:start;padding:6px 0">token</th><th style="text-align:start">ערך</th><th style="text-align:start">שימוש</th></tr>
+<tr style="border-block-start:1px solid #DCD2CB"><td class="mono" style="padding:7px 0">--dur-fast</td><td class="mono">120ms ease-out</td><td>hover, לחיצה</td></tr>
+<tr style="border-block-start:1px solid #DCD2CB"><td class="mono" style="padding:7px 0">--dur-base</td><td class="mono">200ms cubic-bezier(.2,0,0,1)</td><td>צעד חדש בציר הזמן, פופאובר</td></tr>
+<tr style="border-block-start:1px solid #DCD2CB"><td class="mono" style="padding:7px 0">--dur-panel</td><td class="mono">280ms cubic-bezier(.2,0,0,1)</td><td>מגירה / פאנל עקבות</td></tr>
+<tr style="border-block-start:1px solid #DCD2CB"><td class="mono" style="padding:7px 0">caret</td><td class="mono">1s steps(2) infinite</td><td>סמן סטרימינג</td></tr>
+<tr style="border-block-start:1px solid #DCD2CB"><td class="mono" style="padding:7px 0">reduced-motion</td><td class="mono">כל המשכים = 0.01ms</td><td>הסמן נשאר קבוע, בלי הבהוב</td></tr>
+</table>
+</section>
+</div>
+
+<section>
+<h2>הקובץ: app/tokens.css</h2>
+<pre>:root {
+  --surface:#F5F0EB; --surface-raised:#FFFBF8; --surface-sunken:#EDE4DE;
+  --text:#151313; --text-muted:#5B5450; --border:#DCD2CB; --border-input:#8A8079; --border-strong:#151313;
+  --accent:#C1121F; --accent-hover:#9E0E19; --on-accent:#FFFFFF; --focus:#C1121F;
+  --tint-rose:#F6D3D1; --on-rose:#7A0B18;  --tint-stone:#DDD8D4; --on-stone:#1F1B19;
+  --tint-salmon:#FBCDBE; --on-salmon:#6B1A0B;  --tint-ink:#151313; --on-ink:#F5F0EB;
+  --match-strong:#F5F0EB; --match-strong-bg:#151313;
+  --match-partial:#6B1A0B; --match-partial-bg:#FBCDBE;
+  --match-gap:#4A4440; --match-gap-bg:#E6DFDA;        /* gap = neutral, never red */
+  --fallback:#1F1B19; --fallback-bg:#DDD8D4; --removed:#5B5450;
+  --danger:#151313; --danger-bg:#E6DFDA;               /* destructive actions + real errors only */
+  --shadow-pop:0 10px 28px rgb(31 29 25 / .16);
+  --font:'Assistant',system-ui,sans-serif; --font-mono:'IBM Plex Mono',ui-monospace,monospace;
+  --fs-body:17px; --lh-body:1.65; --fs-ui:15px; --fs-small:13px; --fs-trace:12.5px;
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px; --space-6:32px; --space-7:48px;
+  --r-sm:6px; --r-md:10px; --r-lg:14px; --measure:700px;
+  --dur-fast:120ms; --dur-base:200ms; --dur-panel:280ms; --ease:cubic-bezier(.2,0,0,1);
+}
+:lang(he) { --fs-body:18px; --lh-body:1.8; --fs-ui:15.5px; --fs-small:13.5px; }
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface:#100E0E; --surface-raised:#1A1717; --surface-sunken:#0A0909;
+    --text:#F3EDE8; --text-muted:#B5ABA6; --border:#3A3230; --border-input:#7C716C; --border-strong:#F3EDE8;
+    --accent:#FF5C63; --accent-hover:#FF8086; --on-accent:#1A0506; --focus:#FF5C63;
+    --tint-rose:#4A1519; --on-rose:#FFC9CC;  --tint-stone:#2B2725; --on-stone:#E4DDD8;
+    --tint-salmon:#4A2216; --on-salmon:#FFC9B5;  --tint-ink:#7A0B18; --on-ink:#FFD9D6;
+    --match-strong:#151313; --match-strong-bg:#F3EDE8;  --match-partial:#FFC9B5; --match-partial-bg:#4A2216;
+    --match-gap:#CFC6C1; --match-gap-bg:#2A2523;  --fallback:#E4DDD8; --fallback-bg:#2B2725; --removed:#B5ABA6;
+    --danger:#F3EDE8; --danger-bg:#2A2523; --shadow-pop:0 10px 28px rgb(0 0 0 / .5);
+  }
+}
+.mono, code { font-family:var(--font-mono); font-variant-numeric:tabular-nums; }
+:focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
+@media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration:.01ms !important; transition-duration:.01ms !important; } }</pre>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1600,"height":2260}}'>
+class Component extends DCLogic {
+renderVals() {
+const rows = [
+['surface / text','#F5F0EB','#151313','16.35','#100E0E','#F3EDE8','16.58','טקסט ראשי'],
+['surface / text-muted','#F5F0EB','#5B5450','6.56','#100E0E','#B5ABA6','8.56','טקסט משני'],
+['surface-raised / text-muted','#FFFBF8','#5B5450','7.21','#1A1717','#B5ABA6','7.92','כרטיסים, composer'],
+['surface / accent','#F5F0EB','#C1121F','5.50','#100E0E','#FF5C63','6.38','קישורים, פוקוס'],
+['accent / on-accent','#C1121F','#FFFFFF','6.22','#FF5C63','#1A0506','6.52','כפתור ראשי, תגית AI'],
+['tint-ink / on-ink','#151313','#F5F0EB','16.35','#7A0B18','#FFD9D6','8.55','הודעת משתמש, סימון, התאמה חזקה (בכהה: הפוך)'],
+['tint-rose / on-rose','#F6D3D1','#7A0B18','8.03','#4A1519','#FFC9CC','10.25','ציטוט 1, מהמטמון'],
+['tint-stone / on-stone','#DDD8D4','#1F1B19','12.08','#2B2725','#E4DDD8','11.01','ציטוט 2, מודל גיבוי'],
+['tint-salmon / on-salmon','#FBCDBE','#6B1A0B','8.20','#4A2216','#FFC9B5','9.32','ציטוט 3, התאמה חלקית'],
+['match-gap-bg / match-gap','#E6DFDA','#4A4440','7.27','#2A2523','#CFC6C1','9.01','פער: אפור ניטרלי, מקווקו, לא אדום'],
+['danger-bg / danger','#E6DFDA','#151313','14.04','#2A2523','#F3EDE8','13.04','מחיקה ושגיאה: שחור, כי האדום הוא המותג']
+].map(r => ({ name:r[0], lbg:r[1], lfg:r[2], lcr:r[3], dbg:r[4], dfg:r[5], dcr:r[6], label:r[7], lhex:r[1], dhex:r[4] }));
+const space = [4,8,12,16,24,32,48,64,96].map((p,i) => ({ px:p, n:(i+1) }));
+return { rows, space };
+}
+}
+</script>
+</body>
+</html>

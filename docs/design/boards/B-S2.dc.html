@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>B · S2 שיחה</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Hebrew:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+.mono{font-family:'IBM Plex Mono','IBM Plex Sans Hebrew',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button{font-family:inherit;cursor:pointer}
+a{color:#B83A08}
+.cite{display:inline-flex;align-items:center;justify-content:center;height:20px;padding-inline:5px;box-sizing:border-box;margin-inline:3px;border-radius:4px;border:1px solid #B83A08;background:#fff;color:#B83A08;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;text-decoration:none;vertical-align:1px}
+.fb{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:1px solid #D5D9DE;background:#fff;color:#5A626B;border-radius:6px}
+.chip{border:1px solid #D5D9DE;background:#fff;color:#14171A;border-radius:6px;padding:8px 14px;font-size:14px;font-weight:500}
+.readout{display:flex;align-items:center;flex-wrap:wrap;gap:10px;background:#F6F7F9;border:1px solid #D5D9DE;border-radius:6px;padding:8px 12px;font-size:12.5px;color:#5A626B}
+:focus-visible{outline:2px solid #B83A08;outline-offset:2px}
+</style>
+</helmet>
+<div dir="rtl" style="width:1040px;height:1420px;box-sizing:border-box;background:#EEF0F2;color:#14171A;font-family:'IBM Plex Sans Hebrew',sans-serif;display:flex;flex-direction:column">
+
+<header style="display:flex;align-items:center;gap:16px;padding-inline:32px;height:56px;flex:none;box-sizing:border-box;background:#fff;border-block-end:1px solid #D5D9DE">
+<div style="display:flex;align-items:center;gap:10px">
+<span style="font-size:16px;font-weight:700">הסוכן של שרה</span>
+<span style="background:#14171A;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:600">סוכן AI</span>
+</div>
+<nav aria-label="ניווט ראשי" style="margin-inline-start:auto;display:flex;align-items:center;gap:18px;font-size:14px">
+<a href="#" style="color:#5A626B;text-decoration:none">איך זה עובד</a>
+<a href="#" style="color:#5A626B;text-decoration:none">איכות</a>
+<div role="group" aria-label="שפה" style="display:flex;border:1px solid #D5D9DE;border-radius:6px;overflow:hidden">
+<button type="button" aria-pressed="true" style="border:0;background:#14171A;color:#fff;padding:5px 11px;font-size:13px;font-weight:600">עב</button>
+<button type="button" aria-pressed="false" style="border:0;background:#fff;color:#14171A;padding:5px 11px;font-size:13px;font-weight:600">EN</button>
+</div>
+<button type="button" style="display:flex;align-items:center;gap:7px;border:1px solid #D5D9DE;background:#fff;color:#14171A;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:600">
+<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8M4.5 7 8 10.5 11.5 7M3 13.5h10"/></svg>הורדת קו״ח</button>
+<button type="button" aria-label="עוד פעולות" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:0;background:transparent;color:#14171A;border-radius:6px">
+<svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor" aria-hidden="true"><circle cx="9" cy="3.5" r="1.5"/><circle cx="9" cy="9" r="1.5"/><circle cx="9" cy="14.5" r="1.5"/></svg></button>
+</nav>
+</header>
+
+<main style="flex:1;display:flex;flex-direction:column;align-items:center;padding-block-start:32px;min-height:0">
+<div style="width:700px;display:flex;flex-direction:column;gap:26px">
+
+<div dir="auto" style="align-self:flex-start;background:#14171A;color:#fff;border-radius:8px;padding:10px 16px;font-size:17px;line-height:1.6">מה הפרויקט הכי מורכב שלה?</div>
+
+<article aria-label="תשובת הסוכן" style="background:#fff;border:1px solid #D5D9DE;border-radius:10px;padding:22px 24px;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#5A626B">הסוכן של שרה<span class="mono" style="font-weight:400">· תשובה 1</span></div>
+<div dir="auto" style="position:relative;font-size:17.5px;line-height:1.8">
+<p style="margin:0 0 12px">הפרויקט המורכב ביותר בתיק הוא <strong>פרויקט א׳</strong>, צינור לביקורת אנושית של תרגום מכונה (שם וערכים לדוגמה בלבד).<a class="cite" href="#s1" aria-label="מקור 1">1</a> שרה הייתה אחראית על שכבת האחזור והדירוג: היא השתמשה ב-<bdi class="mono" style="font-size:15.5px">pgvector</bdi> עם <bdi class="mono" style="font-size:15.5px">RRF</bdi> ו-<bdi class="mono" style="font-size:15.5px">rerank</bdi>, וה-<bdi class="mono" style="font-size:15.5px">Recall@5</bdi> עלה ל-<bdi class="mono" style="font-size:15.5px">0.96</bdi> (ערך לדוגמה).<a class="cite" href="#s2" aria-label="מקור 2, פתוח" style="background:#B83A08;color:#fff">2</a></p>
+<p style="margin:0">הצינור רץ על תור הודעות ושמר מעקב מלא אחרי כל החלטה, כך שמבקר אנושי יכול היה לשחזר למה תרגום מסוים סומן לבדיקה.<a class="cite" href="#s3" aria-label="מקור 3">3</a></p>
+
+<div role="dialog" aria-label="מקור 2" style="position:absolute;inset-block-start:84px;inset-inline-start:36px;width:380px;box-sizing:border-box;background:#fff;border:1px solid #14171A;border-radius:8px;box-shadow:0 8px 24px rgba(20,23,26,.16);z-index:3;font-size:14.5px;line-height:1.6;overflow:hidden">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:12px 14px;background:#F6F7F9;border-block-end:1px solid #D5D9DE">
+<span style="font-weight:700">פרויקט א׳ · אחזור ודירוג</span>
+<span class="mono" style="font-size:12px;color:#5A626B">קטע 14 · דוגמה</span>
+</div>
+<blockquote dir="auto" style="margin:0;padding:12px 14px">…השכבה משלבת חיפוש לקסיקלי ווקטורי באמצעות <bdi class="mono" style="font-size:13px">RRF</bdi>, ואחריה <bdi class="mono" style="font-size:13px">rerank</bdi> על 20 המועמדים הראשונים…</blockquote>
+<div class="mono" style="display:flex;gap:14px;padding:0 14px 12px;font-size:12px;color:#5A626B"><span>rrf 0.031</span><span>rerank 0.91</span><span>נבחר ✓</span></div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-block-start:1px solid #D5D9DE;font-size:13.5px;font-weight:600">
+<a href="#t-row-14" style="display:inline-flex;align-items:center;gap:6px;text-underline-offset:3px">איך זה נמצא?
+<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 8H3M7 4 3 8l4 4"/></svg></a>
+<a href="#" style="color:#5A626B;text-underline-offset:3px">פתיחת הרשומה</a>
+</div>
+</div>
+</div>
+
+<div id="s1" style="border-block-start:1px solid #D5D9DE;padding-block-start:10px">
+<button type="button" aria-expanded="true" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:'IBM Plex Sans Hebrew',sans-serif;font-size:13px;font-weight:600;color:#5A626B">מקורות · 3
+<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10l5-5 5 5"/></svg></button>
+<ol style="list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:14.5px">
+<li style="display:flex;gap:12px"><span class="mono" style="color:#B83A08;width:16px;font-size:12.5px">[1]</span><a href="#" style="color:#14171A;text-underline-offset:3px">פרויקט א׳ · סקירה</a></li>
+<li style="display:flex;gap:12px"><span class="mono" style="color:#B83A08;width:16px;font-size:12.5px">[2]</span><a href="#" style="color:#14171A;text-underline-offset:3px">פרויקט א׳ · אחזור ודירוג</a></li>
+<li style="display:flex;gap:12px"><span class="mono" style="color:#B83A08;width:16px;font-size:12.5px">[3]</span><a href="#" style="color:#14171A;text-underline-offset:3px">פרויקט א׳ · ארכיטקטורה</a></li>
+</ol>
+</div>
+
+<div class="readout mono">
+<span>2 צעדים</span><span aria-hidden="true">·</span><span>1.4 שנ׳</span><span aria-hidden="true">·</span><span>1,820 טוקנים</span><span aria-hidden="true">·</span><span>gpt-oss-120b</span><span aria-hidden="true">·</span><span>3 מקורות</span>
+<span role="img" aria-label="התפלגות זמן: אחזור 30%, טוקן ראשון 25%, יצירה 45%" style="display:flex;width:84px;height:6px;border-radius:3px;overflow:hidden;gap:1px"><span style="width:30%;background:#B83A08"></span><span style="width:25%;background:#14171A"></span><span style="width:45%;background:#9AA2AB"></span></span>
+<button type="button" aria-expanded="false" style="margin-inline-start:auto;display:flex;align-items:center;gap:6px;border:1px solid #D5D9DE;background:#fff;color:#14171A;border-radius:4px;font-size:12.5px;font-weight:600;font-family:'IBM Plex Sans Hebrew',sans-serif;padding:3px 10px">פירוט
+<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l5 5 5-5"/></svg></button>
+</div>
+
+<div style="display:flex;align-items:center;gap:8px">
+<button type="button" class="fb" aria-label="תשובה מועילה"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 11v9H4v-9zM7 11l4-7a2 2 0 0 1 2 2v3h5.2a2 2 0 0 1 2 2.3l-1.2 6a2 2 0 0 1-2 1.7H7"/></svg></button>
+<button type="button" class="fb" aria-label="תשובה לא מועילה"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform:rotate(180deg)"><path d="M7 11v9H4v-9zM7 11l4-7a2 2 0 0 1 2 2v3h5.2a2 2 0 0 1 2 2.3l-1.2 6a2 2 0 0 1-2 1.7H7"/></svg></button>
+</div>
+</article>
+
+<div dir="auto" style="align-self:flex-start;background:#14171A;color:#fff;border-radius:8px;padding:10px 16px;font-size:17px;line-height:1.6">ומה היה הכי קשה שם?</div>
+
+<article aria-label="תשובת הסוכן" style="background:#fff;border:1px solid #D5D9DE;border-radius:10px;padding:22px 24px;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#5A626B">הסוכן של שרה<span class="mono" style="font-weight:400">· תשובה 2</span></div>
+<div dir="auto" style="font-size:17.5px;line-height:1.8">
+<p style="margin:0 0 12px">לפי התיעוד, הקושי המרכזי היה האיזון בין זמן תגובה לאיכות הדירוג: ה-<bdi class="mono" style="font-size:15.5px">rerank</bdi> הוסיף כ-<bdi class="mono" style="font-size:15.5px">300ms</bdi> (ערך לדוגמה) לכל שאילתה, ולכן שרה הוסיפה מטמון ותקרת זמן.<a class="cite" href="#" aria-label="מקור 1">1</a></p>
+<p style="margin:0;padding:12px 14px;background:#F6F7F9;border:1px dashed #9AA2AB;border-radius:8px;font-size:16.5px">אין לי מידע על חלופות שנשקלו ונפסלו. זה לא מופיע בחומרים שיש לי. אפשר להשאיר לשרה הודעה עם השאלה הזו.</p>
+</div>
+<div><button type="button" style="border:1px solid #B83A08;background:#fff;color:#B83A08;border-radius:6px;padding:7px 14px;font-weight:600;font-size:13.5px">להשאיר הודעה לשרה</button></div>
+
+<div style="border-block-start:1px solid #D5D9DE;padding-block-start:10px">
+<button type="button" aria-expanded="false" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:'IBM Plex Sans Hebrew',sans-serif;font-size:13px;font-weight:600;color:#5A626B">מקורות · 1
+<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l5 5 5-5"/></svg></button>
+</div>
+
+<div class="readout mono">
+<span>3 צעדים</span><span aria-hidden="true">·</span><span>2.9 שנ׳</span><span aria-hidden="true">·</span><span>2,140 טוקנים</span><span aria-hidden="true">·</span><span>gpt-oss-20b</span><span aria-hidden="true">·</span><span>1 מקור</span>
+<span style="display:inline-flex;align-items:center;gap:5px;background:#F3E4BF;color:#7A4B00;border-radius:4px;padding:2px 8px;font-family:'IBM Plex Sans Hebrew',sans-serif;font-size:12px;font-weight:600"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h9l-2-2M14 11H5l2 2"/></svg>מודל גיבוי</span>
+<span style="display:inline-flex;align-items:center;gap:5px;border:1px dashed #5A626B;color:#5A626B;border-radius:4px;padding:1px 8px;font-family:'IBM Plex Sans Hebrew',sans-serif;font-size:12px;font-weight:600"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 8h10"/></svg>ציטוט הוסר</span>
+<button type="button" aria-expanded="false" style="margin-inline-start:auto;display:flex;align-items:center;gap:6px;border:1px solid #D5D9DE;background:#fff;color:#14171A;border-radius:4px;font-size:12.5px;font-weight:600;font-family:'IBM Plex Sans Hebrew',sans-serif;padding:3px 10px">פירוט
+<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l5 5 5-5"/></svg></button>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+<button type="button" class="chip">איך מדדו את ה-Recall@5?</button>
+<button type="button" class="chip">אילו טכנולוגיות נוספות בפרויקט?</button>
+<button type="button" class="chip">תבדוק התאמה למשרה</button>
+</div>
+</article>
+
+</div>
+</main>
+
+<div style="flex:none;display:flex;justify-content:center;padding-block:12px 20px;background:#EEF0F2">
+<div style="width:700px">
+<div style="background:#fff;border:1px solid #14171A;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:12px">
+<div role="group" aria-label="מצב קלט" style="display:flex;border:1px solid #D5D9DE;border-radius:6px;overflow:hidden">
+<button type="button" aria-pressed="true" style="border:0;background:#14171A;color:#fff;padding:5px 10px;font-size:12.5px;font-weight:600">שאלה</button>
+<button type="button" aria-pressed="false" style="border:0;background:#fff;color:#14171A;padding:5px 10px;font-size:12.5px;font-weight:600">משרה</button>
+</div>
+<label for="q-b2" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">שאלה</label>
+<input id="q-b2" dir="auto" placeholder="שאלה נוספת…" style="flex:1;border:0;background:transparent;font-family:'IBM Plex Sans Hebrew',sans-serif;font-size:17px;color:#14171A;outline-offset:6px">
+<span class="mono" style="font-size:12px;color:#5A626B">0 / 1,000</span>
+<button type="button" aria-label="שליחה" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:0;border-radius:8px;background:#B83A08;color:#fff">
+<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 8H3M7 4 3 8l4 4"/></svg></button>
+</div>
+<p style="margin:10px 0 0;font-size:12.5px;color:#5A626B">השיחות נשמרות 30 יום ועוברות דרך ספקי מודלים חיצוניים. <a href="#">מדיניות פרטיות</a></p>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1040,"height":1420}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
