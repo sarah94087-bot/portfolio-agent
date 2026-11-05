@@ -123,8 +123,20 @@ function SourcePopover({ n, source, top, t, onClose }: PopoverProps) {
             <CloseIcon />
           </button>
         </div>
-        <blockquote dir="auto" className="m-0 overflow-y-auto px-4 py-3.5 text-[16px] leading-[1.7] md:text-[15px] md:leading-[1.6]">
-          <Bidi text={source.text} />
+        {/* A chunk can be a whole record (C4), so the quote scrolls inside a bounded window;
+            focusable, so the keyboard can scroll it too. Records are Markdown, rendered as the
+            answer is. */}
+        <blockquote
+          dir="auto"
+          tabIndex={0}
+          aria-label={sectionLabel(source)}
+          className="m-0 overflow-y-auto px-4 py-3.5 text-[16px] leading-[1.7] md:max-h-72 md:text-[15px] md:leading-[1.6]"
+        >
+          {blocks([{ kind: "text", text: source.text }]).map((b, i) => (
+            <p key={i} className={`mb-2 last:mb-0 ${b.kind === "li" ? "relative ps-4 before:absolute before:start-0.5 before:content-['•']" : ""} ${b.kind === "h" ? "font-extrabold" : ""}`}>
+              <Inlines inlines={b.inlines} cite={() => null} />
+            </p>
+          ))}
         </blockquote>
       </div>
     </>
