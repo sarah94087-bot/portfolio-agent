@@ -235,13 +235,13 @@ Makefile                  dev, test, eval, ingest
 
 | ADR | החלטה |
 |---|---|
-| 0001 | לולאת סוכן עצמית במקום framework |
-| 0002 | סוכן אחד עם כלים, בלי multi-agent |
+| 0001 | לולאת סוכן עצמית במקום framework. **נכתב** (`adr/0001-own-agent-loop.md`) |
+| 0002 | סוכן אחד עם כלים, בלי multi-agent. **נכתב** (`adr/0002-single-agent.md`) |
 | 0003 | Neon כמסד יחיד, בלי Redis ובלי שירות חיפוש |
 | 0004 | Python ו-FastAPI ב-Vercel לצד Next.js, דרך Vercel Services. **נכתב** (`adr/0004-vercel-services.md`) |
 | 0005 | לקוח אחד תואם OpenAI לכל הספקים, Groq ראשי. **נכתב** (`adr/0005-llm-providers.md`) |
-| 0006 | אכיפת ציטוטים בזמן הזרמה |
-| 0007 | registry אחד לכלים, והרצה בתוך התהליך במקום דרך MCP |
+| 0006 | אכיפת ציטוטים בזמן הזרמה. **נכתב** (`adr/0006-streaming-citation-enforcement.md`) |
+| 0007 | registry אחד לכלים, והרצה בתוך התהליך במקום דרך MCP. **נכתב** (`adr/0007-tool-registry-in-process.md`) |
 | 0008 | פריסה דרך GitHub Actions אחרי evals, ולא פריסה אוטומטית |
 | 0009 | בלי Gemini חינמי בנתיב של המבקרים. embeddings נבחר ב-M3, ואין מודל חירום מחוץ ל-Groq. **נכתב** (`adr/0009-no-free-gemini-in-production.md`) |
 | 0010 ואילך | החלטות השליפה מ-M3 (פרק 5, סעיף 9) |
