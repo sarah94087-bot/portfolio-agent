@@ -6,7 +6,7 @@ the model has to answer with what it found instead of the loop cutting it off mi
 
 The loop does not know about SSE frames or HTTP. It reports through `emit(event, data)` with
 the event types of docs/05-architecture.md, section 5, and the text goes through a TextFilter,
-the citation filter by default (agent/citations.py), so no caller skips it. Tools are called
+the output guard and the citation filter by default, so no caller skips them. Tools are called
 one at a time, in the order the model asked for them, so the trace reads top to bottom.
 """
 
@@ -16,8 +16,10 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
+from portfolio_agent.agent import prompt
 from portfolio_agent.agent.citations import CitationFilter
 from portfolio_agent.agent.emit import Emit
+from portfolio_agent.agent.guard import OutputGuard
 from portfolio_agent.providers.base import (
     Finish,
     Message,
@@ -65,6 +67,9 @@ class TurnResult:
     models: list[str] = field(default_factory=list)
     hit_max_rounds: bool = False
     cited: dict[str, int] = field(default_factory=dict)  # chunk id -> source number
+    blocked: str | None = None  # "canary" when the guard stopped the answer
+    redacted: int = 0  # phones and emails replaced with the CV pointer
+    language: str | None = None  # he | en | mixed | none, recorded only
     dropped: list[str] = field(default_factory=list)  # invalid ids the filter removed
 
 
@@ -81,7 +86,7 @@ async def run_turn(
     text_filter: TextFilter | None = None,
     max_rounds: int = MAX_ROUNDS,
 ) -> TurnResult:
-    text_filter = text_filter or CitationFilter()
+    text_filter = text_filter or OutputGuard(CitationFilter(), prompt.canary())
     messages: list[Message] = [
         {"role": "system", "content": system_prompt},
         *history,
@@ -120,6 +125,8 @@ async def run_turn(
             if isinstance(event, TextDelta):
                 round_text.append(event.text)
                 await text_filter.feed(event.text, frozenset(allowed), out)
+                if getattr(text_filter, "blocked", None):
+                    break  # the guard stopped the answer; nothing more is read or run
             elif isinstance(event, Restart):
                 # The model failed mid-answer and the next one starts this round over. The
                 # visitor is told, and the UI drops what this round showed (section 4).
@@ -144,6 +151,8 @@ async def run_turn(
                             "summary": {"tool_calls": [c.name for c in calls]}})
         answer += round_text
 
+        if getattr(text_filter, "blocked", None):
+            break
         if not calls:
             break
         if last:
@@ -185,9 +194,16 @@ async def run_turn(
             hit_max = True  # the next round is the last, and it runs without tools
 
     await text_filter.flush(out)
+    blocked = getattr(text_filter, "blocked", None)
     return TurnResult(
-        "".join(answer), frozenset(allowed), rounds, usage, models, hit_max,
-        dict(getattr(text_filter, "numbers", {})), list(getattr(text_filter, "dropped", [])),
+        # A blocked answer is never kept as written: it held the canary.
+        text=getattr(text_filter, "shown_text", "") if blocked else "".join(answer),
+        allowed_chunks=frozenset(allowed), rounds=rounds, usage=usage, models=models,
+        hit_max_rounds=hit_max,
+        cited=dict(getattr(text_filter, "numbers", {})),
+        dropped=list(getattr(text_filter, "dropped", [])),
+        blocked=blocked, redacted=getattr(text_filter, "redacted", 0),
+        language=getattr(text_filter, "language", None),
     )
 
 

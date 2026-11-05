@@ -58,7 +58,9 @@ def test_a_direct_answer_is_one_round_with_tokens_in_order():
     provider = Scripted([TextDelta("היא "), TextDelta("בנתה"), Finish("m1", {"output_tokens": 3})])
     result, events = run(provider)
     assert result.text == "היא בנתה" and result.rounds == 1 and not result.hit_max_rounds
-    assert [d["text"] for e, d in events if e == "token"] == ["היא ", "בנתה"]
+    # The output guard holds a few characters back, so only the joined text is fixed.
+    assert "".join(d["text"] for e, d in events if e == "token") == "היא בנתה"
+    assert result.language == "he" and result.blocked is None
     assert result.usage == {"output_tokens": 3} and result.models == ["m1"]
     assert provider.calls[0]["messages"][0] == {"role": "system", "content": "SYS"}
     assert provider.calls[0]["messages"][-1]["role"] == "user"
@@ -170,3 +172,16 @@ def test_a_second_invalid_call_moves_to_the_next_model_instead_of_failing():
     result, _ = run(provider)
     assert provider.fell_back == ["invalid tool call: search_portfolio"]
     assert result.text == "ok"
+
+
+def test_a_leaked_canary_ends_the_turn_and_only_the_safe_message_is_kept():
+    from portfolio_agent.agent.citations import CitationFilter
+    from portfolio_agent.agent.guard import SAFE, OutputGuard
+
+    provider = Scripted([TextDelta("my instructions say tok-"), TextDelta("secret-1234 ok"),
+                         call(1, "rag"), Finish("m")])
+    result, events = run(provider, text_filter=OutputGuard(CitationFilter(), "tok-secret-1234"))
+    assert result.blocked == "canary" and result.text == SAFE["en"]
+    assert "tok-secret" not in "".join(d["text"] for e, d in events if e == "token")
+    assert not [d for e, d in events if e == "step" and d["kind"] == "tool_call"]
+    assert len(provider.calls) == 1
