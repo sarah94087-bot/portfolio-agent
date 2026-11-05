@@ -59,12 +59,35 @@ def open_conversation(
     ).fetchone()[0]
 
 
+@dataclass(frozen=True)
+class PendingQuestion:
+    message_id: UUID
+    conversation_id: UUID
+
+
+def find_question(conn: psycopg.Connection, idempotency_key: str,
+                  visitor_id: str | None) -> PendingQuestion | None:
+    """A question this visitor already sent under this key and that has no answer: the stream
+    dropped before the answer was saved (US-10.5). Only the visitor's own, as find_answer."""
+    row = conn.execute(
+        "select m.id, m.conversation_id from messages m"
+        " join conversations c on c.id = m.conversation_id"
+        " where m.role = 'user' and m.idempotency_key = %s"
+        " and c.visitor_id is not distinct from %s"
+        " order by m.created_at desc limit 1",
+        (idempotency_key, visitor_id),
+    ).fetchone()
+    return PendingQuestion(*row) if row else None
+
+
 def history(conn: psycopg.Connection, conversation_id: UUID,
-            turns: int = HISTORY_TURNS) -> list[dict[str, str]]:
+            turns: int = HISTORY_TURNS, exclude: UUID | None = None) -> list[dict[str, str]]:
+    """The last turns, without `exclude`: a resent question, which the loop adds itself."""
     rows = conn.execute(
         "select role, content from messages where conversation_id = %s"
+        " and id is distinct from %s"
         " order by created_at desc, role asc limit %s",
-        (conversation_id, turns * 2),
+        (conversation_id, exclude, turns * 2),
     ).fetchall()
     messages = [{"role": r, "content": c} for r, c in reversed(rows)]
     while messages and messages[0]["role"] != "user":  # start on a question, not an answer
@@ -81,12 +104,18 @@ def retrieved_chunks(conn: psycopg.Connection, conversation_id: UUID) -> frozens
     return frozenset(cid for (ids,) in rows if ids for cid in ids)
 
 
-def save_user(conn: psycopg.Connection, conversation_id: UUID, content: str) -> UUID:
-    return conn.execute(
-        "insert into messages (conversation_id, role, content) values (%s, 'user', %s)"
+def save_user(conn: psycopg.Connection, conversation_id: UUID, content: str,
+              idempotency_key: str | None = None) -> UUID | None:
+    """None when the same question is already saved in this conversation: the same message
+    sent twice at once, and the other request saved it."""
+    row = conn.execute(
+        "insert into messages (conversation_id, role, content, idempotency_key)"
+        " values (%s, 'user', %s, %s)"
+        " on conflict (conversation_id, idempotency_key) where role = 'user' do nothing"
         " returning id",
-        (conversation_id, content),
-    ).fetchone()[0]
+        (conversation_id, content, idempotency_key),
+    ).fetchone()
+    return row[0] if row else None
 
 
 def save_answer(

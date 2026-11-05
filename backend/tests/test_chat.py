@@ -168,6 +168,23 @@ def test_a_resent_message_is_replayed_without_calling_the_model(use):
     assert next(d for e, d in again if e == "usage")["output_tokens"] == 0
 
 
+def test_a_question_resent_after_a_drop_is_saved_once_and_counted_once(use):
+    # The stream breaks after the question was saved and before the answer was (US-10.5).
+    retried = Scripted([TextDelta("Hi."), Finish("m", {})])
+    use(Scripted([TextDelta("She built"), RuntimeError("connection cut")]), retried,
+        limits=Limits(conversation=1))  # a second count of the question would refuse the retry
+    _, cut = post({"message": "MCP?", "idempotency_key": "key-drop-1"})
+    assert cut[-2][1]["code"] == "internal"
+    cid = cut[0][1]["conversation_id"]
+    _, again = post({"message": "MCP?", "idempotency_key": "key-drop-1"})
+    assert again[0][1]["conversation_id"] == cid and text(again) == "Hi."
+    assert [m["content"] for m in retried.calls[0] if m["role"] == "user"] == ["MCP?"]
+    with psycopg.connect(DB_URL) as conn:
+        roles = [r for (r,) in conn.execute(
+            "select role from messages where conversation_id = %s order by created_at", (cid,))]
+    assert roles == ["user", "assistant"]
+
+
 def test_the_next_turn_sees_the_history_and_may_cite_what_was_retrieved_before(use):
     first = Scripted([search("MCP"), Finish("m")],
                      [TextDelta("Yes [[git-mcp-server#all]]."), Finish("m")])

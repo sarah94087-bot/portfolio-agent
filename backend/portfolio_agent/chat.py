@@ -196,18 +196,24 @@ async def _answer(req: ChatRequest, deps: Deps, caller: Caller, out: _Out) -> No
             return await _replay(conn, stored, deps, out)
 
         now = deps.now()
-        conversation_id = db.open_conversation(conn, req.conversation_id, req.company_slug,
-                                               caller.visitor_id)
+        # Sent before, and the stream dropped before the answer was saved: continue from the
+        # saved question, so it is in the history once and the conversation counts it once.
+        # The visitor's own limits still count it, since the model runs again.
+        pending = db.find_question(conn, req.idempotency_key, caller.visitor_id)
+        conversation_id = pending.conversation_id if pending else db.open_conversation(
+            conn, req.conversation_id, req.company_slug, caller.visitor_id)
         try:
             admit(conn, visitor_id=caller.visitor_id,
                   ip_hash=visitor.ip_hash(conn, caller.ip, now.date()),
-                  conversation_id=conversation_id, now=now, limits=limits)
+                  conversation_id=conversation_id, now=now, limits=limits,
+                  resent=pending is not None)
         except Denied as e:
             return await out.error(e.code, e.message, e.retryable, limit=e.limit,
                                    retry_after=e.retry_after)
-        history = db.history(conn, conversation_id)
+        history = db.history(conn, conversation_id, exclude=pending and pending.message_id)
         allowed = db.retrieved_chunks(conn, conversation_id)
-        db.save_user(conn, conversation_id, req.message)
+        if not pending:
+            db.save_user(conn, conversation_id, req.message, req.idempotency_key)
         message_id = uuid.uuid4()
         cache_key = None
         if deps.use_cache and not history:  # only a first question, from the cache

@@ -70,12 +70,14 @@ def _to_midnight(now: datetime) -> int:
 
 
 def admit(conn: psycopg.Connection, *, visitor_id: str, ip_hash: str, conversation_id: UUID,
-          now: datetime, limits: Limits, cost: int = 1) -> None:
-    """Counts one message, or raises Denied and counts nothing. `cost` is 3 for a job match."""
+          now: datetime, limits: Limits, cost: int = 1, resent: bool = False) -> None:
+    """Counts one message, or raises Denied and counts nothing. `cost` is 3 for a job match.
+    `resent`: the question is already saved in the conversation (chat.py), so it is not a new
+    one there; the visitor and IP limits still count it, as the model runs again."""
     asked = conn.execute(
         "select count(*) from messages where conversation_id = %s and role = 'user'",
         (conversation_id,),
-    ).fetchone()[0]
+    ).fetchone()[0] - resent
     if asked >= limits.conversation:
         raise Denied("conversation", "This conversation is full. Start a new one.", None)
     day = now.date()
