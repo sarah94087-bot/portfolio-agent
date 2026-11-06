@@ -28,8 +28,8 @@ on:
         description: "stage4: Groq tokens this invocation may spend"
         default: "60000"
       ref:
-        description: "stage4: the commit to run on (run 1's corpus)"
-        default: dca8892
+        description: "stage4: the full commit SHA to run on (run 1's corpus)"
+        default: dca88926c45bea3f08af8fad8e666c275e297a41  # checkout needs all 40 characters
 
 concurrency:
   group: groq
@@ -100,6 +100,7 @@ jobs:
           assert missing + have == 58, "saved rankings no longer match R3's candidates here"
           EOF
       - name: Rerank
+        id: rerank
         working-directory: run/evals
         env:
           DATABASE_URL: postgresql://agent:agent@localhost:5432/agent
@@ -109,7 +110,7 @@ jobs:
           RUN_NO: ${{ inputs.run }}
         run: python -m retrieval.run_stage4 "$RUN_NO" | tee "$RUNNER_TEMP/stage4.txt"
       - name: Push the results branch
-        if: always()
+        if: always() && steps.rerank.outcome != 'skipped'
         working-directory: run
         env:
           RUN_NO: ${{ inputs.run }}
@@ -161,12 +162,13 @@ jobs:
       - run: npm ci
         working-directory: evals
       - name: T1, live
+        id: t1
         working-directory: evals
         env:
           GROQ_API_KEY_EVALS: ${{ secrets.GROQ_API_KEY_EVALS }}
         run: node answers/run.mjs t1 --no-cache
       - name: Push the results branch
-        if: always()
+        if: always() && steps.t1.outcome != 'skipped'
         env:
           BRANCH: groq/t1-${{ github.run_id }}
         run: |
