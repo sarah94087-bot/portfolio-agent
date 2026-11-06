@@ -1,0 +1,179 @@
+# The runs that spend Groq tokens, started by hand from the Actions tab. They run here because
+# the home network intercepts TLS to api.groq.com (Netspark, since 2026-11-04), and the Groq
+# key must never pass through it. Each run pushes what it saved to a branch of its own,
+# groq/<job>-<run id>, to be read and merged by hand; nothing is pushed to main.
+#
+# - stage4: one run of the retrieval stage 4 reranker (evals/retrieval/run_stage4.py). It runs
+#   on `ref`, the commit run 1 used (dca8892, 16 records), since a different corpus changes the
+#   candidates and so drops the saved rankings. It resumes from the run's saved file and stops
+#   at `max_tokens`, so a run can take more than one day.
+# - t1: the live T1 (docs/03-evaluation-methodology.md, section 7) on main, Groq with the judge,
+#   with R3 search: the embedding model is fetched by hash and the knowledge base loaded.
+#
+# One at a time: the Groq quota is per model and per day, shared by both jobs.
+name: groq
+
+on:
+  workflow_dispatch:
+    inputs:
+      job:
+        description: "stage4 or t1"
+        type: choice
+        options: [stage4, t1]
+        default: stage4
+      run:
+        description: "stage4: the run number (2 or 3)"
+        default: "2"
+      max_tokens:
+        description: "stage4: Groq tokens this invocation may spend"
+        default: "60000"
+      ref:
+        description: "stage4: the commit to run on (run 1's corpus)"
+        default: dca8892
+
+concurrency:
+  group: groq
+  cancel-in-progress: false
+
+permissions:
+  contents: write  # to push the results branch
+
+env:
+  GROQ_MODEL: openai/gpt-oss-120b  # what run 1 and the prompt were measured with
+  GROQ_FALLBACK_MODELS: qwen/qwen3.8-27b,openai/gpt-oss-20b
+  MODELS_DIR: ${{ github.workspace }}/../models
+
+jobs:
+  stage4:
+    if: inputs.job == 'stage4'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    services:
+      db:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: agent
+          POSTGRES_PASSWORD: agent
+          POSTGRES_DB: agent
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U agent -d agent"
+          --health-interval 2s --health-timeout 3s --health-retries 20
+    steps:
+      # main, for the model fetch script; the run itself is on `ref`, in run/
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          path: main
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          ref: ${{ inputs.ref }}
+          path: run
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+      - run: pip install -e "run/backend[dev,experiments]"
+      # The same bytes every M3 result was measured with, checked by SHA-256 as they stream.
+      - name: Fetch the embedding model
+        env:
+          PYTHONPATH: main/backend
+        run: python -m portfolio_agent.retrieval.fetch_model "$MODELS_DIR/multilingual-e5-small"
+      # With no tokens to spend, every question without a usable saved ranking shows as
+      # missing. A saved ranking is usable only if R3 gives the same candidates here as it did
+      # on the laptop, so if any saved one is dropped, the run stops before paying for it again.
+      - name: Check the saved rankings still apply
+        working-directory: run/evals
+        env:
+          DATABASE_URL: postgresql://agent:agent@localhost:5432/agent
+          EMBEDDING_MODELS_DIR: ${{ env.MODELS_DIR }}
+          RERANK_MAX_TOKENS: "0"
+          GROQ_API_KEY_EVALS: unused
+          RUN_NO: ${{ inputs.run }}
+        run: |
+          python -m retrieval.run_stage4 "$RUN_NO" | tail -n 1 > "$RUNNER_TEMP/check.json"
+          python - <<'EOF'
+          import json, os, pathlib
+          status = json.loads(pathlib.Path(os.environ["RUNNER_TEMP"], "check.json").read_text())
+          saved = pathlib.Path(f"datasets/rerank/d1-dev-r4-run{os.environ['RUN_NO']}.json")
+          have = len(json.loads(saved.read_text(encoding="utf-8"))["rankings"]) if saved.exists() else 0
+          missing = len(status["missing"])
+          print(f"saved {have}, missing {missing}")
+          assert missing + have == 58, "saved rankings no longer match R3's candidates here"
+          EOF
+      - name: Rerank
+        working-directory: run/evals
+        env:
+          DATABASE_URL: postgresql://agent:agent@localhost:5432/agent
+          EMBEDDING_MODELS_DIR: ${{ env.MODELS_DIR }}
+          RERANK_MAX_TOKENS: ${{ inputs.max_tokens }}
+          GROQ_API_KEY_EVALS: ${{ secrets.GROQ_API_KEY_EVALS }}
+          RUN_NO: ${{ inputs.run }}
+        run: python -m retrieval.run_stage4 "$RUN_NO" | tee "$RUNNER_TEMP/stage4.txt"
+      - name: Push the results branch
+        if: always()
+        working-directory: run
+        env:
+          RUN_NO: ${{ inputs.run }}
+          BRANCH: groq/stage4-run${{ inputs.run }}-${{ github.run_id }}
+        run: |
+          git add -f evals/datasets/rerank evals/results
+          if git diff --cached --quiet; then echo "nothing saved"; exit 0; fi
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -q -m "Stage 4 run $RUN_NO, from groq workflow run ${{ github.run_id }}"
+          git push -q origin "HEAD:refs/heads/$BRANCH"
+          echo "pushed $BRANCH"
+      - if: always()
+        run: cat "$RUNNER_TEMP/stage4.txt" >> "$GITHUB_STEP_SUMMARY" || true
+
+  t1:
+    if: inputs.job == 't1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    services:
+      db:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: agent
+          POSTGRES_PASSWORD: agent
+          POSTGRES_DB: agent
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U agent -d agent"
+          --health-interval 2s --health-timeout 3s --health-retries 20
+    env:
+      DATABASE_URL: postgresql://agent:agent@localhost:5432/agent
+      EVAL_DATABASE_URL: postgresql://agent:agent@localhost:5432/agent
+      EMBEDDING_MODEL_DIR: ${{ github.workspace }}/../models/multilingual-e5-small
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: evals/package-lock.json
+      - run: pip install -e "backend[dev]"
+      - run: python -m portfolio_agent.retrieval.fetch_model
+      # migrations, the C4 chunks with their vectors, and kb_version, as on Neon
+      - run: python -m portfolio_agent.load
+      - run: npm ci
+        working-directory: evals
+      - name: T1, live
+        working-directory: evals
+        env:
+          GROQ_API_KEY_EVALS: ${{ secrets.GROQ_API_KEY_EVALS }}
+        run: node answers/run.mjs t1 --no-cache
+      - name: Push the results branch
+        if: always()
+        env:
+          BRANCH: groq/t1-${{ github.run_id }}
+        run: |
+          git add -f evals/results/promptfoo-t1-latest.json || true
+          if git diff --cached --quiet; then echo "nothing saved"; exit 0; fi
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -q -m "Live T1, from groq workflow run ${{ github.run_id }}"
+          git push -q origin "HEAD:refs/heads/$BRANCH"
+          echo "pushed $BRANCH"
