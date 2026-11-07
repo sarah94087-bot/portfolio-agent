@@ -118,13 +118,29 @@ jobs:
           GROQ_API_KEY_EVALS: ${{ secrets.GROQ_API_KEY_EVALS }}
           RUN_NO: ${{ inputs.run }}
         run: python -m retrieval.run_stage4 "$RUN_NO" | tee "$RUNNER_TEMP/stage4.txt"
+      # Kept first as an artifact, so a failed push loses nothing (run 2's first rankings were
+      # lost that way: groq #3).
+      - name: Keep what the run saved
+        if: always() && steps.rerank.outcome != 'skipped'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: stage4-run${{ inputs.run }}
+          path: |
+            run/evals/datasets/rerank/d1-dev-r4-run${{ inputs.run }}.json
+            run/evals/results/
+          if-no-files-found: warn
+      # The branch starts from main, not from `ref`: a branch whose workflow files differ from
+      # main's is refused to this token (it has no `workflows` permission).
       - name: Push the results branch
         if: always() && steps.rerank.outcome != 'skipped'
-        working-directory: run
+        working-directory: main
         env:
           RUN_NO: ${{ inputs.run }}
           BRANCH: groq/stage4-run${{ inputs.run }}-${{ github.run_id }}
         run: |
+          mkdir -p evals/results
+          cp ../run/evals/datasets/rerank/d1-dev-r4-run"$RUN_NO".json evals/datasets/rerank/
+          cp ../run/evals/results/*-stage4-* evals/results/ 2>/dev/null || true
           git add -f evals/datasets/rerank evals/results
           if git diff --cached --quiet; then echo "nothing saved"; exit 0; fi
           git -c user.name="github-actions[bot]" \
@@ -176,6 +192,13 @@ jobs:
         env:
           GROQ_API_KEY_EVALS: ${{ secrets.GROQ_API_KEY_EVALS }}
         run: node answers/run.mjs t1 --no-cache
+      - name: Keep what the run saved
+        if: always() && steps.t1.outcome != 'skipped'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: t1
+          path: evals/results/promptfoo-t1-latest.json
+          if-no-files-found: warn
       - name: Push the results branch
         if: always() && steps.t1.outcome != 'skipped'
         env:
