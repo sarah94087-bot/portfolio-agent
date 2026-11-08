@@ -27,7 +27,7 @@ export function Header({ lang, t }: { lang: Locale; t: Dictionary["header"] }) {
   const cvHref = `/cv/sarah-halevi-${lang}.pdf`;
 
   return (
-    <header className="flex h-14 flex-none items-center gap-2 border-b-[3px] border-accent px-4 md:h-[68px] md:gap-4 md:px-10">
+    <header className="sticky top-0 z-10 flex h-14 flex-none items-center gap-2 border-b-[3px] border-accent bg-surface px-4 md:h-[68px] md:gap-4 md:px-10">
       <Link href={`/${lang}`} className="flex items-center gap-2 rounded-sm md:gap-3">
         <Mark />
         <span className="whitespace-nowrap text-[16px] font-extrabold md:text-[18px]">{t.agentName}</span>
