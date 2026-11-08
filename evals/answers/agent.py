@@ -27,6 +27,7 @@ from portfolio_agent.agent.guard import HEBREW, PRIVATE, language
 from portfolio_agent.guards.quotas import Limits
 from portfolio_agent.providers.base import Finish, TextDelta, ToolCall
 from portfolio_agent.providers.router import from_env
+from portfolio_agent.retrieval import rerank
 
 UNLIMITED = Limits(visitor_day=10**9, visitor_minute=10**9, ip_day=10**9, conversation=10**9)
 
@@ -60,12 +61,21 @@ def _router():
     return from_env(httpx.AsyncClient(), env)
 
 
+@cache
+def _ranker():
+    env = dict(os.environ)
+    if env.get("GROQ_API_KEY_EVALS"):
+        env["GROQ_API_KEY"] = env["GROQ_API_KEY_EVALS"]
+    return rerank.from_env(httpx.Client(), env)
+
+
 def deps() -> chat.Deps:
     scripted = os.environ.get("EVAL_MODEL") == "scripted"
     return chat.Deps(
         database_url=lambda: os.environ.get("EVAL_DATABASE_URL") or os.environ.get("DATABASE_URL"),
         provider=(lambda quota: Scripted()) if scripted
         else (lambda quota: _router().for_turn(quota)),
+        ranker=(lambda: None) if scripted else _ranker,
         limits=lambda: UNLIMITED,
         tracer=lambda: None,
         table=os.environ.get("EVAL_TABLE", "chunks"),

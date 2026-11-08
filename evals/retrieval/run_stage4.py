@@ -32,10 +32,13 @@ from portfolio_agent.retrieval import hybrid, vector
 from portfolio_agent.retrieval.lexical import Hit
 from portfolio_agent.retrieval.query import name_pattern, owner_names, strip_names
 from portfolio_agent.retrieval.rerank import (
+    BAD_REQUEST_TRIES,
     CANDIDATE_TOKENS,
     RERANK_CANDIDATES,
+    SYSTEM,
     apply_order,
-    candidates_block,
+    prompt,
+    rank_tool,
 )
 
 from retrieval.embedders import Embedder, env, post
@@ -51,36 +54,8 @@ SIMPLEST_FIRST = ("R3", "R4")
 TABLE = "stage4_chunks"
 MAX_TOKENS = int(os.environ.get("RERANK_MAX_TOKENS", "60000"))  # per invocation (docs/10, §3)
 
-SYSTEM = (
-    "You rank search results for an assistant that answers questions about Sarah's work. "
-    "Order the candidate passages from the most to the least useful for answering the "
-    "visitor's question. Rank every candidate id you are given, and only those."
-)
-
 # (question, query, candidates) -> (ranking, tokens, ms spent waiting on 429)
 Ranker = Callable[[str, str, Sequence[Hit]], tuple[list[str], int, int]]
-
-
-def rank_tool(ids: Sequence[str]) -> dict:
-    return {"type": "function", "function": {
-        "name": "rank_passages",
-        "description": "Give the candidate ids, best first.",
-        "parameters": {"type": "object", "required": ["ranking"], "properties": {
-            "ranking": {"type": "array", "items": {"type": "string", "enum": list(ids)},
-                        "minItems": 1, "maxItems": len(ids)},
-        }},
-    }}
-
-
-def prompt(question: str, query: str, hits: Sequence[Hit]) -> str:
-    return (f"Visitor's question: {question}\nSearch query: {query}\n\n"
-            f"Candidates:\n\n{candidates_block(hits)}")
-
-
-# Groq answers 400 when the model's tool call fails its own validation, about 1 call in 90
-# (stage 4, run 2). It is tried once more; if that fails too, the ranking is empty, so R4
-# keeps R3's order for that question (rerank.apply_order), and the fallback is counted.
-BAD_REQUEST_TRIES = 2
 
 
 def groq_ranker(client: httpx.Client) -> Ranker:

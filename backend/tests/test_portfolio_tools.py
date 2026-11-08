@@ -9,13 +9,17 @@ import pytest
 
 from portfolio_agent import migrate
 from portfolio_agent.ingest import chunk, load, upsert
+from portfolio_agent.providers.openai_compat import ProviderError
 from portfolio_agent.retrieval.lexical import Hit
+from portfolio_agent.retrieval.rerank import Ranking
+from portfolio_agent.tools import portfolio
 from portfolio_agent.tools.portfolio import (
     GET_PROJECT,
     MAX_RESULTS,
     MAX_TOKENS,
     SEARCH,
     PortfolioContext,
+    Record,
     _within_budget,
 )
 from portfolio_agent.tools.registry import Registry
@@ -34,6 +38,95 @@ def test_the_budget_keeps_whole_chunks_best_first():
     assert [h.id for h in _within_budget(hits)] == ["r1#all", "r2#all"]
     assert [h.id for h in _within_budget([hit(1, MAX_TOKENS + 500)])] == ["r1#all"]
     assert len(_within_budget([hit(i, 10) for i in range(9)])) == MAX_RESULTS
+
+
+class Embedder:
+    def embed_query(self, text):
+        return [0.0]
+
+
+class Ranker:
+    name = "groq/m"
+
+    def __init__(self, answer):
+        self.answer = answer
+        self.got = None
+
+    def rank(self, question, query, hits):
+        self.got = (question, query, [h.id for h in hits])
+        if isinstance(self.answer, Exception):
+            raise self.answer
+        return self.answer
+
+
+class Quota:
+    def closed(self):
+        return {}
+
+    def close(self, model, until):
+        raise AssertionError("not expected")
+
+    def spend(self, model, tokens):
+        pass
+
+
+def fused(i):
+    return Hit(f"r{i}#all", f"r{i}", ("all",), "text", {"lexical": 0.1, "vector": 0.2, "rrf": 0.3})
+
+
+@pytest.fixture
+def searched(monkeypatch):
+    """search_portfolio on n fused hits, without a database."""
+
+    def run(ranker, n=4, **args):
+        monkeypatch.setattr(portfolio.hybrid, "search",
+                            lambda *a, **k: [fused(i) for i in range(n)])
+        records = {f"r{i}": Record(f"r{i}", "project" if i % 2 else "faq", f"R{i}")
+                   for i in range(4)}
+        ctx = PortfolioContext(None, records, (), embedder=Embedder(), ranker=ranker, quota=Quota(),
+                               question="the visitor's words")
+        return portfolio.search_portfolio(portfolio.SearchArgs(query="q", **args), ctx)
+    return run
+
+
+def test_r4_orders_the_results_and_the_trace_shows_both_orders(searched):
+    ranker = Ranker(Ranking(["r2#all", "r0#all", "r3#all", "r1#all"], 2300))
+    trace = searched(ranker).trace_view
+    assert ranker.got[0] == "the visitor's words"
+    assert trace["method"] == "R4"
+    assert trace["rerank"] == {"model": "groq/m", "tokens": 2300, "fallback": None}
+    assert [r["chunk_id"] for r in trace["results"]][:2] == ["r2#all", "r0#all"]
+    assert [r["rank"] for r in trace["results"]] == [1, 2, 3, 4]
+    assert trace["results"][0]["scores"]["rerank"] == 1
+    # the panel's table stays in fused order, with the model's place beside each
+    assert [c["chunk_id"] for c in trace["candidates"]] == [f"r{i}#all" for i in range(4)]
+    assert [c["scores"]["rerank"] for c in trace["candidates"]] == [2, 4, 1, 3]
+    assert "rerank" in trace["latency_ms"]
+
+
+def test_a_failed_rerank_is_an_r3_search_that_says_why(searched):
+    trace = searched(Ranker(ProviderError("unavailable", "x"))).trace_view
+    assert trace["method"] == "R3" and trace["rerank"]["fallback"] == "unavailable"
+    assert [r["chunk_id"] for r in trace["results"]] == [f"r{i}#all" for i in range(4)]
+    assert all(r["scores"]["rerank"] is None for r in trace["results"])
+
+
+def test_without_a_ranker_the_search_is_r3(searched):
+    trace = searched(None).trace_view
+    assert trace["method"] == "R3" and trace["rerank"] is None
+
+
+def test_the_type_filter_runs_first_so_the_model_reads_only_what_can_be_returned(searched):
+    ranker = Ranker(Ranking(["r3#all", "r1#all"], 2300))
+    trace = searched(ranker, types=["project"]).trace_view
+    assert ranker.got[2] == ["r1#all", "r3#all"]
+    assert [r["chunk_id"] for r in trace["results"]] == ["r3#all", "r1#all"]
+
+
+def test_one_candidate_needs_no_ranking(searched):
+    ranker = Ranker(Ranking(["r0#all"], 2300))
+    trace = searched(ranker, n=1).trace_view
+    assert ranker.got is None and trace["method"] == "R3" and trace["rerank"] is None
 
 
 @pytest.fixture(scope="module")

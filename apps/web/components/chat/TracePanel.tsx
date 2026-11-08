@@ -86,7 +86,7 @@ function stepText(item: TimelineItem, lang: string, t: ChatStrings): { name: Rea
         name: <>{tr.toolCall} · <Code>{item.tool}</Code></>,
         meta: seconds(item.ms, lang, t),
         text: item.tool === "search_portfolio"
-          ? item.method === "R1" ? tr.searchR1 : tr.searchR3
+          ? item.method === "R1" ? tr.searchR1 : item.method === "R4" ? tr.searchR4 : tr.searchR3
           : <Sentence text={tr.projectText} vals={{ record: item.record ?? "" }} />,
       };
     case "tool_result":
@@ -124,7 +124,7 @@ function Candidates({ search, highlight, rowId, lang, t }: {
   const wanted = highlight ? search.rows.findIndex((r) => r.chunkId === highlight) : -1;
   const shown = all || wanted >= FIRST_ROWS ? search.rows : search.rows.slice(0, FIRST_ROWS);
   const cols = [t.lexical, t.vector, "RRF", t.rerank];
-  const values = (r: Row) => [score(r.lexical, 3), score(r.vector, 2), score(r.rrf, 3), score(r.rerank, 2)];
+  const values = (r: Row) => [score(r.lexical, 3), score(r.vector, 2), score(r.rrf, 3), score(r.rerank, 0)];
   const mark = (r: Row) => (r.chunkId === highlight ? "outline-2 -outline-offset-2 outline-accent" : "");
 
   return (

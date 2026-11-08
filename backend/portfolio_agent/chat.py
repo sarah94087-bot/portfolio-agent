@@ -50,7 +50,7 @@ from portfolio_agent.ingest import Doc, load
 from portfolio_agent.providers.base import NeedsFallback
 from portfolio_agent.providers.openai_compat import ProviderError
 from portfolio_agent.providers.router import AllModelsFailed, from_env
-from portfolio_agent.retrieval import embedder
+from portfolio_agent.retrieval import embedder, rerank
 from portfolio_agent.tools.portfolio import GET_PROJECT, SEARCH, PortfolioContext
 from portfolio_agent.tools.registry import Registry
 
@@ -82,6 +82,11 @@ def _http() -> httpx.AsyncClient:
 
 
 @cache
+def _ranker() -> rerank.GroqRanker | None:
+    return rerank.from_env(httpx.Client())
+
+
+@cache
 def _docs() -> list[Doc]:
     return load()
 
@@ -93,6 +98,7 @@ class Deps:
     database_url: Callable[[], str | None] = lambda: Settings.from_env().database_url
     provider: Callable[[ProviderQuota], Any] = lambda quota: _router().for_turn(quota)
     embedder: Callable[[], Any] = embedder.from_env
+    ranker: Callable[[], Any] = _ranker  # None without a Groq key: the search stays R3
     docs: Callable[[], list[Doc]] = _docs
     agent_enabled: Callable[[], bool] = lambda: Settings.from_env().agent_enabled
     limits: Callable[[], Limits] = Limits.from_env
@@ -250,8 +256,9 @@ async def _answer(req: ChatRequest, deps: Deps, caller: Caller, out: _Out) -> No
                                 "prompt_version": prompt.VERSION})
 
         docs = deps.docs()
-        ctx = PortfolioContext.from_docs(conn, docs, embedder=deps.embedder(), table=deps.table)
         quota = ProviderQuota(conn, now, limits)
+        ctx = PortfolioContext.from_docs(conn, docs, embedder=deps.embedder(), table=deps.table,
+                                         ranker=deps.ranker(), quota=quota, question=req.message)
         provider = deps.provider(quota)
         try:
             result = await run_turn(
@@ -275,8 +282,10 @@ async def _answer(req: ChatRequest, deps: Deps, caller: Caller, out: _Out) -> No
         out.dropped = result.dropped
         model = result.models[-1] if result.models else None
         if model:  # all of the turn's tokens go to the model that finished it; a switch is rare
-            quota.spend(model, result.usage.get("input_tokens", 0)
-                        + result.usage.get("output_tokens", 0))
+            # Under the router's name for it, as the provider reports a shorter one: a model
+            # past its visitor share is closed by that name (quotas.ProviderQuota.closed).
+            quota.spend(getattr(provider, "current", None) or model,
+                        result.usage.get("input_tokens", 0) + result.usage.get("output_tokens", 0))
         # The same message sent twice at once: the other request saved it, and that is fine.
         with contextlib.suppress(psycopg.errors.UniqueViolation):
             db.save_answer(

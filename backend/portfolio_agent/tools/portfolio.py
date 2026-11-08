@@ -5,9 +5,10 @@ docs/04-retrieval-design.md, section 8: at most 5 chunks and 3,000 tokens per ca
 the chunk_id the answer cites and the scores the trace panel shows.
 
 Retrieval is the configuration M3 chose: R3 (ADR-0011) with e5-small (ADR-0012) and Q1 with
-the owner's name stripped (ADR-0013). R4 is still being evaluated, so `rerank` is null. Without
-an embedder (tests, or before the embedding migration), the search runs R1 alone and says so in
-the trace, rather than failing.
+the owner's name stripped (ADR-0013), then R4 (ADR-0014). `method` in the trace is the one that
+ordered the results: R3 when the reranker is off or failed, and `rerank.fallback` says why.
+Without an embedder (tests, or before the embedding migration), the search runs R1 alone and
+says so in the trace, rather than failing.
 """
 
 import json
@@ -25,6 +26,7 @@ from portfolio_agent.ingest import Doc, count_tokens
 from portfolio_agent.retrieval import hybrid, lexical
 from portfolio_agent.retrieval.lexical import CANDIDATES, Hit
 from portfolio_agent.retrieval.query import name_pattern, owner_names, strip_names
+from portfolio_agent.retrieval.rerank import Quota, Ranker, rerank
 from portfolio_agent.tools.registry import Tool, ToolResult
 
 MAX_RESULTS = 5
@@ -50,6 +52,9 @@ class PortfolioContext:
     names: tuple[str, ...]
     embedder: Embedder | None = None
     table: str = "chunks"
+    ranker: Ranker | None = None
+    quota: Quota | None = None
+    question: str = ""  # the visitor's own words, which the reranker reads with the query
 
     @classmethod
     def from_docs(cls, conn: psycopg.Connection, docs: Sequence[Doc], **kw) -> "PortfolioContext":
@@ -136,14 +141,26 @@ def search_portfolio(args: SearchArgs, ctx: PortfolioContext) -> ToolResult:
         wanted = set(args.types)
         hits = [h for h in hits
                 if (r := ctx.records.get(h.record_id)) is not None and r.type in wanted]
+    reranked = None
+    if method == "R3" and ctx.ranker is not None and ctx.quota is not None and len(hits) > 1:
+        started = time.perf_counter()
+        outcome = rerank(hits, ctx.question or query, query, ctx.ranker, ctx.quota)
+        timings["rerank"] = round((time.perf_counter() - started) * 1000)
+        hits = outcome.hits
+        reranked = {"model": ctx.ranker.name, "tokens": outcome.tokens,
+                    "fallback": outcome.fallback}
+        if outcome.fallback is None:
+            method = "R4"
+    order = {h.id: h.scores["rerank"] for h in hits if "rerank" in h.scores}
     kept = _within_budget(hits)
     views = [_view(h, ctx) for h in kept]
     chosen = {h.id for h in kept}
     trace = {
         "query_used": query,
         "method": method,
+        "rerank": reranked,
         "results": [
-            {**v, "rank": i, "scores": {**h.scores, "rerank": None}}
+            {**v, "rank": i, "scores": {**h.scores, "rerank": order.get(h.id)}}
             for i, (v, h) in enumerate(zip(views, kept, strict=True), start=1)
         ],
         "candidates_considered": considered,
@@ -151,7 +168,7 @@ def search_portfolio(args: SearchArgs, ctx: PortfolioContext) -> ToolResult:
         # each method, and which ones went to the model. A short excerpt, not the whole chunk.
         "candidates": [
             {"chunk_id": h.id, "record_title": _title(h, ctx), "excerpt": _excerpt(h.text),
-             "scores": {**h.scores, "rerank": None}, "selected": h.id in chosen}
+             "scores": {**h.scores, "rerank": order.get(h.id)}, "selected": h.id in chosen}
             for h in ranked
         ],
         "latency_ms": timings,

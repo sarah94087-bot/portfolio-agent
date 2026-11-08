@@ -64,7 +64,8 @@ def use(kb, monkeypatch):
         providers.extend(factories)
         monkeypatch.setattr(chat, "DEPS", chat.Deps(
             database_url=lambda: DB_URL, provider=lambda quota: providers.pop(0),
-            embedder=lambda: None, docs=lambda: kb, agent_enabled=lambda: enabled,
+            embedder=lambda: None, ranker=lambda: None, docs=lambda: kb,
+            agent_enabled=lambda: enabled,
             limits=lambda: limits or Limits(), tracer=lambda: TRACES, table=TABLE,
         ))
         BROWSER["client"] = TestClient(app)  # one visitor per test, keeping its cookie
@@ -306,6 +307,18 @@ def test_the_turn_s_tokens_are_counted_against_its_model(use):
     with psycopg.connect(DB_URL) as conn:
         assert conn.execute("select count from quota_counters where scope = 'provider_tokens'"
                             " and key = %s", (model,)).fetchone()[0] == 150
+
+
+def test_the_tokens_go_under_the_router_s_name_for_the_model(use):
+    """The router closes a model by its own name, so a shorter one would never close it."""
+    model = f"m-{uuid.uuid4().hex}"
+    provider = answer(model, {"input_tokens": 100, "output_tokens": 50})
+    provider.current = f"groq/{model}"
+    use(provider)
+    post({"message": "hi", "idempotency_key": "key-spend-2"})
+    with psycopg.connect(DB_URL) as conn:
+        assert conn.execute("select count from quota_counters where scope = 'provider_tokens'"
+                            " and key = %s", (f"groq/{model}",)).fetchone()[0] == 150
 
 
 def test_the_same_first_question_is_answered_from_the_cache_with_its_trace(use):
