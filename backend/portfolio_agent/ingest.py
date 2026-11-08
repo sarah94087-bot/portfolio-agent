@@ -300,14 +300,17 @@ class PassageEmbedder(Protocol):
 
 def embed_missing(
     conn: psycopg.Connection, chunks: list[Chunk], embedder: PassageEmbedder,
-    table: str = "chunks",
+    table: str = "chunks", every: bool = False,
 ) -> int:
     """Embeds the chunks whose row has no vector yet: new ones, and ones upsert changed. What is
-    embedded is what R1 indexes, Chunk.content, as in the M3 experiments. Returns how many."""
+    embedded is what R1 indexes, Chunk.content, as in the M3 experiments. Returns how many.
+
+    `every` replaces the existing vectors too, for when the embedding computation changes. The
+    new vectors are computed first and stored in one transaction, so search never sees a gap."""
     missing = {r[0] for r in conn.execute(
         sql.SQL("select id from {} where embedding is null").format(sql.Identifier(table))
     )}
-    todo = [c for c in chunks if c.id in missing]
+    todo = [c for c in chunks if every or c.id in missing]
     if todo:
         vectors = embedder.embed_passages([c.content for c in todo])
         store_embeddings(conn, table, {c.id: v for c, v in zip(todo, vectors, strict=True)})

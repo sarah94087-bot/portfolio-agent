@@ -6,6 +6,10 @@ unit vectors. The index and the queries must use the same files, so the files ar
 SHA-256: a different export or quantization fails to load instead of silently changing the
 results. Changing them means re-embedding every chunk (ADR-0012, consequences).
 
+One difference from the evals code, on purpose (ADR-0015): each text goes through the model
+alone. The quantized model scales a batch as a whole, so in a batch a text's vector depends on
+the texts beside it, and the index would depend on how a load happened to group them.
+
 Where the check runs (Sarah, 2026-11-05): at build and at ingest, not on every cold start,
 where it costs 0.3 to 0.5 s on top of a 1.3 s load. Until the build step exists (M5), every
 load checks; from M5 the build verifies the bundled files and from_env loads with check=False.
@@ -26,7 +30,6 @@ NAME = "multilingual-e5-small"
 DIM = 384
 MAX_LENGTH = 512
 QUERY_PREFIX, PASSAGE_PREFIX = "query: ", "passage: "
-BATCH = 16
 # The files every M3 result was measured with (hashed on 2026-11-05).
 FILES = {
     "onnx/model_quantized.onnx": "f80102d3f2a1229f387d3c81909990d8945513e347b0eab049f7de3c6f98c193",
@@ -77,7 +80,6 @@ class E5Embedder:
         )
         self.tokenizer = Tokenizer.from_file(str(model_dir / "tokenizer.json"))
         self.tokenizer.enable_truncation(MAX_LENGTH)
-        self.tokenizer.enable_padding()
         self.inputs = {i.name for i in self.session.get_inputs()}
         self.load_ms = round((time.perf_counter() - started) * 1000)
 
@@ -91,10 +93,10 @@ class E5Embedder:
         import numpy as np
 
         out: list[list[float]] = []
-        for i in range(0, len(texts), BATCH):
-            enc = self.tokenizer.encode_batch(list(texts[i : i + BATCH]))
-            ids = np.array([e.ids for e in enc], dtype=np.int64)
-            mask = np.array([e.attention_mask for e in enc], dtype=np.int64)
+        for text in texts:  # one at a time, so a vector depends only on its text (ADR-0015)
+            enc = self.tokenizer.encode(text)
+            ids = np.array([enc.ids], dtype=np.int64)
+            mask = np.array([enc.attention_mask], dtype=np.int64)
             feed = {"input_ids": ids, "attention_mask": mask}
             if "token_type_ids" in self.inputs:
                 feed["token_type_ids"] = np.zeros_like(ids)

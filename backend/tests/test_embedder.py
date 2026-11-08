@@ -5,6 +5,7 @@ import math
 import os
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -34,6 +35,28 @@ def test_without_the_env_var_there_is_no_model(monkeypatch):
     emb.from_env.cache_clear()
 
 
+def test_each_text_goes_through_the_model_alone():
+    """ADR-0015. Runs in CI, where the model files are absent."""
+    np = pytest.importorskip("numpy")
+
+    class Tokenizer:
+        def encode(self, text):
+            return SimpleNamespace(ids=[1, 2], attention_mask=[1, 1])
+
+    class Session:
+        shapes = []
+
+        def run(self, _, feed):
+            self.shapes.append(feed["input_ids"].shape)
+            return [np.ones((1, 2, emb.DIM), dtype=np.float32)]
+
+    model = object.__new__(emb.E5Embedder)
+    model.session, model.tokenizer = Session(), Tokenizer()
+    model.inputs = {"input_ids", "attention_mask"}
+    assert len(model.embed_passages(["a", "b", "c"])) == 3
+    assert Session.shapes == [(1, 2)] * 3
+
+
 @pytest.fixture(scope="module")
 def model():
     return emb.E5Embedder(Path(MODEL_DIR))
@@ -54,9 +77,17 @@ def test_query_and_passage_prefixes_give_different_vectors(model):
 
 
 @needs_model
-def test_same_vectors_as_the_embedder_the_m3_results_came_from(model, monkeypatch):
-    """The backend must reproduce evals/retrieval/embedders.py exactly, or ADR-0012's numbers
-    would not describe what runs in production."""
+def test_a_vector_depends_only_on_its_own_text(model):
+    texts = ["A short passage.", "היא בנתה חיפוש היברידי עם pgvector ו-BM25. " * 40, "Another one."]
+    together = model.embed_passages(texts)
+    assert model.embed_passages(texts[::-1])[::-1] == together
+    assert [model.embed_passages([t])[0] for t in texts] == together
+
+
+@needs_model
+def test_same_computation_as_the_embedder_the_m3_results_came_from(model, monkeypatch):
+    """Given one text at a time, the evals embedder must match exactly. It batches, so two texts
+    together would differ (ADR-0015), but the prefixes, pooling and truncation are the same."""
     evals = Path(__file__).resolve().parents[2] / "evals"
     monkeypatch.syspath_prepend(str(evals))
     monkeypatch.setenv("EMBEDDING_MODELS_DIR", str(Path(MODEL_DIR).parent))
@@ -65,8 +96,8 @@ def test_same_vectors_as_the_embedder_the_m3_results_came_from(model, monkeypatc
 
     reference = CANDIDATES["e5-small"]()
     texts = ["Human approval before an AI agent writes", "איך היא בדקה את איכות השליפה?"]
-    for got, want in zip(model.embed_passages(texts), reference.embed(texts, "passage"),
-                         strict=True):
+    for text, got in zip(texts, model.embed_passages(texts), strict=True):
+        want = reference.embed([text], "passage")[0]
         assert max(abs(a - b) for a, b in zip(got, want, strict=True)) < 1e-6
     assert max(abs(a - b) for a, b in zip(
         model.embed_query(texts[1]), reference.embed([texts[1]], "query")[0], strict=True

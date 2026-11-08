@@ -49,6 +49,21 @@ def test_a_load_writes_every_chunk_with_a_vector_and_a_second_changes_nothing(ta
     assert second["kb_version"] == first["kb_version"]
 
 
+def test_reembed_replaces_vectors_that_are_already_there(table):
+    first = load.run(DB_URL, "models", table=table, log=lambda _: None)
+    other = "[" + ",".join(["0"] + ["1"] + ["0"] * (DIM - 2)) + "]"
+    with psycopg.connect(DB_URL, autocommit=True) as conn:
+        conn.execute(f"update {table} set embedding = %s::vector", (other,))
+    out = load.run(DB_URL, "models", table=table, log=lambda _: None, reembed=True)
+    assert out["embedded"] == first["embedded"]
+    assert out["inserted"] == out["updated"] == out["deleted"] == 0
+    assert out["kb_version"] == first["kb_version"]
+    with psycopg.connect(DB_URL) as conn:
+        left = conn.execute(f"select count(*) from {table} where embedding = %s::vector",
+                            (other,)).fetchone()[0]
+    assert left == 0
+
+
 def test_a_chunk_no_longer_in_the_portfolio_is_deleted_and_shown_first(table):
     load.run(DB_URL, "models", table=table, log=lambda _: None)
     with psycopg.connect(DB_URL, autocommit=True) as conn:

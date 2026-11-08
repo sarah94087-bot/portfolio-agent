@@ -1,6 +1,6 @@
 """Load the knowledge base into the database the agent searches.
 
-    python -m portfolio_agent.load [--dry-run] [database url]
+    python -m portfolio_agent.load [--dry-run] [--reembed] [database url]
 
 The URL is the argument, or DATABASE_URL. In order:
 1. migrations (migrate.py), so the tables exist;
@@ -12,6 +12,8 @@ The URL is the argument, or DATABASE_URL. In order:
    keys on (db/cache.py), so a run says which version the agent now answers from.
 
 --dry-run reads the database and the portfolio and prints what would change, writing nothing.
+--reembed replaces every chunk's vector, not only the missing ones: for when the embedding
+computation changes and the chunks do not (ADR-0015).
 """
 
 import subprocess
@@ -58,7 +60,7 @@ def plan(conn: psycopg.Connection, chunks, table: str = "chunks") -> dict[str, l
 
 
 def run(url: str, model_dir: Path | None, dry_run: bool = False, table: str = "chunks",
-        log=print) -> dict:
+        log=print, reembed: bool = False) -> dict:
     docs = load()
     chunks = chunk(docs, STRATEGY)
     log(f"target: {where(url)}, table {table}")
@@ -68,6 +70,8 @@ def run(url: str, model_dir: Path | None, dry_run: bool = False, table: str = "c
             changes = plan(conn, chunks, table)
         for kind, ids in changes.items():
             log(f"would {kind} {len(ids)}" + (f": {', '.join(ids)}" if ids else ""))
+        if reembed:
+            log(f"would re-embed {len(chunks)}")
         return {"dry_run": True, **{k: len(v) for k, v in changes.items()}}
 
     if model_dir is None:
@@ -76,7 +80,7 @@ def run(url: str, model_dir: Path | None, dry_run: bool = False, table: str = "c
     migrate.run(url)
     with psycopg.connect(url, autocommit=True, connect_timeout=10) as conn:
         counts = upsert(conn, chunks, table, commit_sha=_commit())
-        counts["embedded"] = embed_missing(conn, chunks, e5, table)
+        counts["embedded"] = embed_missing(conn, chunks, e5, table, every=reembed)
         missing = conn.execute(sql.SQL("select count(*) from {} where embedding is null")
                                .format(sql.Identifier(table))).fetchone()[0]
         if missing:
@@ -87,13 +91,14 @@ def run(url: str, model_dir: Path | None, dry_run: bool = False, table: str = "c
 
 
 def main(argv: list[str]) -> int:
-    args = [a for a in argv[1:] if a != "--dry-run"]
+    args = [a for a in argv[1:] if a not in ("--dry-run", "--reembed")]
     url = args[0] if args else Settings.from_env().database_url
     if not url:
-        print("usage: python -m portfolio_agent.load [--dry-run] [database url]"
+        print("usage: python -m portfolio_agent.load [--dry-run] [--reembed] [database url]"
               "  (or set DATABASE_URL)")
         return 2
-    run(url, embedder.model_dir_from_env(), dry_run="--dry-run" in argv)
+    run(url, embedder.model_dir_from_env(), dry_run="--dry-run" in argv,
+        reembed="--reembed" in argv)
     return 0
 
 
