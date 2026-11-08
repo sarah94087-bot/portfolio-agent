@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { Callout, DocPage, Ext, Section, TableFrame, Term, td, th } from "@/components/ui/DocPage";
+import { DocPage, Ext, Section, TableFrame, Term, td, th } from "@/components/ui/DocPage";
 import { getDictionary, hasLocale, type Locale } from "../dictionaries";
 
 // S12 (US-12.1). This page describes what the system does today, checked against the code and
 // the migrations. Features that are not built (contact form, company links) are left out until
-// they are. When the retention job ships (M6), remove the callout and update the table.
+// they are.
 
 const cvHref = "/cv/sara-halevy-cv.pdf";
 const providers = {
@@ -24,8 +24,6 @@ const copy: Record<Locale, {
   title: string;
   lede: string;
   updated: string;
-  calloutTitle: string;
-  callout: ReactNode;
   storedTitle: string;
   columns: [string, string, string, string];
   rows: Row[];
@@ -47,8 +45,6 @@ const copy: Record<Locale, {
     title: "פרטיות",
     lede: "האתר שומר רק מה שצריך כדי לענות ולמנוע ניצול. אין חשבונות, אין פרסום ואין מעקב של צד שלישי. עדיף לא לכתוב בשיחה מידע אישי.",
     updated: "עודכן ב-8 בנובמבר 2026",
-    calloutTitle: "המחיקה האוטומטית עדיין לא פועלת",
-    callout: <>תקופות השמירה בטבלה הן היעד, והעבודה שמוחקת נתונים ישנים עדיין בבנייה. עד שתפעל, מידע נשאר גם אחרי התקופה. שיחה אפשר למחוק מיד בכפתור ״מחיקת השיחה״.</>,
     storedTitle: "מה נשמר",
     columns: ["מה", "למה", "איפה", "לכמה זמן"],
     rows: [
@@ -73,7 +69,7 @@ const copy: Record<Locale, {
     cookie: <>יש עוגייה אחת, הכרחית לפעולת האתר. היא שומרת מזהה אקראי, וקוד האתר בדפדפן לא יכול לקרוא אותה. אין עוגיות ניתוח או פרסום, ולכן אין באנר הסכמה.</>,
     deleteTitle: "מחיקת שיחה",
     deletion: <>הכפתור ״מחיקת השיחה״ מוחק מיד מהמסד את השיחה, ההודעות, הצעדים והמשוב שלה. רק מי שהשיחה קשורה לעוגייה שלו יכול למחוק אותה.</>,
-    deleteLimits: <>המחיקה לא מגיעה ללוגים של Groq, ועדיין לא מגיעה ל-Langfuse. תשובות במטמון המשותף לא נמחקות, כי אין בהן שום קשר למבקר.</>,
+    deleteLimits: <>המחיקה לא מגיעה ללוגים של Groq. עבודה יומית מוחקת מ-Langfuse את הרישומים של התשובות בשיחה. בקשה שהסתיימה בלי תשובה עלולה להשאיר שם רישום, ובו מיילים ומספרי טלפון מוסתרים. תשובות במטמון המשותף לא נמחקות, כי אין בהן שום קשר למבקר.</>,
     contactTitle: "יצירת קשר בנושא פרטיות",
     contact: <>פרטי הקשר של שרה מופיעים ב<a href={cvHref} download="Sara Halevy cv.pdf" className="text-accent underline underline-offset-3">קורות החיים</a>.</>,
   },
@@ -82,8 +78,6 @@ const copy: Record<Locale, {
     title: "Privacy",
     lede: "The site keeps only what it needs to answer and to prevent abuse. No accounts, no advertising, no third-party tracking. Please don't share personal information in the chat.",
     updated: "Updated November 8, 2026",
-    calloutTitle: "Automatic deletion is not running yet",
-    callout: <>The retention periods in the table are the target, and the job that deletes old data is still being built. Until it runs, data stays beyond those periods. A conversation can be deleted right away with the “Delete conversation” button.</>,
     storedTitle: "What is kept",
     columns: ["What", "Why", "Where", "How long"],
     rows: [
@@ -108,7 +102,7 @@ const copy: Record<Locale, {
     cookie: <>There is one cookie, required for the site to work. It holds a random id, and page scripts cannot read it. There are no analytics or advertising cookies, so there is no consent banner.</>,
     deleteTitle: "Deleting a conversation",
     deletion: <>The “Delete conversation” button immediately removes the conversation, its messages, steps and feedback from the database. Only the visitor whose cookie owns the conversation can delete it.</>,
-    deleteLimits: <>Deletion does not reach Groq’s logs, and does not reach Langfuse yet. Answers in the shared cache are not deleted, since they have no link to a visitor.</>,
+    deleteLimits: <>Deletion does not reach Groq’s logs. A daily job removes the traces of the conversation’s answers from Langfuse. A request that ended without an answer may leave a trace there, with emails and phone numbers masked. Answers in the shared cache are not deleted, since they have no link to a visitor.</>,
     contactTitle: "Privacy questions",
     contact: <>Sarah’s contact details are in her <a href={cvHref} download="Sara Halevy cv.pdf" className="text-accent underline underline-offset-3">CV</a>.</>,
   },
@@ -128,7 +122,6 @@ export default async function PrivacyPage({ params }: PageProps<"/[lang]/privacy
   return (
     <DocPage lang={lang} eyebrow={c.eyebrow} title={c.title} lede={c.lede}>
       <p className="mt-3 text-small text-text-muted">{c.updated}</p>
-      <Callout title={c.calloutTitle}>{c.callout}</Callout>
 
       <Section title={c.storedTitle}>
         <TableFrame label={c.storedTitle}>
