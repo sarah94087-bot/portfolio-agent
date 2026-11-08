@@ -150,7 +150,7 @@ def sweep_old_traces(client: httpx.Client, access: tracing.LangfuseAccess,
 
 
 def main() -> int:
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.WARNING)  # at INFO, httpx logs every request's address
     url = os.environ.get("DATABASE_URL_DIRECT") or os.environ.get("DATABASE_URL")
     if not url:
         print("DATABASE_URL_DIRECT or DATABASE_URL is required", file=sys.stderr)

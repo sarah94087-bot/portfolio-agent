@@ -2,6 +2,7 @@
 
 import base64
 import json
+import logging
 import os
 import uuid
 from datetime import UTC, date, datetime, timedelta
@@ -250,6 +251,15 @@ def test_main_needs_a_database_url(monkeypatch):
     monkeypatch.delenv("DATABASE_URL_DIRECT", raising=False)
     monkeypatch.delenv("DATABASE_URL", raising=False)
     assert retention.main() == 2
+
+
+def test_request_addresses_stay_out_of_the_public_logs(monkeypatch):
+    levels = []
+    monkeypatch.setattr(retention.logging, "basicConfig", lambda level: levels.append(level))
+    monkeypatch.delenv("DATABASE_URL_DIRECT", raising=False)
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    retention.main()
+    assert levels[0] > logging.INFO  # httpx logs each request at INFO
 
 
 def test_langfuse_access_needs_both_keys_and_keeps_only_the_origin():
