@@ -40,6 +40,12 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
   const pageLang = lang === "he" ? "he" : "en";
   const busy = turns.some((t) => t.status === "sending" || t.status === "streaming");
 
+  // Spike S2: a cold start takes about 9 s, so the page wakes the function, Neon and the
+  // embedding model while the visitor reads and types. Nothing depends on the answer.
+  useEffect(() => {
+    fetch("/api/health?warm=1", { cache: "no-store" }).catch(() => {});
+  }, []);
+
   // S3: one answer's trace at a time. Focus goes back to what opened it.
   const [trace, setTrace] = useState<{ key: string; chunkId?: string } | null>(null);
   const traceFrom = useRef<HTMLElement | null>(null);

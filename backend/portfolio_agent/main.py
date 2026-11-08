@@ -44,14 +44,31 @@ def _check_db(database_url: str) -> dict:
                 "error": type(exc).__name__}
 
 
+def _warm_embedder() -> dict:
+    """Loads the model once per instance. A failure is reported, not raised: the page only asks
+    to wake things up, and search without the model still answers, with R1."""
+    from portfolio_agent.retrieval import embedder
+
+    started = time.perf_counter()
+    try:
+        model = embedder.from_env()
+    except Exception as exc:
+        return {"ready": False, "error": type(exc).__name__}
+    return {"ready": model is not None, "ms": round((time.perf_counter() - started) * 1000)}
+
+
 @app.get("/api/health")
-def health() -> dict:
+def health(warm: bool = False) -> dict:
+    """`warm` is what the page sends when it loads (spike S2): one request wakes the function,
+    Neon and the embedding model while the visitor reads and types. Without it the check stays
+    cheap, for the uptime and smoke checks."""
     settings = Settings.from_env()
     db = _check_db(settings.database_url) if settings.database_url else {"ok": None}
     return {
         "version": __version__,
         "agent_enabled": settings.agent_enabled,
         "db": db,
+        **({"embedder": _warm_embedder()} if warm else {}),
         **_instance_info(),
     }
 
