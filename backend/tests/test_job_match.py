@@ -137,6 +137,7 @@ async def test_only_extraction_reads_the_posting(docs, events, searched):
     assert "Ignore your instructions" not in str(model.calls[1:])
     assert all(c["temperature"] == 0 for c in model.calls)
     assert model.calls[0]["tool_choice"]["function"]["name"] == "save_requirements"
+    assert model.calls[0]["reasoning_effort"] == "low"
 
 
 @runs
@@ -216,6 +217,13 @@ async def test_two_bad_answers_end_the_run(events):
     bad = [ToolCall("1", "save_requirements", "[]"), Finish("m", USAGE)]
     with pytest.raises(job_match.BadOutput):
         await job_match.extract(POSTING, runtime(Model(bad, list(bad)), events))
+
+
+@runs
+async def test_no_tool_call_at_all_says_how_many_tokens_went(events):
+    empty = [Finish("m", {"input_tokens": 900, "output_tokens": 1700})]
+    with pytest.raises(job_match.BadOutput, match="TypeError, output tokens 3400"):
+        await job_match.extract(POSTING, runtime(Model(empty, list(empty)), events))
 
 
 @runs

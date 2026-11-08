@@ -246,7 +246,8 @@ jobs:
         env:
           GROQ_API_KEY_EVALS: ${{ secrets.GROQ_API_KEY_EVALS }}
           JOBMATCH_MAX_TOKENS: ${{ inputs.max_tokens }}
-        run: python -m jobmatch.run | tee "$RUNNER_TEMP/d3.txt"
+        shell: bash  # with pipefail, so that tee does not hide a failure
+        run: python -m jobmatch.run 2>&1 | tee "$RUNNER_TEMP/d3.txt"
       - name: Keep what the run saved
         if: always() && steps.d3.outcome != 'skipped'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

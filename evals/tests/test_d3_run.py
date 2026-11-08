@@ -14,6 +14,7 @@ from jobmatch.run import (
     write_saved,
 )
 from portfolio_agent.providers.openai_compat import ProviderError
+from portfolio_agent.tools import job_match
 
 
 def job(n, labels):
@@ -127,6 +128,20 @@ def test_a_limit_from_groq_keeps_what_was_saved():
 
     drive([a, b], run, saved)
     assert list(saved) == [a.id]
+
+
+def test_a_job_with_bad_output_is_skipped_and_the_rest_run():
+    a, b = job(1, ["none"]), job(2, ["none"])
+    saved = {}
+
+    async def run(j):
+        if j is a:
+            raise job_match.BadOutput("job.rate: TypeError")
+        return row(j, ["none"])
+
+    drive([a, b], run, saved)
+    assert list(saved) == [b.id]
+    assert metrics([a, b], saved)["jobs"] == 1
 
 
 def test_saved_results_of_other_prompts_are_ignored(tmp_path):

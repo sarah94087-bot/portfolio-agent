@@ -101,3 +101,25 @@ def test_a_timeout_or_a_dropped_connection_is_unavailable():
 
 def test_classify_without_retry_after():
     assert classify(429, "per minute", httpx.Headers()).retry_after is None
+
+
+def effort_sent(model_name):
+    seen = {}
+
+    def handler(request):
+        seen["body"] = json.loads(request.content)
+        return httpx.Response(200, text=sse({"choices": [], "usage": {}}))
+
+    async def go():
+        endpoint = Endpoint("groq/x", "https://api.example.test/openai/v1", "k", model_name)
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            model = OpenAICompatible(endpoint, client)
+            return [e async for e in model.stream([], [], reasoning_effort="low")]
+
+    asyncio.run(go())
+    return seen["body"].get("reasoning_effort")
+
+
+def test_reasoning_effort_goes_only_to_models_that_take_it():
+    assert effort_sent("openai/gpt-oss-120b") == "low"
+    assert effort_sent("qwen/qwen3.8-27b") is None

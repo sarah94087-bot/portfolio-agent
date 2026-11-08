@@ -195,6 +195,10 @@ async def run_all(
         except ProviderError as e:
             print(f"stopping at {job.id}: {e}", flush=True)
             return
+        except job_match.BadOutput as e:  # not saved, so the job shows as not run
+            print(f"{job.id} failed: {e}", flush=True)
+            spent += JOB_ESTIMATE
+            continue
         save()
         spent += saved[job.id]["tokens"]
         print(f"{job.id}: {saved[job.id]['tokens']} tokens", flush=True)

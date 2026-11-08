@@ -47,7 +47,9 @@ TRIES = 2  # Groq answers 400 when a model's tool call fails validation, about 1
 EXTRACT_MAX_OUTPUT = 1500
 SUMMARY_MAX_OUTPUT = 500
 # Out of docs/06's 1,500: a rationale of up to 25 words, in Hebrew too, for up to 15 requirements.
-RATE_BASE_OUTPUT = 400
+# The base is for reasoning, which comes out of the same limit: at 400, the first live run got
+# no tool call at all for a job of 10 requirements, twice (ADR-0016).
+RATE_BASE_OUTPUT = 1200
 RATE_OUTPUT_PER_REQUIREMENT = 130
 
 Lang = Literal["he", "en"]
@@ -230,7 +232,8 @@ async def _ask(rt: JobRuntime, name: str, system: str, user: str, tool: dict[str
     `parse` made of the tool's arguments (or of the text, without a tool) and the step summary."""
     messages: list[Message] = [{"role": "system", "content": system},
                                {"role": "user", "content": user}]
-    options: dict[str, Any] = {"temperature": 0, "max_tokens": max_tokens}
+    options: dict[str, Any] = {"temperature": 0, "max_tokens": max_tokens,
+                               "reasoning_effort": "low"}
     if tool:
         options["tool_choice"] = {"type": "function",
                                   "function": {"name": tool["function"]["name"]}}
@@ -276,7 +279,7 @@ async def _ask(rt: JobRuntime, name: str, system: str, user: str, tool: dict[str
                                "duration_ms": _ms(started), "summary": summary})
         return parsed, summary
     rt.add_usage(total)
-    raise BadOutput(f"{name}: {type(error).__name__}")
+    raise BadOutput(f"{name}: {type(error).__name__}, output tokens {total.get('output_tokens')}")
 
 
 def _ms(started: float) -> int:

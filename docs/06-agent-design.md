@@ -154,7 +154,7 @@ Groq qwen3.8-27b ──► Groq gpt-oss-20b   (בלי Gemini, ADR-0009)
 | פרמטר | תשובות | `match_job` |
 |---|---|---|
 | temperature | 0.2 | 0 |
-| max output tokens | 800 | 1,500. דירוג: `400 + 130 × n` דרישות (ADR-0016) |
+| max output tokens | 800 | 1,500. דירוג: `1,200 + 130 × n` דרישות (ADR-0016) |
 
 ## 5. ניהול הקשר
 
