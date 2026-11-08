@@ -64,6 +64,11 @@
 }
 
 @layer base {
+  /* The header is sticky on every page: what gets focus or is scrolled to stops under it. */
+  html {
+    scroll-padding-top: 80px;
+  }
+
   body {
     background: var(--surface);
     color: var(--text);
@@ -94,6 +99,19 @@
       animation-duration: 0.01ms !important;
       transition-duration: 0.01ms !important;
     }
+  }
+}
+
+/* A short window, as at 400% zoom: the sticky header and composer would leave no room for the
+   conversation (WCAG 1.4.10), so they scroll with the page. */
+@media (max-height: 30rem) {
+  header,
+  [data-dock] {
+    position: static !important;
+  }
+
+  html {
+    scroll-padding: 0 !important;
   }
 }
 

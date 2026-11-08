@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 import type { Dictionary } from "@/app/[lang]/dictionaries";
 import { Button } from "@/components/ui/Button";
@@ -60,8 +60,12 @@ export function Feedback({ messageId, lang, t }: { messageId: string; lang: stri
 
   function openPanel() {
     setPanel(true);
-    requestAnimationFrame(() => fieldRef.current?.focus());
   }
+
+  // After the rating's request the field may not exist yet on the next frame, so focus waits for it.
+  useEffect(() => {
+    if (panel) fieldRef.current?.focus();
+  }, [panel]);
 
   function closePanel() {
     setPanel(false);
