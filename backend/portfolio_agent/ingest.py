@@ -119,6 +119,8 @@ def load(portfolio_dir: Path = PORTFOLIO_DIR) -> list[Doc]:
         record, _ = check_file(path)
         _, body = split(path.read_text(encoding="utf-8"))
         docs.append(Doc(record, with_metrics(record, doc_sections(body))))
+    if not docs:
+        raise IngestError(f"no records in {portfolio_dir}")
     return docs
 
 

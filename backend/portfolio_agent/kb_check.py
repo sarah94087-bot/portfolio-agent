@@ -15,7 +15,10 @@ from typing import Annotated, Literal
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
-PORTFOLIO_DIR = Path(__file__).resolve().parent.parent.parent / "portfolio"
+REPO_PORTFOLIO_DIR = Path(__file__).resolve().parent.parent.parent / "portfolio"
+BUNDLED_PORTFOLIO_DIR = Path(__file__).resolve().parent / "knowledge"  # bundle.py, on Vercel
+# The repo's records when they are there, so a local run can never read a stale copy.
+PORTFOLIO_DIR = REPO_PORTFOLIO_DIR if REPO_PORTFOLIO_DIR.is_dir() else BUNDLED_PORTFOLIO_DIR
 
 SLUG = r"^[a-z0-9]+(-[a-z0-9]+)*$"
 Text = Annotated[str, Field(min_length=1)]

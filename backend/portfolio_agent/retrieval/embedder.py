@@ -12,7 +12,7 @@ the texts beside it, and the index would depend on how a load happened to group 
 
 Where the check runs (Sarah, 2026-11-05): at build and at ingest, not on every cold start,
 where it costs 0.3 to 0.5 s on top of a 1.3 s load. The Vercel build downloads the files into
-BUNDLED_DIR and checks them as they arrive (fetch_model --bundle), so from_env loads those
+BUNDLED_DIR and checks them as they arrive (bundle.py), so from_env loads those
 with check=False. A folder given by EMBEDDING_MODEL_DIR is still checked.
 
 The model files are not in the repo (130 MB). EMBEDDING_MODEL_DIR, or BUNDLED_DIR on Vercel, is

@@ -34,10 +34,11 @@ include = ["portfolio_agent", "portfolio_agent.*"]
 [tool.setuptools.package-data]
 "portfolio_agent.agent" = ["prompts/*.md"]
 
-# The Vercel build (ADR-0012): the model files are not in the repo, so the build fetches them,
-# checked against the pinned hashes. It runs after the dependencies are installed.
+# The Vercel build (ADR-0012): the knowledge base sits outside this service and the model files
+# are not in the repo, so the build puts both beside the code, the model checked against the
+# pinned hashes. It runs after the dependencies are installed.
 [tool.vercel.scripts]
-build = "python -m portfolio_agent.retrieval.fetch_model --bundle"
+build = "python -m portfolio_agent.bundle"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

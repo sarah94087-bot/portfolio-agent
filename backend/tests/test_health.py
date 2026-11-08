@@ -2,6 +2,7 @@
 
 from fastapi.testclient import TestClient
 
+from portfolio_agent import chat
 from portfolio_agent.main import app
 from portfolio_agent.retrieval import embedder
 
@@ -28,6 +29,18 @@ def test_warm_loads_the_model_and_says_so(monkeypatch):
 def test_warm_without_model_files_is_not_ready(monkeypatch):
     monkeypatch.setattr(embedder, "from_env", lambda: None)
     assert client.get("/api/health?warm=1").json()["embedder"]["ready"] is False
+
+
+def test_warm_reports_the_records_it_loaded():
+    knowledge = client.get("/api/health?warm=1").json()["knowledge"]
+    assert knowledge["ready"] is True and knowledge["records"] > 0
+
+
+def test_warm_without_a_knowledge_base_is_not_ready(monkeypatch):
+    monkeypatch.setattr(chat.DEPS, "docs", lambda: [])  # what production had: no profile record
+    response = client.get("/api/health?warm=1")
+    assert response.status_code == 200
+    assert response.json()["knowledge"] == {"ready": False, "error": "ValueError"}
 
 
 def test_a_model_that_fails_to_load_is_reported_not_raised(monkeypatch):

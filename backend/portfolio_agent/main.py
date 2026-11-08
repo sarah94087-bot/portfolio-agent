@@ -57,6 +57,19 @@ def _warm_embedder() -> dict:
     return {"ready": model is not None, "ms": round((time.perf_counter() - started) * 1000)}
 
 
+def _warm_knowledge() -> dict:
+    """Loads the records once per instance, and checks what a chat turn needs from them first:
+    the profile's name. The deploy's smoke test reads this, at no cost in model tokens."""
+    from portfolio_agent.retrieval.query import owner_names
+
+    try:
+        docs = chat.DEPS.docs()
+        owner_names(d.record for d in docs)
+    except Exception as exc:
+        return {"ready": False, "error": type(exc).__name__}
+    return {"ready": True, "records": len(docs)}
+
+
 @app.get("/api/health")
 def health(warm: bool = False) -> dict:
     """`warm` is what the page sends when it loads (spike S2): one request wakes the function,
@@ -68,7 +81,7 @@ def health(warm: bool = False) -> dict:
         "version": __version__,
         "agent_enabled": settings.agent_enabled,
         "db": db,
-        **({"embedder": _warm_embedder()} if warm else {}),
+        **({"embedder": _warm_embedder(), "knowledge": _warm_knowledge()} if warm else {}),
         **_instance_info(),
     }
 

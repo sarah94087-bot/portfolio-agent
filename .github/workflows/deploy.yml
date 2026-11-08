@@ -5,7 +5,7 @@
 #
 # It spends no model tokens. The smoke test will add the fixed cached question of docs/10 once
 # the response cache holds it; until then it checks health, the page and that the embedding
-# model loads (/api/health?warm=1).
+# model and the knowledge base load (/api/health?warm=1).
 #
 # After a rollback Vercel stops assigning new deployments to the production domain. Check why it
 # failed, then give production back with `vercel promote <deployment url>`.
@@ -76,7 +76,8 @@ jobs:
                   last = (health.status_code, page.status_code, health.text[:300])
                   body = health.json() if health.status_code == 200 else {}
                   if (page.status_code == 200 and body.get("db", {}).get("ok")
-                          and body.get("embedder", {}).get("ready")):
+                          and body.get("embedder", {}).get("ready")
+                          and body.get("knowledge", {}).get("ready")):
                       print("ok", last)
                       raise SystemExit(0)
               except httpx.HTTPError as exc:
