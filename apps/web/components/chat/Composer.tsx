@@ -124,7 +124,7 @@ export const Composer = forwardRef<HTMLTextAreaElement, Props>(function Composer
         <div className="flex flex-wrap items-center gap-2.5">
           <span className="inline-flex items-center rounded-full bg-accent px-[9px] py-px text-[12px] font-bold text-on-accent">{t.jobMode}</span>
           <span id={`${id}-hint`} className="text-[13px] text-text-muted">{t.jobHint}</span>
-          <span className={`mono ms-auto text-[12.5px] ${over ? "font-medium text-text" : "text-text-muted"}`}>
+          <span dir="ltr" className={`mono ms-auto text-[12.5px] ${over ? "font-medium text-text" : "text-text-muted"}`}>
             {fmt(length)} / {fmt(limit)}
           </span>
         </div>

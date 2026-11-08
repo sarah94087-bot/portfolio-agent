@@ -32,7 +32,7 @@ function JobProgress({ stages, t, lang }: { stages: Stage[]; t: ChatStrings; lan
               {s.state === "wait" && <span className="size-2.5 rounded-full border-[1.5px] border-text-muted" />}
             </span>
             {t.job.stages[s.key]}
-            <span className="mono ms-auto text-[12.5px] font-normal text-text-muted">{note(s)}</span>
+            <span dir={s.key === "evidence" ? "ltr" : undefined} className="ms-auto text-[12.5px] font-normal text-text-muted">{note(s)}</span>
           </li>
         ))}
       </ol>

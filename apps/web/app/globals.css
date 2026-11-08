@@ -144,6 +144,7 @@
 #report-print table { width: 100%; border-collapse: collapse; }
 #report-print th { padding: 6px 8px; text-align: start; border-block-end: 1.5pt solid #000; }
 #report-print td { padding: 7px 8px; vertical-align: top; border-block-end: 0.5pt solid #999; line-height: 1.45; }
+#report-print td:nth-child(2) { white-space: nowrap; }
 #report-print tr { break-inside: avoid; }
 #report-print .print-summary { font-size: 11.5pt; line-height: 1.6; }
 #report-print .print-foot { margin-block-start: 14px; border-block-start: 0.5pt solid #000; padding-block-start: 8px; font-size: 9.5pt; }
