@@ -5,6 +5,10 @@ minute (or for Retry-After); one whose day ran out is skipped until the reset. R
 come later go straight to the next model, without spending a call to learn the same thing.
 A 5xx or a timeout moves the call to the next model without opening the breaker for long.
 
+A minute limit that clears within seconds is waited out, before anything was sent and for at
+most MAX_MINUTE_WAIT in a turn: one question can pass 8,000 tokens by a little, and a short
+pause keeps the best model on the answer. Only after that does the call move on.
+
 A failure before the first event is invisible to the visitor. After text was sent, the router
 yields Restart and the next model answers the same round from the start, and the loop tells
 the visitor so: transparency is a pillar, so the switch is shown, not hidden.
@@ -14,9 +18,10 @@ A day limit is written to quota_counters through a QuotaStore (guards/quotas.py)
 the start of every turn, so it survives a cold start and every instance skips the model.
 """
 
+import asyncio
 import os
 import time
-from collections.abc import AsyncIterator, Callable, Sequence
+from collections.abc import AsyncIterator, Awaitable, Callable, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
@@ -28,6 +33,7 @@ from portfolio_agent.providers.openai_compat import Endpoint, OpenAICompatible, 
 MINUTE = 60.0
 DAY_FALLBACK = 3600.0  # when a day limit gives no Retry-After, look again in an hour
 UNAVAILABLE_PAUSE = 10.0  # a 5xx or timeout: a short pause, not a long one
+MAX_MINUTE_WAIT = 10.0  # seconds one turn may wait for a minute limit before switching model
 GROQ_BASE = "https://api.groq.com/openai/v1"
 
 
@@ -66,6 +72,7 @@ class Router:
     models: list[Model]
     clock: Callable[[], float] = time.monotonic
     wall: Callable[[], float] = time.time
+    sleep: Callable[[float], Awaitable[None]] = asyncio.sleep
     closed_until: dict[str, float] = field(default_factory=dict)  # model name -> time
     open_reason: dict[str, str] = field(default_factory=dict)
 
@@ -108,6 +115,16 @@ class TurnRouter:
     dropped: set[str] = field(default_factory=set)
     current: str | None = None
     switches: list[dict[str, str]] = field(default_factory=list)  # for the trace and usage
+    waited: float = 0.0  # seconds this turn already spent waiting for a minute limit
+
+    async def _waited_out(self, error: ProviderError) -> bool:
+        """Waits when the limit clears soon enough. False means move on to the next model."""
+        pause = error.retry_after
+        if error.kind != "rate_minute" or pause is None or self.waited + pause > MAX_MINUTE_WAIT:
+            return False
+        self.waited += pause
+        await self.router.sleep(pause)
+        return True
 
     def fall_back(self, reason: str) -> None:
         """Called by the loop after the second invalid tool call (section 1)."""
@@ -132,19 +149,25 @@ class TurnRouter:
                 yield Restart(failed_after_text[0], model.name, failed_after_text[1])
                 failed_after_text = None
             self.current = model.name
-            try:
-                async for event in model.stream(messages, tools):
-                    started = True
-                    yield event
-                return
-            except ProviderError as e:
-                if e.kind == "bad_request":
-                    raise  # the request itself is wrong; another model would fail the same
-                self.router.trip(model, e, self.store)
-                attempts.append((model.name, e.kind))
-                self.switches.append({"from": model.name, "reason": e.kind})
-                if started:
-                    failed_after_text = (model.name, e.kind)
+            retried = False
+            while True:
+                try:
+                    async for event in model.stream(messages, tools):
+                        started = True
+                        yield event
+                    return
+                except ProviderError as e:
+                    if e.kind == "bad_request":
+                        raise  # the request itself is wrong; another model would fail the same
+                    if not started and not retried and await self._waited_out(e):
+                        retried = True
+                        continue
+                    self.router.trip(model, e, self.store)
+                    attempts.append((model.name, e.kind))
+                    self.switches.append({"from": model.name, "reason": e.kind})
+                    if started:
+                        failed_after_text = (model.name, e.kind)
+                    break
         quota = attempts and all(kind.startswith("rate_") for _, kind in attempts)
         if not attempts:  # every model was already closed before this call
             reasons = [self.router.open_reason.get(m.name, "") for m in self.router.models]

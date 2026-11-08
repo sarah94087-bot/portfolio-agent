@@ -8,6 +8,7 @@ from portfolio_agent.providers.base import Finish, NeedsFallback, TextDelta
 from portfolio_agent.providers.openai_compat import ProviderError
 from portfolio_agent.providers.router import (
     DAY_FALLBACK,
+    MAX_MINUTE_WAIT,
     MINUTE,
     AllModelsFailed,
     Restart,
@@ -64,6 +65,83 @@ def test_a_minute_limit_skips_the_model_for_a_minute_then_it_is_back():
     clock.t += MINUTE + 1
     a.fail = None
     assert text(run(router.for_turn())) == "a"
+
+
+class Busy(Fake):
+    """A minute limit on the first `times` calls, then a normal answer."""
+
+    def __init__(self, name, retry_after, times=1):
+        super().__init__(name)
+        self.pause, self.times = retry_after, times
+
+    async def stream(self, messages, tools):
+        if self.calls < self.times:
+            self.calls += 1
+            raise ProviderError("rate_minute", "x", self.pause)
+        async for event in super().stream(messages, tools):
+            yield event
+
+
+def sleeper():
+    slept = []
+
+    async def sleep(seconds):
+        slept.append(seconds)
+    return slept, sleep
+
+
+def test_a_short_minute_limit_is_waited_out_on_the_same_model():
+    slept, sleep = sleeper()
+    a, b = Busy("a", 7.0), Fake("b")
+    turn = Router([a, b], sleep=sleep).for_turn()
+    assert text(run(turn)) == "a" and b.calls == 0
+    assert slept == [7.0] and turn.switches == []
+
+
+def test_a_long_minute_limit_moves_on_without_waiting():
+    slept, sleep = sleeper()
+    a, b = Busy("a", MAX_MINUTE_WAIT + 1), Fake("b")
+    assert text(run(Router([a, b], sleep=sleep).for_turn())) == "b"
+    assert slept == []
+
+
+def test_a_minute_limit_without_retry_after_moves_on_without_waiting():
+    slept, sleep = sleeper()
+    a, b = Fake("a", "rate_minute"), Fake("b")
+    assert text(run(Router([a, b], sleep=sleep).for_turn())) == "b"
+    assert slept == []
+
+
+def test_a_model_is_waited_for_once_in_a_call():
+    slept, sleep = sleeper()
+    a, b = Busy("a", 2.0, times=2), Fake("b")
+    assert text(run(Router([a, b], sleep=sleep).for_turn())) == "b"
+    assert slept == [2.0] and a.calls == 2
+
+
+def test_the_waits_of_one_turn_are_capped_together():
+    slept, sleep = sleeper()
+    a, b, c = Busy("a", 7.0), Busy("b", 7.0), Fake("c")
+    turn = Router([a, b, c], sleep=sleep).for_turn()
+    assert text(run(turn)) == "a" and slept == [7.0]
+    a.calls, a.times = 0, 1
+    # A second 7 seconds would pass the cap: a is left at once, and b does not wait either.
+    b.times = 0
+    assert text(run(turn)) == "b" and slept == [7.0]
+
+
+def test_a_limit_after_text_was_sent_does_not_wait():
+    slept, sleep = sleeper()
+    a, b = Fake("a", "rate_minute", after=1, retry_after=2.0), Fake("b")
+    events = run(Router([a, b], sleep=sleep).for_turn())
+    assert slept == [] and any(isinstance(e, Restart) for e in events)
+
+
+def test_a_day_limit_is_not_waited_out():
+    slept, sleep = sleeper()
+    a, b = Fake("a", "rate_day", retry_after=2.0), Fake("b")
+    assert text(run(Router([a, b], sleep=sleep).for_turn())) == "b"
+    assert slept == []
 
 
 def test_a_day_limit_waits_for_retry_after_or_an_hour():

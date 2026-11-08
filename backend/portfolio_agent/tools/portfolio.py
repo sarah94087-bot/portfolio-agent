@@ -55,6 +55,11 @@ class PortfolioContext:
     ranker: Ranker | None = None
     quota: Quota | None = None
     question: str = ""  # the visitor's own words, which the reranker reads with the query
+    # A search this turn returned at least one whole record. Then get_project is not offered:
+    # asking for the record again costs a round against Groq's 8,000 tokens a minute. The model
+    # can still reach another project by searching for it. The tool is removed, and its enum
+    # is not narrowed, since Groq answers 400 to a tool call outside the schema's enum.
+    has_whole_record: bool = False
 
     @classmethod
     def from_docs(cls, conn: psycopg.Connection, docs: Sequence[Doc], **kw) -> "PortfolioContext":
@@ -155,6 +160,7 @@ def search_portfolio(args: SearchArgs, ctx: PortfolioContext) -> ToolResult:
             method = "R4"
     order = {h.id: h.scores["rerank"] for h in hits if "rerank" in h.scores}
     kept = _within_budget(hits)
+    ctx.has_whole_record = ctx.has_whole_record or any(h.id.endswith("#all") for h in kept)
     views = [_view(h, ctx) for h in kept]
     chosen = {h.id for h in kept}
     trace = {
@@ -219,4 +225,5 @@ GET_PROJECT = Tool(
     params=ProjectArgs,
     handler=get_project,
     schema_extra=lambda ctx: {"id": {"enum": ctx.project_ids()}},
+    offered=lambda ctx: not ctx.has_whole_record,
 )

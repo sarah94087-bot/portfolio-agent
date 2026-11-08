@@ -132,6 +132,27 @@ def test_one_candidate_needs_no_ranking(searched):
     assert ranker.got is None and trace["method"] == "R3" and trace["rerank"] is None
 
 
+def offered_after(monkeypatch, *hits):
+    monkeypatch.setattr(portfolio.hybrid, "search", lambda *a, **k: list(hits))
+    records = {h.record_id: Record(h.record_id, "project", h.record_id) for h in hits}
+    ctx = PortfolioContext(None, records, (), embedder=Embedder())
+    before = [s["function"]["name"] for s in REGISTRY.schemas(ctx)]
+    portfolio.search_portfolio(portfolio.SearchArgs(query="q"), ctx)
+    return before, [s["function"]["name"] for s in REGISTRY.schemas(ctx)]
+
+
+def test_after_a_whole_record_get_project_is_not_offered(monkeypatch):
+    before, after = offered_after(monkeypatch, fused(1))
+    assert before == ["search_portfolio", "get_project"]
+    assert after == ["search_portfolio"]
+
+
+def test_after_only_parts_of_records_get_project_is_still_offered(monkeypatch):
+    part = Hit("r1#decisions", "r1", ("decisions",), "text", {"lexical": 0.1, "rrf": 0.3})
+    _, after = offered_after(monkeypatch, part)
+    assert after == ["search_portfolio", "get_project"]
+
+
 @pytest.fixture(scope="module")
 def docs():
     return load()

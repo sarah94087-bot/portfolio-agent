@@ -41,6 +41,8 @@ class Tool:
     # Extra JSON schema merged into the generated one, for values only known at runtime,
     # such as the enum of record ids (built at ingestion, section 3).
     schema_extra: Callable[[Any], dict[str, Any]] | None = None
+    # Whether the model is offered the tool in the next round. A round costs a whole prompt.
+    offered: Callable[[Any], bool] | None = None
 
     def schema(self, ctx: Any) -> dict[str, Any]:
         params = self.params.model_json_schema()
@@ -80,7 +82,8 @@ class Registry:
         return registry
 
     def schemas(self, ctx: Any) -> list[dict[str, Any]]:
-        return [tool.schema(ctx) for tool in self.tools.values()]
+        return [tool.schema(ctx) for tool in self.tools.values()
+                if tool.offered is None or tool.offered(ctx)]
 
     def call(self, name: str, raw_args: str | dict[str, Any], ctx: Any) -> ToolResult:
         started = time.perf_counter()
