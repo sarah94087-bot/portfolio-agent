@@ -11,7 +11,15 @@ import { answer, ev, failure, meta, TEXT } from "./support/recordings";
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"];
 
 async function check(page: Page, state: string) {
+  // Anything can slide under a sticky bar at some scroll position, and axe would then call it a
+  // small target. Scanned with the bars in the flow, the result does not depend on scrolling;
+  // what is really hidden from the keyboard is keyboard.spec.ts's job.
+  const bars = (position: string) => page.evaluate((p) => {
+    document.querySelectorAll<HTMLElement>("header, [data-dock]").forEach((el) => { el.style.position = p; });
+  }, position);
+  await bars("static");
   const { violations } = await new AxeBuilder({ page }).withTags(TAGS).analyze();
+  await bars("");
   const found = violations.map((v) => ({
     rule: v.id,
     impact: v.impact,
