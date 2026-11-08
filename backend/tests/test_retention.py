@@ -259,3 +259,128 @@ def test_langfuse_access_needs_both_keys_and_keeps_only_the_origin():
         "LANGFUSE_HOST": "https://eu.lf.test/project/abc"})
     assert access.origin == "https://eu.lf.test"
     assert base64.b64decode(access.auth) == b"pk:sk"
+
+
+def sweep_server(pages, deleted, get_status=200, delete_status=200, gets=None):
+    """A fake Langfuse: `pages` are the bodies of successive reads."""
+    pages = list(pages)
+
+    def handler(request):
+        if request.method == "GET":
+            if gets is not None:
+                gets.append(request)
+            if get_status != 200:
+                return httpx.Response(get_status)
+            return httpx.Response(200, json=pages.pop(0))
+        deleted.append(json.loads(request.content)["traceIds"])
+        return httpx.Response(delete_status, json={"message": "ok"})
+    return handler
+
+
+def page(*trace_ids, cursor=None):
+    return {"data": [{"id": "o", "traceId": t} for t in trace_ids],
+            "meta": {"cursor": cursor} if cursor else {}}
+
+
+def test_the_sweep_window_stays_inside_the_30_days_langfuse_can_read():
+    assert retention.SWEEP_NEWEST < retention.SWEEP_OLDEST < retention.CONVERSATIONS
+    assert timedelta(days=1) < retention.SWEEP_OLDEST - retention.SWEEP_NEWEST  # a missed run
+
+
+def test_the_sweep_follows_cursors_and_keeps_one_window():
+    deleted, gets = [], []
+    pages = [page("a", "b", cursor="c1"), page(cursor="c2"), page("b", None, "c")]
+    with langfuse(sweep_server(pages, deleted, gets=gets)) as client:
+        assert retention.sweep_old_traces(client, ACCESS, NOW) == (3, True)
+    assert deleted == [["a", "b", "c"]]
+    assert [r.url.params.get("cursor") for r in gets] == [None, "c1", "c2"]
+    for request in gets:
+        assert request.url.path == "/api/public/v2/observations"
+        assert request.url.params["fromStartTime"] == "2026-10-09T14:23:00Z"
+        assert request.url.params["toStartTime"] == "2026-10-12T02:23:00Z"
+        assert request.url.params["fields"] == "core"
+
+
+def test_the_sweep_sends_nothing_to_delete_when_it_finds_nothing():
+    deleted = []
+    with langfuse(sweep_server([page()], deleted)) as client:
+        assert retention.sweep_old_traces(client, ACCESS, NOW) == (0, True)
+    assert deleted == []
+
+
+def test_the_sweep_batches_and_stops_at_its_share_of_the_daily_limit(monkeypatch):
+    monkeypatch.setattr(retention, "TRACE_BATCH", 2)
+    monkeypatch.setattr(retention, "MAX_SWEEP_BATCHES", 2)
+    deleted = []
+    with langfuse(sweep_server([page("a", "b", "c", "d", "e")], deleted)) as client:
+        assert retention.sweep_old_traces(client, ACCESS, NOW) == (4, True)
+    assert deleted == [["a", "b"], ["c", "d"]]
+
+
+def test_the_sweep_stops_at_the_page_limit(monkeypatch):
+    monkeypatch.setattr(retention, "MAX_SWEEP_PAGES", 2)
+    deleted, gets = [], []
+    pages = [page("a", cursor="c1"), page("b", cursor="c2"), page("never")]
+    with langfuse(sweep_server(pages, deleted, gets=gets)) as client:
+        assert retention.sweep_old_traces(client, ACCESS, NOW) == (2, True)
+    assert len(gets) == 2 and deleted == [["a", "b"]]
+
+
+@pytest.mark.parametrize("status", [401, 429, 500])
+def test_a_refused_read_deletes_nothing(status):
+    deleted = []
+    with langfuse(sweep_server([], deleted, get_status=status)) as client:
+        assert retention.sweep_old_traces(client, ACCESS, NOW) == (0, False)
+    assert deleted == []
+
+
+@pytest.mark.parametrize("body", [{}, {"data": [{}]}, {"data": None, "meta": {}}, []])
+def test_an_unexpected_read_deletes_nothing(body):
+    deleted = []
+    with langfuse(sweep_server([body], deleted)) as client:
+        assert retention.sweep_old_traces(client, ACCESS, NOW) == (0, False)
+    assert deleted == []
+
+
+def test_a_refused_sweep_delete_is_a_failure():
+    deleted = []
+    with langfuse(sweep_server([page("a")], deleted, delete_status=500)) as client:
+        assert retention.sweep_old_traces(client, ACCESS, NOW) == (0, False)
+
+
+def run_main_with_keys(monkeypatch, handler):
+    client = langfuse(handler)  # before the patch below: it replaces httpx.Client itself
+    monkeypatch.setenv("DATABASE_URL_DIRECT", DB_URL)
+    monkeypatch.setenv("LANGFUSE_PUBLIC_KEY", "pk")
+    monkeypatch.setenv("LANGFUSE_SECRET_KEY", "sk")
+    monkeypatch.setattr(retention.httpx, "Client", lambda: client)
+    return retention.main()
+
+
+def one_queued_trace():
+    """Alone in the queue, and nothing left for main's purge to add to it. Closed afterwards:
+    PGlite takes one client at a time."""
+    migrate.run(DB_URL)
+    with psycopg.connect(DB_URL, autocommit=True) as c:
+        c.execute("delete from conversations")
+        c.execute("delete from trace_deletions")
+        return enqueue(c, uuid.uuid4(), datetime.now(UTC) - timedelta(days=1))
+
+
+@needs_db
+def test_main_runs_the_queue_and_then_the_sweep(monkeypatch, capsys):
+    trace = one_queued_trace()
+    deleted = []
+    assert run_main_with_keys(monkeypatch, sweep_server([page("old")], deleted)) == 0
+    assert deleted == [[trace.hex], ["old"]]
+    out = capsys.readouterr().out
+    assert "old traces accepted for deletion: 1" in out and trace.hex not in out
+
+
+@needs_db
+def test_main_skips_the_sweep_after_a_failed_delete_and_fails(monkeypatch):
+    one_queued_trace()
+    gets = []
+    handler = sweep_server([page("old")], [], delete_status=500, gets=gets)
+    assert run_main_with_keys(monkeypatch, handler) == 1
+    assert gets == []
