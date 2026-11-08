@@ -23,7 +23,7 @@ export function LangToggle({ current, label }: { current: string; label: string 
             href={`/${o.lang}${rest}`}
             hrefLang={o.lang}
             lang={o.lang}
-            aria-label={o.name}
+            aria-label={`${o.label} ${o.name}`} // starts with what is on screen, for voice control (2.5.3)
             aria-current={active ? "page" : undefined}
             className={`flex min-h-9 min-w-10 items-center justify-center px-3 text-[14px] font-bold ${
               active ? "bg-tint-ink text-on-ink" : "text-text hover:bg-surface-sunken"

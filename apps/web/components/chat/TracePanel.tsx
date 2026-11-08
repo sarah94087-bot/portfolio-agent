@@ -334,7 +334,7 @@ export function TracePanel({ turn, index, lang, t, highlight, onClose }: Props) 
     <>
       {/* phones: a backdrop that closes the sheet; the conversation stays in view above it */}
       <div aria-hidden="true" onClick={onClose} className="fixed inset-0 top-14 z-30 md:hidden" />
-      <aside
+      <div
         role="dialog"
         aria-labelledby={`${ids}-title`}
         className="fixed inset-x-0 bottom-0 z-40 flex max-h-[70vh] flex-col rounded-t-[18px] border-t-[1.5px] border-border-strong bg-surface-raised shadow-pop
@@ -469,7 +469,7 @@ export function TracePanel({ turn, index, lang, t, highlight, onClose }: Props) 
 
           {view.events.length === 0 && events}
         </div>
-      </aside>
+      </div>
     </>
   );
 }

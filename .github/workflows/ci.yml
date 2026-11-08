@@ -67,6 +67,33 @@ jobs:
       - run: npm run build
       - run: npm audit --omit=dev --audit-level=moderate
 
+  # The screens in a real browser, on recorded streams, with axe on every page and state (M5's
+  # exit criteria, ADR-0017). No backend and no model: e2e/support/fixtures.ts blocks anything
+  # that would leave the site.
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # builds the site, starts it and runs everything in e2e/
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: failure()
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report
+          retention-days: 7
+
   # T1's cases through the real agent (database, tools, citation filter, guard and the code
   # checks), with a scripted model and no judge: no tokens, so it runs on every push. The live
   # T1, with Groq and the judge, joins once its first run is calibrated (docs/03, section 7).
