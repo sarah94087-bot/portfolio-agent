@@ -1,0 +1,89 @@
+# The only way to production (docs/10-ops-and-costs.md, section 5; automatic production deploys
+# are off in vercel.json). It runs after ci passes on main, or by hand from the Actions tab.
+# In order: migrations and the knowledge base, the deploy, a smoke test, and a rollback of the
+# deploy if the smoke test fails. Migrations are expand/contract, so they are not rolled back.
+#
+# It spends no model tokens. The smoke test will add the fixed cached question of docs/10 once
+# the response cache holds it; until then it checks health, the page and that the embedding
+# model loads (/api/health?warm=1).
+#
+# After a rollback Vercel stops assigning new deployments to the production domain. Check why it
+# failed, then give production back with `vercel promote <deployment url>`.
+#
+# Secrets: DATABASE_URL_DIRECT, VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID.
+name: deploy
+
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  SITE: https://portfolio-agent-rosy.vercel.app
+  VERCEL_CLI: vercel@65.12.1
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          # the commit ci passed on, not whatever main is by now
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: "24"
+      - run: pip install -e backend
+      # Outside the checkout, so the files are not uploaded with the source.
+      - name: Fetch the embedding model by hash
+        run: python -m portfolio_agent.retrieval.fetch_model "$RUNNER_TEMP/model"
+      - name: Migrations and the knowledge base
+        run: python -m portfolio_agent.load
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_DIRECT }}
+          EMBEDDING_MODEL_DIR: ${{ runner.temp }}/model
+      - name: Deploy
+        id: deploy
+        run: npx --yes "$VERCEL_CLI" deploy --prod --yes --token "$VERCEL_TOKEN"
+      - name: Smoke test
+        run: |
+          python - <<'EOF'
+          import os, time, httpx
+          site = os.environ["SITE"]
+          last = None
+          for _ in range(12):
+              try:
+                  health = httpx.get(f"{site}/api/health?warm=1", timeout=60)
+                  page = httpx.get(f"{site}/he", timeout=30)
+                  last = (health.status_code, page.status_code, health.text[:300])
+                  body = health.json() if health.status_code == 200 else {}
+                  if (page.status_code == 200 and body.get("db", {}).get("ok")
+                          and body.get("embedder", {}).get("ready")):
+                      print("ok", last)
+                      raise SystemExit(0)
+              except httpx.HTTPError as exc:
+                  last = repr(exc)
+              time.sleep(10)
+          raise SystemExit(f"smoke test failed: {last}")
+          EOF
+      - name: Roll back the deploy
+        if: failure() && steps.deploy.outcome == 'success'
+        run: npx --yes "$VERCEL_CLI" rollback --token "$VERCEL_TOKEN"
