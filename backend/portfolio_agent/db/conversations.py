@@ -14,6 +14,9 @@ import psycopg
 from psycopg import sql
 
 HISTORY_TURNS = 6
+# A pasted job posting is read by one model call and never again (docs/07, section 2): a later
+# turn sees that a posting was pasted and the report's summary, not the posting.
+JOB_POSTING_MARK = "[The visitor pasted a job posting here. Its text is not kept in the context.]"
 
 
 @dataclass(frozen=True)
@@ -95,10 +98,10 @@ def history(conn: psycopg.Connection, conversation_id: UUID,
             turns: int = HISTORY_TURNS, exclude: UUID | None = None) -> list[dict[str, str]]:
     """The last turns, without `exclude`: a resent question, which the loop adds itself."""
     rows = conn.execute(
-        "select role, content from messages where conversation_id = %s"
-        " and id is distinct from %s"
+        "select role, case when meta ->> 'kind' = 'job_posting' then %s else content end"
+        " from messages where conversation_id = %s and id is distinct from %s"
         " order by created_at desc, role asc limit %s",
-        (conversation_id, exclude, turns * 2),
+        (JOB_POSTING_MARK, conversation_id, exclude, turns * 2),
     ).fetchall()
     messages = [{"role": r, "content": c} for r, c in reversed(rows)]
     while messages and messages[0]["role"] != "user":  # start on a question, not an answer
@@ -116,15 +119,16 @@ def retrieved_chunks(conn: psycopg.Connection, conversation_id: UUID) -> frozens
 
 
 def save_user(conn: psycopg.Connection, conversation_id: UUID, content: str,
-              idempotency_key: str | None = None) -> UUID | None:
+              idempotency_key: str | None = None, *, job_posting: bool = False) -> UUID | None:
     """None when the same question is already saved in this conversation: the same message
     sent twice at once, and the other request saved it."""
+    meta = {"kind": "job_posting"} if job_posting else {}
     row = conn.execute(
-        "insert into messages (conversation_id, role, content, idempotency_key)"
-        " values (%s, 'user', %s, %s)"
+        "insert into messages (conversation_id, role, content, idempotency_key, meta)"
+        " values (%s, 'user', %s, %s, %s)"
         " on conflict (conversation_id, idempotency_key) where role = 'user' do nothing"
         " returning id",
-        (conversation_id, content, idempotency_key),
+        (conversation_id, content, idempotency_key, json.dumps(meta)),
     ).fetchone()
     return row[0] if row else None
 
@@ -159,6 +163,25 @@ def merge_steps(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
         key = (e.get("step_id"), e.get("status") == "restart")
         merged[key] = {**merged.get(key, {}), **{k: v for k, v in e.items() if v is not None}}
     return list(merged.values())
+
+
+@dataclass(frozen=True)
+class StoredReport:
+    conversation_id: UUID
+    meta: dict[str, Any]
+    created_at: Any
+
+
+def find_report(conn: psycopg.Connection, message_id: UUID, visitor_id: str) -> StoredReport | None:
+    """A job match report of this visitor's, for the link in the downloaded file."""
+    row = conn.execute(
+        "select m.conversation_id, m.meta, m.created_at from messages m"
+        " join conversations c on c.id = m.conversation_id"
+        " where m.id = %s and m.role = 'assistant' and c.visitor_id = %s"
+        " and m.meta ? 'card'",
+        (message_id, visitor_id),
+    ).fetchone()
+    return StoredReport(*row) if row else None
 
 
 def chunk_sources(conn: psycopg.Connection, ids: list[str], table: str = "chunks") -> list[tuple]:

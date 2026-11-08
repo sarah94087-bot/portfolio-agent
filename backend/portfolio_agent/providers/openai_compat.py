@@ -68,8 +68,10 @@ class OpenAICompatible:
         return self.endpoint.name
 
     async def stream(
-        self, messages: Sequence[Message], tools: Sequence[dict[str, Any]]
+        self, messages: Sequence[Message], tools: Sequence[dict[str, Any]], **options: Any
     ) -> AsyncIterator[Event]:
+        """`options` overrides fields of the request for one call: temperature, max_tokens and
+        tool_choice (the job match reads structured output at temperature 0)."""
         body: dict[str, Any] = {
             "model": self.endpoint.model,
             "messages": list(messages),
@@ -77,6 +79,7 @@ class OpenAICompatible:
             "stream_options": {"include_usage": True},
             "temperature": self.temperature,
             "max_tokens": self.max_tokens,
+            **options,
         }
         if tools:
             body["tools"] = list(tools)

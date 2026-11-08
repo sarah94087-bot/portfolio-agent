@@ -4,9 +4,8 @@ Each job is a description, rewritten from a public ad or written from scratch, s
 requirements the ad states. Sarah labels each requirement `strong`, `partial` or `none`; the
 agent's report is later scored against those labels (kappa, gap coverage, false strong).
 
-`overall` is the score of docs/07-advanced-capabilities.md, section 2: strong 1, partial 0.5,
-none 0, a `must` weighs twice a `nice`, shown as a category. It lives here until the job-match
-pipeline is built in code (M5), so the set can be checked for a spread of categories now.
+`score` and `overall` are the pipeline's own (portfolio_agent/tools/job_rules.py), applied to the
+labels, so the set can be checked for a spread of categories.
 """
 
 from collections import Counter
@@ -14,13 +13,12 @@ from pathlib import Path
 from typing import Literal
 
 import yaml
+from portfolio_agent.tools import job_rules
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 D3_PATH = Path(__file__).resolve().parent.parent / "datasets" / "d3.yaml"
 
 Strength = Literal["strong", "partial", "none"]
-POINTS = {"strong": 1.0, "partial": 0.5, "none": 0.0}
-WEIGHT = {"must": 2, "nice": 1}
 
 
 class Requirement(BaseModel):
@@ -61,13 +59,11 @@ class Job(BaseModel):
 
 
 def score(requirements: list[Requirement]) -> float:
-    total = sum(WEIGHT[r.kind] for r in requirements)
-    return sum(WEIGHT[r.kind] * POINTS[r.label] for r in requirements) / total
+    return job_rules.score((r.kind, r.label) for r in requirements)
 
 
 def overall(requirements: list[Requirement]) -> Literal["high", "partial", "low"]:
-    s = score(requirements)
-    return "high" if s >= 0.75 else "partial" if s >= 0.45 else "low"
+    return job_rules.overall(score(requirements))
 
 
 def load_d3(path: Path = D3_PATH) -> list[Job]:

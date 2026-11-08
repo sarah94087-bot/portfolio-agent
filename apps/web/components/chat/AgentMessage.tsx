@@ -1,160 +1,52 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import type { Dictionary } from "@/app/[lang]/dictionaries";
 import { Button } from "@/components/ui/Button";
 import { Tag } from "@/components/ui/Tag";
-import { ChevronIcon, CloseIcon, RetryIcon, SpinnerIcon, SwapIcon } from "@/components/ui/icons";
-import { blocks, runs, spoken, type Inline } from "@/lib/answer";
+import { CheckIcon, ChevronIcon, RetryIcon, SpinnerIcon, SwapIcon } from "@/components/ui/icons";
+import { blocks, spoken } from "@/lib/answer";
 import type { Source, Turn } from "@/lib/chat";
+import { jobStages, type Stage } from "@/lib/job";
 import { Feedback } from "./Feedback";
+import { JobReport } from "./JobReport";
+import { Bidi, Cite, fill, Inlines, plural, sectionLabel, SourcePopover, tone, type ChatStrings } from "./sources";
 
-export type ChatStrings = Dictionary["chat"];
+export type { ChatStrings };
 
-// One tone per source number, cycling: rose, stone, salmon (board A-S2).
-const TONES = ["bg-tint-rose text-on-rose", "bg-tint-stone text-on-stone", "bg-tint-salmon text-on-salmon"];
-const tone = (n: number) => TONES[(n - 1) % TONES.length];
-
-const fill = (s: string, n: number | string) => s.replace("{n}", String(n));
-
-function plural(lang: string, forms: { one: string; other: string }, n: number) {
-  const rule = new Intl.PluralRules(lang).select(n);
-  return fill(rule === "one" ? forms.one : forms.other, n.toLocaleString(lang));
-}
-
-/** Text with Latin words isolated: in Hebrew, "ב-pgvector" keeps its order. */
-function Bidi({ text }: { text: string }) {
+function JobProgress({ stages, t, lang }: { stages: Stage[]; t: ChatStrings; lang: string }) {
+  const note = (s: Stage) => {
+    if (s.key === "evidence" && s.done !== undefined && s.total !== undefined) {
+      return `${s.done.toLocaleString(lang)} / ${s.total.toLocaleString(lang)}`;
+    }
+    return s.key === "extract" && s.total !== undefined ? plural(lang, t.job.found, s.total) : "";
+  };
   return (
-    <>
-      {runs(text).map((r, i) => (r.latin ? <bdi key={i}>{r.text}</bdi> : r.text))}
-    </>
-  );
-}
-
-type CiteProps = {
-  n: number;
-  label: string;
-  open: boolean;
-  ready: boolean;
-  onOpen: (n: number, el: HTMLButtonElement) => void;
-};
-
-function Cite({ n, label, open, ready, onOpen }: CiteProps) {
-  return (
-    <button
-      type="button"
-      data-cite={n}
-      aria-label={label}
-      aria-expanded={ready ? open : undefined}
-      aria-haspopup={ready ? "dialog" : undefined}
-      disabled={!ready} // the sources arrive at the end of the answer
-      onClick={(e) => onOpen(n, e.currentTarget)}
-      className={`mono mx-[3px] inline-flex h-5 min-w-5 items-center justify-center rounded-sm px-1 align-[2px] text-[12px] font-medium disabled:cursor-default ${tone(n)} ${open ? "outline-2 outline-offset-1 outline-text" : ""}`}
-    >
-      {n}
-    </button>
-  );
-}
-
-function Inlines({ inlines, cite }: { inlines: Inline[]; cite: (n: number, key: number) => React.ReactNode }) {
-  return (
-    <>
-      {inlines.map((i, k) => {
-        if (i.kind === "break") return <br key={k} />;
-        if (i.kind === "cite") return cite(i.index, k);
-        return i.bold ? <strong key={k}><Bidi text={i.text} /></strong> : <Bidi key={k} text={i.text} />;
-      })}
-    </>
-  );
-}
-
-function sectionLabel(s: Source) {
-  return s.section && s.section !== "all" ? `${s.recordTitle} · ${s.section}` : s.recordTitle;
-}
-
-type PopoverProps = {
-  n: number;
-  source: Source;
-  top: number;
-  t: ChatStrings;
-  onClose: () => void;
-  onFound?: () => void; // "how was this chunk found?": the chunk's row in S3
-};
-
-// The source of one citation: a popover under the line on desktop, a bottom sheet on mobile
-// (boards A-S2 and S2-Mobile). Esc, the close button or a click outside closes it, and focus
-// goes back to the citation.
-function SourcePopover({ n, source, top, t, onClose, onFound }: PopoverProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const titleId = useId();
-  useEffect(() => {
-    ref.current?.focus();
-    const key = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    const click = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!ref.current?.contains(target) && !target.closest("[data-cite]")) onClose();
-    };
-    document.addEventListener("keydown", key);
-    document.addEventListener("mousedown", click);
-    return () => {
-      document.removeEventListener("keydown", key);
-      document.removeEventListener("mousedown", click);
-    };
-  }, [onClose]);
-
-  return (
-    <>
-      <div aria-hidden="true" className="fixed inset-0 z-20 bg-black/45 md:hidden" />
-      <div
-        ref={ref}
-        role="dialog"
-        aria-labelledby={titleId}
-        tabIndex={-1}
-        style={{ "--top": `${top}px` } as React.CSSProperties}
-        className="fixed inset-x-0 bottom-0 z-30 flex max-h-[70vh] flex-col overflow-hidden rounded-t-[18px] border-t-[1.5px] border-border-strong bg-surface-raised pb-[max(16px,env(safe-area-inset-bottom))] text-[15px] leading-[1.6] shadow-pop outline-none md:absolute md:inset-x-auto md:bottom-auto md:start-10 md:top-(--top) md:max-h-none md:w-[372px] md:rounded-lg md:border-[1.5px] md:pb-0"
-      >
-        <div className="flex justify-center pt-2 md:hidden" aria-hidden="true">
-          <span className="h-1 w-10 rounded-[2px] bg-text-muted" />
-        </div>
-        <div className={`flex items-center gap-3 px-4 py-2.5 md:py-3 ${tone(n)}`}>
-          <h2 id={titleId} className="flex-1 text-[16px] font-extrabold md:text-[15px]">
-            {n} · <Bidi text={sectionLabel(source)} />
-          </h2>
-          <button type="button" onClick={onClose} aria-label={t.close} className="-me-2 flex size-11 items-center justify-center rounded-md md:size-8">
-            <CloseIcon />
-          </button>
-        </div>
-        {/* A chunk can be a whole record (C4), so the quote scrolls inside a bounded window;
-            focusable, so the keyboard can scroll it too. Records are Markdown, rendered as the
-            answer is. */}
-        <blockquote
-          dir="auto"
-          tabIndex={0}
-          aria-label={sectionLabel(source)}
-          className="m-0 overflow-y-auto px-4 py-3.5 text-[16px] leading-[1.7] md:max-h-72 md:text-[15px] md:leading-[1.6]"
-        >
-          {blocks([{ kind: "text", text: source.text }]).map((b, i) => (
-            <p key={i} className={`mb-2 last:mb-0 ${b.kind === "li" ? "relative ps-4 before:absolute before:start-0.5 before:content-['•']" : ""} ${b.kind === "h" ? "font-extrabold" : ""}`}>
-              <Inlines inlines={b.inlines} cite={() => null} />
-            </p>
-          ))}
-        </blockquote>
-        {onFound && (
-          <div className="border-t border-border px-4 py-2.5">
-            <button type="button" onClick={onFound} className="text-[14px] font-bold text-accent underline underline-offset-2">
-              {t.trace.howFound}
-            </button>
-          </div>
-        )}
-      </div>
-    </>
+    <div aria-hidden="true" className="rounded-[14px] border border-border bg-surface-raised px-4 py-3.5">
+      <ol className="m-0 flex list-none flex-col gap-2.5 p-0 text-[15px]">
+        {stages.map((s) => (
+          <li key={s.key} className={`flex items-center gap-3 ${s.state === "wait" ? "text-text-muted" : "text-text"} ${s.state === "run" ? "font-bold" : ""}`}>
+            <span className="flex size-[22px] flex-none items-center justify-center text-accent">
+              {s.state === "done" && <CheckIcon size={18} />}
+              {s.state === "run" && <SpinnerIcon size={18} />}
+              {s.state === "wait" && <span className="size-2.5 rounded-full border-[1.5px] border-text-muted" />}
+            </span>
+            {t.job.stages[s.key]}
+            <span className="mono ms-auto text-[12.5px] font-normal text-text-muted">{note(s)}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }
 
 function status(turn: Turn, t: ChatStrings): string | null {
   if (turn.status === "sending") return t.thinking;
   if (turn.status !== "streaming") return null;
+  if (turn.job && !turn.report) {
+    const run = jobStages(turn.steps).find((s) => s.state === "run");
+    return run ? t.job.stages[run.key] : t.thinking;
+  }
   const last = turn.steps.at(-1);
   if (last?.status === "restart") return t.restarting;
   if (last?.kind === "tool_call" && last.status === "start") {
@@ -178,7 +70,7 @@ function errorText(turn: Turn, t: ChatStrings): string {
     case "provider_unavailable":
       return t.errors.unavailable;
     case "input_too_long":
-      return t.errors.tooLong;
+      return turn.job ? t.job.tooLong : t.errors.tooLong;
     default:
       return t.errors.internal;
   }
@@ -247,13 +139,14 @@ type Props = {
   lang: string;
   t: ChatStrings;
   agentName: string;
+  agentLine: string; // the first line of a printed report
   onRetry: () => void;
   traceOpen: boolean;
   // S3 opens from the details button, or at a chunk's row from a source
   onTrace: (from: HTMLElement, chunkId?: string) => void;
 };
 
-export function AgentMessage({ turn, lang, t, agentName, onRetry, traceOpen, onTrace }: Props) {
+export function AgentMessage({ turn, lang, t, agentName, agentLine, onRetry, traceOpen, onTrace }: Props) {
   const [open, setOpen] = useState<{ n: number; top: number; from: HTMLButtonElement } | null>(null);
   const [showSources, setShowSources] = useState(false);
   const [quiet, setQuiet] = useState(false);
@@ -269,7 +162,9 @@ export function AgentMessage({ turn, lang, t, agentName, onRetry, traceOpen, onT
     const id = setTimeout(() => setQuiet(true), 4000);
     return () => clearTimeout(id);
   }, [done]);
-  const announce = done && !quiet ? spoken(turn.parts) : "";
+  const announce = done && !quiet
+    ? turn.report ? `${t.job.level[turn.report.overall]}. ${turn.report.summary}` : spoken(turn.parts)
+    : "";
 
   const byIndex = new Map<number, Source>();
   for (const p of turn.parts) {
@@ -303,16 +198,36 @@ export function AgentMessage({ turn, lang, t, agentName, onRetry, traceOpen, onT
         {agentName}
       </div>
 
-      <div role="status" className={now ? "flex items-center gap-2.5 text-ui text-text-muted" : "sr-only"}>
+      <div role="status" className={now && !(turn.job && turn.status === "streaming") ? "flex items-center gap-2.5 text-ui text-text-muted" : "sr-only"}>
         {now ? (
-          <>
-            <SpinnerIcon />
-            {now}
-          </>
+          turn.job && !turn.report && turn.status !== "sending" ? (
+            <span className="sr-only">{now}</span>
+          ) : (
+            <>
+              <SpinnerIcon />
+              {now}
+            </>
+          )
         ) : (
           announce
         )}
       </div>
+
+      {turn.job && streaming && turn.steps.length > 0 && !turn.report && (
+        <JobProgress stages={jobStages(turn.steps)} t={t} lang={lang} />
+      )}
+
+      {turn.report && (
+        <JobReport
+          report={turn.report}
+          markdown={turn.markdown}
+          sources={turn.sources}
+          lang={lang}
+          t={t}
+          agentLine={agentLine}
+          onFound={turn.steps.some((s) => s.name === "search_portfolio") ? (from, chunkId) => onTrace(from, chunkId) : undefined}
+        />
+      )}
 
       {shown.length > 0 && (
         <div ref={body} className="relative">
@@ -398,11 +313,11 @@ export function AgentMessage({ turn, lang, t, agentName, onRetry, traceOpen, onT
         </div>
       )}
 
-      {(turn.status === "done" || (turn.status === "error" && turn.usage)) && (
+      {!turn.restored && (turn.status === "done" || (turn.status === "error" && turn.usage)) && (
         <TraceLine turn={turn} lang={lang} t={t} open={traceOpen} onOpen={(from) => onTrace(from)} />
       )}
 
-      {turn.status === "done" && turn.messageId && (
+      {turn.status === "done" && turn.messageId && !turn.restored && (
         <Feedback key={turn.messageId} messageId={turn.messageId} lang={lang} t={t.feedback} />
       )}
     </article>

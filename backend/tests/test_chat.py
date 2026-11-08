@@ -71,6 +71,7 @@ def use(kb, monkeypatch):
         BROWSER["client"] = TestClient(app)  # one visitor per test, keeping its cookie
         with psycopg.connect(DB_URL, autocommit=True) as conn:
             conn.execute("delete from response_cache")  # no test answers from another's
+            conn.execute("delete from quota_counters where scope = 'ip'")  # one test client
     return install
 
 

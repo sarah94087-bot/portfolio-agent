@@ -11,9 +11,10 @@ visitor sees in the trace panel (scores, timings, candidates). Keeping them apar
 data out of the model's context.
 """
 
+import inspect
 import json
 import time
-from collections.abc import Callable, Iterable
+from collections.abc import Awaitable, Callable, Iterable
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
@@ -36,7 +37,8 @@ class Tool:
     name: str
     description: str
     params: type[BaseModel]
-    handler: Callable[[BaseModel, Any], ToolResult]
+    # A coroutine for a tool that calls models itself (match_job); the loop awaits it.
+    handler: Callable[[BaseModel, Any], ToolResult | Awaitable[ToolResult]]
     effect: Effect = "read"
     # Extra JSON schema merged into the generated one, for values only known at runtime,
     # such as the enum of record ids (built at ingestion, section 3).
@@ -68,6 +70,11 @@ def _ms(started: float) -> int:
     return round((time.perf_counter() - started) * 1000)
 
 
+def _finish(result: ToolResult, name: str, started: float) -> ToolResult:
+    trace = {**result.trace_view, "tool": name, "duration_ms": _ms(started)}
+    return ToolResult(result.model_view, trace, result.chunk_ids, result.error)
+
+
 @dataclass
 class Registry:
     tools: dict[str, Tool] = field(default_factory=dict)
@@ -85,7 +92,19 @@ class Registry:
         return [tool.schema(ctx) for tool in self.tools.values()
                 if tool.offered is None or tool.offered(ctx)]
 
-    def call(self, name: str, raw_args: str | dict[str, Any], ctx: Any) -> ToolResult:
+    async def acall(self, name: str, raw_args: str | dict[str, Any], ctx: Any) -> ToolResult:
+        """`call`, for the loop: a tool that is a coroutine is awaited here."""
+        started = time.perf_counter()
+        result = self.call(name, raw_args, ctx)
+        if not inspect.isawaitable(result):
+            return result
+        try:
+            return _finish(await result, name, started)
+        except Exception as e:  # a failing tool is reported to the model, not raised
+            return _error("tool_failed", f"{type(e).__name__}: {e}", name, started)
+
+    def call(self, name: str, raw_args: str | dict[str, Any], ctx: Any) -> Any:
+        """A ToolResult, or for a coroutine tool something to await (see acall)."""
         started = time.perf_counter()
         tool = self.tools.get(name)
         if tool is None:
@@ -102,8 +121,7 @@ class Registry:
             result = tool.handler(args, ctx)
         except Exception as e:  # a failing tool is reported to the model, not raised
             return _error("tool_failed", f"{type(e).__name__}: {e}", name, started)
-        trace = {**result.trace_view, "tool": name, "duration_ms": _ms(started)}
-        return ToolResult(result.model_view, trace, result.chunk_ids, result.error)
+        return result if inspect.isawaitable(result) else _finish(result, name, started)
 
     @staticmethod
     def _check_enums(tool: Tool, args: BaseModel, ctx: Any) -> None:

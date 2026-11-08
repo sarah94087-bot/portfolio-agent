@@ -22,6 +22,9 @@ export type ComposerStrings = {
   send: string;
   counter: string; // "{n} of {max} characters"
   overLimit: string;
+  jobMode: string;
+  jobHint: string;
+  runMatch: string;
 };
 
 type Props = {
@@ -107,6 +110,50 @@ export const Composer = forwardRef<HTMLTextAreaElement, Props>(function Composer
     );
   }
 
+  // Board S4-Report, "job-posting mode": the limit is always in view, and the hint says that the
+  // text is data before anything is pasted.
+  if (mode === "job") {
+    return (
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          submit();
+        }}
+        className="flex flex-col gap-2.5 rounded-[14px] border-[1.5px] border-accent bg-surface-raised px-3.5 py-3 md:px-4 md:py-3.5"
+      >
+        <div className="flex flex-wrap items-center gap-2.5">
+          <span className="inline-flex items-center rounded-full bg-accent px-[9px] py-px text-[12px] font-bold text-on-accent">{t.jobMode}</span>
+          <span id={`${id}-hint`} className="text-[13px] text-text-muted">{t.jobHint}</span>
+          <span className={`mono ms-auto text-[12.5px] ${over ? "font-medium text-text" : "text-text-muted"}`}>
+            {fmt(length)} / {fmt(limit)}
+          </span>
+        </div>
+        <label htmlFor={id} className="sr-only">{t.jobLabel}</label>
+        <textarea
+          ref={ref}
+          id={id}
+          dir="auto"
+          rows={5}
+          value={value}
+          disabled={disabled}
+          placeholder={t.jobPlaceholder}
+          aria-describedby={`${id}-hint`}
+          aria-invalid={over || undefined}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full resize-none rounded-[10px] border border-border-input bg-surface px-3 py-2.5 text-[16px] leading-[1.6] text-text placeholder:text-text-muted md:text-[15px]"
+        />
+        <span role="status" className="sr-only">{over ? t.overLimit : ""}</span>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Button type="submit" className="min-h-10" disabled={!canSend}>{t.runMatch}</Button>
+          <Button variant="ghost" className="min-h-10" onClick={() => onModeChange("question")}>
+            <BackIcon />
+            {t.backToQuestion}
+          </Button>
+        </div>
+      </form>
+    );
+  }
+
   return (
     <form
       onSubmit={(e) => {
@@ -116,16 +163,16 @@ export const Composer = forwardRef<HTMLTextAreaElement, Props>(function Composer
       className="flex flex-col gap-2.5 rounded-lg border-[1.5px] border-border-strong bg-surface-raised px-3.5 pb-3 pt-3 md:px-4 md:pt-3.5"
     >
       <label htmlFor={id} className="sr-only">
-        {mode === "job" ? t.jobLabel : t.questionLabel}
+        {t.questionLabel}
       </label>
       <textarea
         ref={ref}
         id={id}
         dir="auto"
-        rows={mode === "job" ? 6 : 2}
+        rows={2}
         value={value}
         disabled={disabled}
-        placeholder={mode === "job" ? t.jobPlaceholder : t.questionPlaceholder}
+        placeholder={t.questionPlaceholder}
         aria-describedby={near ? `${id}-count` : undefined}
         aria-invalid={over || undefined}
         onChange={(e) => onChange(e.target.value)}
@@ -133,17 +180,10 @@ export const Composer = forwardRef<HTMLTextAreaElement, Props>(function Composer
         className="w-full resize-none bg-transparent text-[16px] leading-[1.7] text-text outline-offset-[6px] placeholder:text-text-muted md:text-[19px]"
       />
       <div className="flex items-center gap-3">
-        {mode === "question" ? (
-          <Button variant="ghost" className="text-[14px]" onClick={() => onModeChange("job")}>
-            <DocumentIcon />
-            {t.pasteJob}
-          </Button>
-        ) : (
-          <Button variant="ghost" className="text-[14px]" onClick={() => onModeChange("question")}>
-            <BackIcon />
-            {t.backToQuestion}
-          </Button>
-        )}
+        <Button variant="ghost" className="text-[14px]" onClick={() => onModeChange("job")}>
+          <DocumentIcon />
+          {t.pasteJob}
+        </Button>
 
         {near && (
           <span id={`${id}-count`} className={`mono ms-auto text-[12.5px] ${over ? "font-medium text-text" : "text-text-muted"}`}>
