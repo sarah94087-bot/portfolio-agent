@@ -121,15 +121,21 @@ class SearchArgs(BaseModel):
 def search_portfolio(args: SearchArgs, ctx: PortfolioContext) -> ToolResult:
     query = strip_names(args.query, name_pattern(ctx.names))
     timings: dict[str, int] = {}
+    # Inside the search, not after it: a type with few chunks rarely reaches the overall top
+    # candidates, and filtering those afterwards would leave nothing.
+    records = None
+    if args.types:
+        wanted = set(args.types)
+        records = [r.id for r in ctx.records.values() if r.type in wanted]
     if ctx.embedder is not None:
         started = time.perf_counter()
         vector = ctx.embedder.embed_query(query)
         timings["embed"] = round((time.perf_counter() - started) * 1000)
-        hits = hybrid.search(ctx.conn, query, vector, CANDIDATES, ctx.table, timings)
+        hits = hybrid.search(ctx.conn, query, vector, CANDIDATES, ctx.table, timings, records)
         method = "R3"
     else:
         started = time.perf_counter()
-        hits = lexical.search(ctx.conn, query, CANDIDATES, ctx.table)
+        hits = lexical.search(ctx.conn, query, CANDIDATES, ctx.table, records)
         timings["lexical"] = round((time.perf_counter() - started) * 1000)
         hits = [Hit(h.id, h.record_id, h.sections, h.text,
                     {"lexical": h.scores.get("rrf"), "vector": None, "rrf": h.scores.get("rrf")})
@@ -137,10 +143,6 @@ def search_portfolio(args: SearchArgs, ctx: PortfolioContext) -> ToolResult:
         method = "R1"
     considered = len(hits)
     ranked = hits
-    if args.types:
-        wanted = set(args.types)
-        hits = [h for h in hits
-                if (r := ctx.records.get(h.record_id)) is not None and r.type in wanted]
     reranked = None
     if method == "R3" and ctx.ranker is not None and ctx.quota is not None and len(hits) > 1:
         started = time.perf_counter()

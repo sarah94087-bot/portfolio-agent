@@ -51,5 +51,9 @@ def test_search_returns_what_either_side_finds_with_both_scores():
             assert by_id["vec#b"].scores["lexical"] is None
             assert by_id["lex#a"].sections == ("a",)
             assert len(search(conn, "pgvector", [1, 0], k=1, table="h")) == 1
+            # The filter runs before the top k: lex#a is last overall, and first among its own.
+            only = search(conn, "pgvector", [1, 0], k=1, table="h", records=["lex"])
+            assert [h.id for h in only] == ["lex#a"]
+            assert search(conn, "pgvector", [1, 0], k=5, table="h", records=[]) == []
         finally:
             conn.execute("drop table h")

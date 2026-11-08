@@ -10,6 +10,7 @@ Two rankings over the same chunks table, fused with Reciprocal Rank Fusion (k = 
 Both sides use the same normalization (retrieval/normalize.py).
 """
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 
 import psycopg
@@ -52,7 +53,7 @@ terms as (
 BM25 = """
 with {terms},
 docs as (
-  select c.id, u.lexeme, coalesce(array_length(u.positions, 1), 1)::float as tf
+  select c.id, c.record_id, u.lexeme, coalesce(array_length(u.positions, 1), 1)::float as tf
   from {t} c, unnest(c.tsv) u
 ),
 len as (select id, sum(tf) as dl from docs group by id),
@@ -66,6 +67,7 @@ select d.id, sum(
   * d.tf * (%(k1)s + 1) / (d.tf + %(k1)s * (1 - %(b)s + %(b)s * len.dl / corpus.avgdl))
 ) as score
 from docs d join df using (lexeme) join len using (id) cross join corpus
+where %(records)s::text[] is null or d.record_id = any(%(records)s::text[])
 group by d.id order by score desc, d.id limit %(n)s
 """
 
@@ -74,7 +76,7 @@ group by d.id order by score desc, d.id limit %(n)s
 TRIGRAM = """
 with {terms},
 hits as (
-  select c.id, terms.term, s.sim from {t} c cross join terms
+  select c.id, c.record_id, terms.term, s.sim from {t} c cross join terms
   cross join lateral (
     select greatest(word_similarity(terms.term, c.norm), word_similarity(terms.term, c.aliases))
     as sim
@@ -85,26 +87,33 @@ corpus as (select count(*)::float as n from {t}),
 df as (select term, count(*)::float as df from hits group by term)
 select h.id, sum(h.sim * ln(1 + (corpus.n - df.df + 0.5) / (df.df + 0.5))) as score
 from hits h join df using (term) cross join corpus
+where %(records)s::text[] is null or h.record_id = any(%(records)s::text[])
 group by h.id order by score desc, h.id limit %(n)s
 """
 
 
-def ranking(conn: psycopg.Connection, query: str, table: str, kind: str) -> list[tuple[str, float]]:
+def ranking(
+    conn: psycopg.Connection, query: str, table: str, kind: str,
+    records: Sequence[str] | None = None,
+) -> list[tuple[str, float]]:
     template = BM25 if kind == "bm25" else TRIGRAM
     stmt = sql.SQL(template).format(terms=sql.SQL(TERMS), t=sql.Identifier(table))
     params = {
-        "q": query, "stop": STOPWORDS, "n": CANDIDATES,
+        "q": query, "stop": STOPWORDS, "n": CANDIDATES, "records": records,
         "k1": BM25_K1, "b": BM25_B, "min_sim": MIN_SIMILARITY,
     }
     return [(row[0], float(row[1])) for row in conn.execute(stmt, params)]
 
 
 def search(
-    conn: psycopg.Connection, query: str, k: int = 10, table: str = "chunks"
+    conn: psycopg.Connection, query: str, k: int = 10, table: str = "chunks",
+    records: Sequence[str] | None = None,
 ) -> list[Hit]:
+    """`records` limits the candidates to those records, before the top ones are taken. Word
+    weights still come from the whole table, so a filter does not change how terms count."""
     q = normalize(query)
-    bm25 = ranking(conn, q, table, "bm25")
-    trigram = ranking(conn, q, table, "trigram")
+    bm25 = ranking(conn, q, table, "bm25", records)
+    trigram = ranking(conn, q, table, "trigram", records)
     fused: dict[str, float] = {}
     for ranked in (bm25, trigram):
         for rank, (cid, _) in enumerate(ranked, start=1):

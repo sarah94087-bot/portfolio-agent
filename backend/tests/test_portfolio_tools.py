@@ -79,8 +79,11 @@ def searched(monkeypatch):
     """search_portfolio on n fused hits, without a database."""
 
     def run(ranker, n=4, **args):
-        monkeypatch.setattr(portfolio.hybrid, "search",
-                            lambda *a, **k: [fused(i) for i in range(n)])
+        def search(conn, query, vector, k, table, timings, wanted=None):
+            hits = [fused(i) for i in range(n)]
+            return [h for h in hits if wanted is None or h.record_id in wanted]
+
+        monkeypatch.setattr(portfolio.hybrid, "search", search)
         records = {f"r{i}": Record(f"r{i}", "project" if i % 2 else "faq", f"R{i}")
                    for i in range(4)}
         ctx = PortfolioContext(None, records, (), embedder=Embedder(), ranker=ranker, quota=Quota(),

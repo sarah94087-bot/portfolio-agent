@@ -57,15 +57,18 @@ def store_embeddings(
 
 
 def search(
-    conn: psycopg.Connection, query_vector: Sequence[float], k: int = 10, table: str = "chunks"
+    conn: psycopg.Connection, query_vector: Sequence[float], k: int = 10, table: str = "chunks",
+    records: Sequence[str] | None = None,
 ) -> list[Hit]:
-    """The k chunks closest to the query by cosine distance, best first."""
+    """The k chunks closest to the query by cosine distance, best first, among `records` when
+    given."""
     rows = conn.execute(
         sql.SQL(
             "select id, record_id, sections, text, 1 - (embedding <=> %s::vector) as sim"
             " from {} where embedding is not null"
+            " and (%s::text[] is null or record_id = any(%s::text[]))"
             " order by embedding <=> %s::vector, id limit %s"
         ).format(sql.Identifier(table)),
-        (to_vector(query_vector), to_vector(query_vector), k),
+        (to_vector(query_vector), records, records, to_vector(query_vector), k),
     ).fetchall()
     return [Hit(r[0], r[1], tuple(r[2]), r[3], {"vector": float(r[4])}) for r in rows]
