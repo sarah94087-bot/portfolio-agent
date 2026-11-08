@@ -74,7 +74,7 @@ class OpenAICompatible:
         self, messages: Sequence[Message], tools: Sequence[dict[str, Any]], **options: Any
     ) -> AsyncIterator[Event]:
         """`options` overrides request fields for one call: temperature, max_tokens,
-        tool_choice and reasoning_effort (the job match reads structured output at temperature 0)."""
+        tool_choice and reasoning_effort (the job match's structured output, at temperature 0)."""
         body: dict[str, Any] = {
             "model": self.endpoint.model,
             "messages": list(messages),
