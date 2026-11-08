@@ -49,19 +49,6 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
     fetch("/api/health?warm=1", { cache: "no-store" }).catch(() => {});
   }, []);
 
-  // The composer sticks to the bottom, so what gets focus has to stop above it (WCAG 2.4.11).
-  useEffect(() => {
-    const root = document.documentElement;
-    const observer = new ResizeObserver(() => {
-      root.style.scrollPaddingBottom = `${dock.current!.offsetHeight + 8}px`;
-    });
-    observer.observe(dock.current!);
-    return () => {
-      observer.disconnect();
-      root.style.scrollPaddingBottom = "";
-    };
-  }, []);
-
   // S3: one answer's trace at a time. Focus goes back to what opened it.
   const [trace, setTrace] = useState<{ key: string; chunkId?: string } | null>(null);
   const traceFrom = useRef<HTMLElement | null>(null);
@@ -85,15 +72,28 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
     };
   }, [traced]);
 
-  function update(next: Turn) {
-    if (next.conversationId) conversationId.current = next.conversationId;
-    setTurns((ts) => ts.map((t) => (t.key === next.key ? next : t)));
-  }
+  // The composer sticks to the bottom, so what gets focus has to stop above it (WCAG 2.4.11).
+  useEffect(() => {
+    const root = document.documentElement;
+    const observer = new ResizeObserver(() => {
+      root.style.scrollPaddingBottom = `${dock.current!.offsetHeight + 8}px`;
+    });
+    observer.observe(dock.current!);
+    return () => {
+      observer.disconnect();
+      root.style.scrollPaddingBottom = "";
+    };
+  }, []);
 
   // What sent or retried is gone or disabled by now, so the keyboard carries on in the field.
   // Not on touch screens, where that would open the on-screen keyboard over the answer.
   function keepFocus() {
     if (!matchMedia("(pointer: coarse)").matches) requestAnimationFrame(() => inputRef.current?.focus({ preventScroll: true }));
+  }
+
+  function update(next: Turn) {
+    if (next.conversationId) conversationId.current = next.conversationId;
+    setTurns((ts) => ts.map((t) => (t.key === next.key ? next : t)));
   }
 
   function send(text: string) {
