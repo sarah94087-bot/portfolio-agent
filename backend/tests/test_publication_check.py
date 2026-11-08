@@ -19,6 +19,43 @@ def test_find_ignores_case_final_letters_niqqud_and_hebrew_prefixes(tmp_path):
     assert errors == ["a.md:2: forbidden term #1", "b.md:1: forbidden term #2"]
 
 
+def test_lock_files_are_not_checked(tmp_path):
+    lock = tmp_path / "package-lock.json"
+    lock.write_text('"integrity": "sha512-xAcmex"\n', encoding="utf-8")
+    assert pc.find(["acme"], [lock], root=tmp_path) == []
+
+
+def test_an_approved_line_passes_and_only_that_line(tmp_path):
+    f = tmp_path / "a.md"
+    f.write_text("Built for Acme.\nAlso for Acme.\n", encoding="utf-8")
+    allowed = {("a.md", pc.line_hash("Built for Acme."))}
+    assert pc.find(["acme"], [f], root=tmp_path, allowed=allowed) == [
+        "a.md:2: forbidden term #1"]
+
+
+def test_editing_an_approved_line_fails_again(tmp_path):
+    f = tmp_path / "a.md"
+    f.write_text("Built for Acme, and more.\n", encoding="utf-8")
+    allowed = {("a.md", pc.line_hash("Built for Acme."))}
+    assert pc.find(["acme"], [f], root=tmp_path, allowed=allowed) == [
+        "a.md:1: forbidden term #1"]
+
+
+def test_the_approval_is_for_one_path(tmp_path):
+    f = tmp_path / "b.md"
+    f.write_text("Built for Acme.\n", encoding="utf-8")
+    allowed = {("a.md", pc.line_hash("Built for Acme."))}
+    assert pc.find(["acme"], [f], root=tmp_path, allowed=allowed) == [
+        "b.md:1: forbidden term #1"]
+
+
+def test_the_allowed_file_is_paths_and_hashes(tmp_path):
+    allowed = tmp_path / "allowed.txt"
+    allowed.write_text("# a comment\n\na.md abc123\n", encoding="utf-8")
+    assert pc.load_allowed(allowed) == {("a.md", "abc123")}
+    assert pc.load_allowed(tmp_path / "missing.txt") == set()
+
+
 def test_errors_never_print_the_term(tmp_path):
     f = tmp_path / "x.md"
     f.write_text("SecretClient\n", encoding="utf-8")

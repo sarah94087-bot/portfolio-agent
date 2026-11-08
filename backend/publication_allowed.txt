@@ -1,0 +1,10 @@
+# Lines Sarah reviewed and approved for publication on 2026-11-08 (publication_check.py).
+# <path> <SHA-256 of the whole line>. An edited line needs a new review.
+evals/datasets/queries/d1-dev-q2-run1.json fc48afb7aa1ae45650e339e5540f1e79153ec7e5037a63e81332d62403b87c36
+evals/datasets/queries/d1-dev-q2-run3.json cb5971e9d4fa6ae29419d885b033bd89d2e00e196f866729e84735560e457599
+evals/results/2026-11-04-b034c7c-stage3-C4-R3-multilingual-e5-small-Q2-run3.json a9036be24be4685a319763b554c2d212d46919d51ab265c549e25e9cd9cd6568
+evals/results/2026-11-04-b034c7c-stage3-C4-R3-multilingual-e5-small-Q2.json 4c54b7f9642dcbaedec3dabcd4453550bbc0474e2a85ab6b1e8d52c9d604a231
+evals/results/2026-11-04-c154973-stage3-C4-R3-multilingual-e5-small-Q2-run3.json cb5971e9d4fa6ae29419d885b033bd89d2e00e196f866729e84735560e457599
+evals/results/2026-11-04-c154973-stage3-C4-R3-multilingual-e5-small-Q2.json 8ee07def866bca09e34aa05a0a0ab2401d6e1a9aaa12629eff49a32c5b0f3720
+portfolio/experience/ainsof-capital.md 0205f655f03a32141fa0a3bc2b7cbd35974d82b6af7388ef97743fd5bde258df
+portfolio/projects/governance-center-pwa.md be7f1a49f46e7e32e5956457d58cf4c940024d99224272aadf31e62bede322b3
