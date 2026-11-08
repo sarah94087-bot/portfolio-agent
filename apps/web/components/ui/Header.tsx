@@ -19,7 +19,6 @@ function Mark() {
 }
 
 export function Header({ lang, t }: { lang: Locale; t: Dictionary["header"] }) {
-  // These routes arrive in M5 (docs/11-roadmap.md); the links are in place so the header is final.
   const links = [
     { href: `/${lang}/how-it-works`, label: t.howItWorks },
     { href: `/${lang}/quality`, label: t.quality },

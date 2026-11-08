@@ -1,0 +1,273 @@
+{
+  "schema": 1,
+  "official": null,
+  "latest": {
+    "date": "2026-11-08",
+    "commit": "dca8892",
+    "split": "dev",
+    "questions": 58,
+    "chunks": 55
+  },
+  "scorecard": [
+    {
+      "group": "all",
+      "metric": "recall@5",
+      "threshold": 0.9,
+      "passed": true,
+      "mean": 0.963,
+      "low": 0.931,
+      "high": 0.989,
+      "n": 58
+    },
+    {
+      "group": "he",
+      "metric": "recall@5",
+      "threshold": 0.85,
+      "passed": true,
+      "mean": 0.957,
+      "low": 0.914,
+      "high": 0.99,
+      "n": 35
+    },
+    {
+      "group": "cross_lingual",
+      "metric": "recall@5",
+      "threshold": 0.85,
+      "passed": true,
+      "mean": 1.0,
+      "low": 1.0,
+      "high": 1.0,
+      "n": 12
+    },
+    {
+      "group": "en",
+      "metric": "recall@5",
+      "threshold": null,
+      "passed": null,
+      "mean": 0.971,
+      "low": 0.928,
+      "high": 1.0,
+      "n": 23
+    },
+    {
+      "group": "all",
+      "metric": "mrr",
+      "threshold": 0.75,
+      "passed": true,
+      "mean": 0.944,
+      "low": 0.897,
+      "high": 0.983,
+      "n": 58
+    }
+  ],
+  "hybrid": {
+    "date": "2026-11-04",
+    "commit": "8c5b5c3",
+    "questions": 50,
+    "chosen": "R3",
+    "rows": [
+      {
+        "method": "R1",
+        "all": {
+          "mean": 0.763,
+          "low": 0.653,
+          "high": 0.867,
+          "n": 50
+        },
+        "he": {
+          "mean": 0.708,
+          "low": 0.557,
+          "high": 0.849,
+          "n": 32
+        },
+        "en": {
+          "mean": 0.861,
+          "low": 0.722,
+          "high": 0.972,
+          "n": 18
+        },
+        "cross_lingual": {
+          "mean": 0.727,
+          "low": 0.455,
+          "high": 1.0,
+          "n": 11
+        },
+        "mrr": {
+          "mean": 0.601,
+          "low": 0.496,
+          "high": 0.707,
+          "n": 50
+        }
+      },
+      {
+        "method": "R2",
+        "all": {
+          "mean": 0.767,
+          "low": 0.667,
+          "high": 0.86,
+          "n": 50
+        },
+        "he": {
+          "mean": 0.75,
+          "low": 0.62,
+          "high": 0.87,
+          "n": 32
+        },
+        "en": {
+          "mean": 0.796,
+          "low": 0.639,
+          "high": 0.926,
+          "n": 18
+        },
+        "cross_lingual": {
+          "mean": 0.818,
+          "low": 0.545,
+          "high": 1.0,
+          "n": 11
+        },
+        "mrr": {
+          "mean": 0.672,
+          "low": 0.572,
+          "high": 0.769,
+          "n": 50
+        }
+      },
+      {
+        "method": "R3",
+        "all": {
+          "mean": 0.88,
+          "low": 0.803,
+          "high": 0.947,
+          "n": 50
+        },
+        "he": {
+          "mean": 0.859,
+          "low": 0.745,
+          "high": 0.958,
+          "n": 32
+        },
+        "en": {
+          "mean": 0.917,
+          "low": 0.843,
+          "high": 0.981,
+          "n": 18
+        },
+        "cross_lingual": {
+          "mean": 0.909,
+          "low": 0.727,
+          "high": 1.0,
+          "n": 11
+        },
+        "mrr": {
+          "mean": 0.764,
+          "low": 0.675,
+          "high": 0.85,
+          "n": 50
+        }
+      }
+    ]
+  },
+  "rerank": {
+    "date": "2026-11-08",
+    "commit": "dca8892",
+    "questions": 58,
+    "chosen": "R4",
+    "rows": [
+      {
+        "method": "R3",
+        "all": {
+          "mean": 0.888,
+          "low": 0.81,
+          "high": 0.954,
+          "n": 58
+        },
+        "he": {
+          "mean": 0.876,
+          "low": 0.762,
+          "high": 0.971,
+          "n": 35
+        },
+        "en": {
+          "mean": 0.906,
+          "low": 0.812,
+          "high": 0.986,
+          "n": 23
+        },
+        "cross_lingual": {
+          "mean": 1.0,
+          "low": 1.0,
+          "high": 1.0,
+          "n": 12
+        },
+        "mrr": {
+          "mean": 0.762,
+          "low": 0.681,
+          "high": 0.837,
+          "n": 58
+        }
+      },
+      {
+        "method": "R4",
+        "all": {
+          "mean": 0.963,
+          "low": 0.931,
+          "high": 0.989,
+          "n": 58
+        },
+        "he": {
+          "mean": 0.957,
+          "low": 0.914,
+          "high": 0.99,
+          "n": 35
+        },
+        "en": {
+          "mean": 0.971,
+          "low": 0.928,
+          "high": 1.0,
+          "n": 23
+        },
+        "cross_lingual": {
+          "mean": 1.0,
+          "low": 1.0,
+          "high": 1.0,
+          "n": 12
+        },
+        "mrr": {
+          "mean": 0.944,
+          "low": 0.897,
+          "high": 0.983,
+          "n": 58
+        }
+      }
+    ],
+    "difference": {
+      "all": {
+        "mean": 0.075,
+        "low": 0.023,
+        "high": 0.138,
+        "n": 58
+      },
+      "he": {
+        "mean": 0.081,
+        "low": 0.005,
+        "high": 0.176,
+        "n": 35
+      },
+      "en": {
+        "mean": 0.065,
+        "low": 0.014,
+        "high": 0.13,
+        "n": 23
+      },
+      "cross_lingual": {
+        "mean": 0.0,
+        "low": 0.0,
+        "high": 0.0,
+        "n": 12
+      }
+    },
+    "improved": 9,
+    "worsened": 1,
+    "still_missing": 6
+  }
+}
