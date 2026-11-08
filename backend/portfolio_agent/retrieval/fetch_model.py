@@ -1,9 +1,11 @@
 """Fetch the embeddings model files from a fixed source, checked against the pinned hashes.
 
-    python -m portfolio_agent.retrieval.fetch_model [target dir]
+    python -m portfolio_agent.retrieval.fetch_model [target dir | --bundle]
 
-The target is the argument, or EMBEDDING_MODEL_DIR. The files come from one revision of one
-repository, so the same command gives the same bytes on a laptop, in CI and in the build:
+The target is the argument, or EMBEDDING_MODEL_DIR. --bundle is the Vercel build
+(pyproject.toml, tool.vercel.scripts): the folder embedder.BUNDLED_DIR, beside the code. The
+files come from one revision of one repository, so the same command gives the same bytes on a
+laptop, in CI and in the build:
 
 - Xenova/multilingual-e5-small at REVISION: the ONNX export of intfloat/multilingual-e5-small
   (MIT) for transformers.js, with its 8-bit quantized model. Its file listing on Hugging Face
@@ -22,7 +24,13 @@ from pathlib import Path
 
 import httpx
 
-from portfolio_agent.retrieval.embedder import ENV_VAR, FILES, ModelFilesError, sha256
+from portfolio_agent.retrieval.embedder import (
+    BUNDLED_DIR,
+    ENV_VAR,
+    FILES,
+    ModelFilesError,
+    sha256,
+)
 
 REPO = "Xenova/multilingual-e5-small"
 REVISION = "761b726dd34fb83930e26aab4e9ac3899aa1fa78"
@@ -63,9 +71,14 @@ def fetch(target: Path, client: httpx.Client | None = None, log=print) -> list[s
 
 
 def main(argv: list[str]) -> int:
+    if argv[1:] == ["--bundle"]:
+        print(f"bundling the model in {BUNDLED_DIR}")
+        fetch(BUNDLED_DIR)
+        return 0
     target = argv[1] if len(argv) > 1 else os.environ.get(ENV_VAR)
     if not target:
-        print(f"usage: python -m portfolio_agent.retrieval.fetch_model <dir>  (or set {ENV_VAR})")
+        print("usage: python -m portfolio_agent.retrieval.fetch_model <dir> | --bundle"
+              f"  (or set {ENV_VAR})")
         return 2
     fetch(Path(target))
     return 0

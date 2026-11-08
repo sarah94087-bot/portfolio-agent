@@ -57,6 +57,24 @@ def test_each_text_goes_through_the_model_alone():
     assert Session.shapes == [(1, 2)] * 3
 
 
+def test_bundled_files_are_used_without_the_hash_check(tmp_path, monkeypatch):
+    """The build checked them (Sarah, 2026-11-05); a cold start must not pay for it again."""
+    (tmp_path / "tokenizer.json").write_text("{}")
+    seen = {}
+
+    class Fake:
+        def __init__(self, model_dir, check=True):
+            seen.update(model_dir=model_dir, check=check)
+
+    monkeypatch.delenv(emb.ENV_VAR, raising=False)
+    monkeypatch.setattr(emb, "BUNDLED_DIR", tmp_path)
+    monkeypatch.setattr(emb, "E5Embedder", Fake)
+    emb.from_env.cache_clear()
+    emb.from_env()
+    emb.from_env.cache_clear()
+    assert seen == {"model_dir": tmp_path, "check": False}
+
+
 @pytest.fixture(scope="module")
 def model():
     return emb.E5Embedder(Path(MODEL_DIR))

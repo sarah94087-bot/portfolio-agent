@@ -11,12 +11,13 @@ alone. The quantized model scales a batch as a whole, so in a batch a text's vec
 the texts beside it, and the index would depend on how a load happened to group them.
 
 Where the check runs (Sarah, 2026-11-05): at build and at ingest, not on every cold start,
-where it costs 0.3 to 0.5 s on top of a 1.3 s load. Until the build step exists (M5), every
-load checks; from M5 the build verifies the bundled files and from_env loads with check=False.
+where it costs 0.3 to 0.5 s on top of a 1.3 s load. The Vercel build downloads the files into
+BUNDLED_DIR and checks them as they arrive (fetch_model --bundle), so from_env loads those
+with check=False. A folder given by EMBEDDING_MODEL_DIR is still checked.
 
-The model files are not in the repo (130 MB). EMBEDDING_MODEL_DIR points at a folder with
-onnx/model_quantized.onnx and tokenizer.json. numpy, onnxruntime and tokenizers are imported
-when the model loads, so code that never embeds does not pay for them.
+The model files are not in the repo (130 MB). EMBEDDING_MODEL_DIR, or BUNDLED_DIR on Vercel, is
+a folder with onnx/model_quantized.onnx and tokenizer.json. numpy, onnxruntime and tokenizers
+are imported when the model loads, so code that never embeds does not pay for them.
 """
 
 import hashlib
@@ -36,6 +37,7 @@ FILES = {
     "tokenizer.json": "0b44a9d7b51c3c62626640cda0e2c2f70fdacdc25bbbd68038369d14ebdf4c39",
 }
 ENV_VAR = "EMBEDDING_MODEL_DIR"
+BUNDLED_DIR = Path(__file__).resolve().parent / "model"
 
 
 class ModelFilesError(Exception):
@@ -61,7 +63,9 @@ def verify(model_dir: Path) -> None:
 
 def model_dir_from_env() -> Path | None:
     value = os.environ.get(ENV_VAR)
-    return Path(value) if value else None
+    if value:
+        return Path(value)
+    return BUNDLED_DIR if (BUNDLED_DIR / "tokenizer.json").exists() else None
 
 
 class E5Embedder:
@@ -110,7 +114,7 @@ class E5Embedder:
 
 @cache
 def from_env() -> E5Embedder | None:
-    """The model once per process, from EMBEDDING_MODEL_DIR. None when it is not set, and the
-    search then runs R1 alone and says so in the trace (tools/portfolio.py)."""
+    """The model once per process. None when there are no files, and the search then runs R1
+    alone and says so in the trace (tools/portfolio.py)."""
     model_dir = model_dir_from_env()
-    return E5Embedder(model_dir) if model_dir else None
+    return E5Embedder(model_dir, check=model_dir != BUNDLED_DIR) if model_dir else None
