@@ -292,6 +292,8 @@ def test_the_knowledge_base_gives_every_record_a_tier(docs):
     assert kb.proofs["git-mcp-server#all"].years == (2025,)
     assert kb.proofs["skills#python"].tier == "used"
     assert kb.proofs["education#all"].tier == "other"
+    assert kb.proofs["profile#all"].tier == "general"
+    assert kb.proofs["faq#all"].tier == "general"
 
 
 def test_the_tool_takes_only_what_the_visitor_pasted():
@@ -373,3 +375,12 @@ def test_markdown_in_hebrew_has_no_percent_and_no_score():
     text = render("he")
     assert "דוח התאמה למשרה" in text and "התאמה חלקית" in text
     assert "%" not in text
+
+
+def test_a_skill_the_requirement_does_not_name_is_not_passed_on():
+    kb = job_match.Knowledge({"skills#react": Proof("used")},
+                             {"skills#react": ("React", ("p",))})
+    skills = [{"chunk_id": "skills#react"}]
+    general = [{"chunk_id": "p#all"}]
+    picked = job_match.choose(general, skills, Requirement("r", "Azure", "must", query="Azure"), kb)
+    assert [h["chunk_id"] for h in picked] == ["p#all"]

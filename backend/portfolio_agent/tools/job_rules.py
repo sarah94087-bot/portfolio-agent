@@ -18,7 +18,7 @@ from typing import Literal
 Strength = Literal["strong", "partial", "none"]
 Kind = Literal["must", "nice"]
 Overall = Literal["high", "partial", "low"]
-Tier = Literal["work", "used", "studied", "listed", "other"]
+Tier = Literal["work", "used", "studied", "listed", "other", "general"]
 
 POINTS: dict[str, float] = {"strong": 1.0, "partial": 0.5, "none": 0.0}
 WEIGHT: dict[str, int] = {"must": 2, "nice": 1}
@@ -96,7 +96,9 @@ def enforce(requirement: Requirement, rating: Rating, candidates: Mapping[str, P
     unique = list(dict.fromkeys(rating.evidence))
     valid = [c for c in unique if c in candidates][:MAX_EVIDENCE]
     dropped = tuple(c for c in unique if c not in candidates)
-    if rating.strength == "none" or not valid:
+    # A profile or an FAQ describes Sarah in general: alone, it proves no requirement.
+    only_general = all(candidates[c].tier == "general" for c in valid)
+    if rating.strength == "none" or not valid or only_general:
         return Rated(requirement, "none", (), no_evidence,
                      capped_from=None if rating.strength == "none" else rating.strength,
                      dropped=dropped)

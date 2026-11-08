@@ -7,7 +7,9 @@ from portfolio_agent.tools.job_rules import Proof, Rating, Requirement
 
 WORK = Proof("work", (2025, 2026))
 CANDIDATES = {"p#all": WORK, "skills#a": Proof("studied"), "skills#b": Proof("listed"),
-              "skills#c": Proof("used"), "education#all": Proof("other")}
+              "skills#c": Proof("used"), "education#all": Proof("other"),
+              "profile#all": Proof("general"),
+              "faq#all": Proof("general")}
 REQ = Requirement("r1", "Python services", "must")
 
 
@@ -107,3 +109,19 @@ def test_gaps_list_the_musts_first_whatever_their_order():
     b = enforce("none", [], Requirement("2", "must one", "must"))
     c = enforce("strong", ["p#all"], Requirement("3", "covered", "must"))
     assert [g.requirement.id for g in rules.gaps([a, c, b])] == ["2", "1"]
+
+
+def rated_on(strength, *evidence):
+    r = rules.Requirement("r1", "Azure", "must")
+    return rules.enforce(r, rules.Rating(strength, evidence, "Why."), CANDIDATES, "No evidence.")
+
+
+def test_profile_or_faq_alone_is_no_evidence():
+    out = rated_on("partial", "profile#all", "faq#all")
+    assert (out.strength, out.evidence, out.capped_from) == ("none", (), "partial")
+    assert out.rationale == "No evidence."
+
+
+def test_profile_beside_other_evidence_keeps_the_rating():
+    out = rated_on("partial", "profile#all", "education#all")
+    assert out.strength == "partial" and "education#all" in out.evidence
