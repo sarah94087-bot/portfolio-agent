@@ -24,7 +24,9 @@ export function Header({ lang, t }: { lang: Locale; t: Dictionary["header"] }) {
     { href: `/${lang}/how-it-works`, label: t.howItWorks },
     { href: `/${lang}/quality`, label: t.quality },
   ];
-  const cvHref = `/cv/sarah-halevi-${lang}.pdf`;
+  // One CV for both languages (US-7.4).
+  const cvHref = "/cv/sara-halevy-cv.pdf";
+  const cvName = "Sara Halevy cv.pdf";
 
   return (
     <header className="sticky top-0 z-10 flex h-14 flex-none items-center gap-2 border-b-[3px] border-accent bg-surface px-4 md:h-[68px] md:gap-4 md:px-10">
@@ -49,7 +51,7 @@ export function Header({ lang, t }: { lang: Locale; t: Dictionary["header"] }) {
 
         <LangToggle current={lang} label={t.language} />
 
-        <a href={cvHref} download className={buttonClass("secondary", "text-[14px] max-md:hidden")}>
+        <a href={cvHref} download={cvName} className={buttonClass("secondary", "text-[14px] max-md:hidden")}>
           <DownloadIcon />
           {t.downloadCv}
         </a>
@@ -75,7 +77,7 @@ export function Header({ lang, t }: { lang: Locale; t: Dictionary["header"] }) {
               </li>
             ))}
             <li>
-              <a href={cvHref} download className="flex items-center gap-2 rounded-sm px-3 py-2.5 hover:bg-surface-sunken">
+              <a href={cvHref} download={cvName} className="flex items-center gap-2 rounded-sm px-3 py-2.5 hover:bg-surface-sunken">
                 <DownloadIcon />
                 {t.downloadCv}
               </a>
