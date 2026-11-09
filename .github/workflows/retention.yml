@@ -1,0 +1,41 @@
+# The daily deletions the privacy page promises (docs/10-ops-and-costs.md, section 5;
+# backend/portfolio_agent/retention.py). It spends no model tokens. A failed run is the alert:
+# GitHub emails it, and anything left over is picked up by the next run.
+#
+# Scheduled runs happen only from main. GitHub turns a schedule off after 60 days with no activity
+# in a public repository, and asks by email to keep it on.
+#
+# Secrets: DATABASE_URL_DIRECT. For deleting traces also LANGFUSE_PUBLIC_KEY, LANGFUSE_SECRET_KEY
+# and, outside the default EU cloud, LANGFUSE_HOST. Without the keys their deletions wait in the
+# database.
+name: retention
+
+on:
+  schedule:
+    - cron: "23 2 * * *"  # off the hour, when GitHub's scheduler is less busy
+  workflow_dispatch:
+
+concurrency:
+  group: retention
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  retention:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+      - run: pip install -e backend
+      - name: Delete what is past its retention period
+        run: python -m portfolio_agent.retention
+        env:
+          DATABASE_URL_DIRECT: ${{ secrets.DATABASE_URL_DIRECT }}
+          LANGFUSE_PUBLIC_KEY: ${{ secrets.LANGFUSE_PUBLIC_KEY }}
+          LANGFUSE_SECRET_KEY: ${{ secrets.LANGFUSE_SECRET_KEY }}
+          LANGFUSE_HOST: ${{ secrets.LANGFUSE_HOST }}

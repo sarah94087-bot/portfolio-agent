@@ -178,7 +178,7 @@ def job_report_of(message_id: UUID, request: Request, lang: Literal["he", "en"] 
 def delete_conversation(conversation_id: UUID, request: Request) -> Response:
     """The visitor deletes their conversation at once (US-12.4): 204, or 404 when it is not
     theirs or is gone already, so nobody learns which ids exist. Traces already in Langfuse go
-    in the daily retention job, by conversation id (M6)."""
+    in the daily retention job, by the ids of its answers (retention.py)."""
     visitor_id = visitor.read_cookie(request.cookies.get(visitor.COOKIE))
     if visitor_id is None:
         return Response(status_code=404)

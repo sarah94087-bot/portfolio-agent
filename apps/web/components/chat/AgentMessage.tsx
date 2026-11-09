@@ -278,7 +278,7 @@ export function AgentMessage({ turn, lang, t, agentName, agentLine, onRetry, tra
       )}
 
       {turn.status === "error" && turn.error && (
-        <div className="flex flex-col items-start gap-3 rounded-md bg-danger-bg px-4 py-3 text-ui text-danger">
+        <div role="alert" className="flex flex-col items-start gap-3 rounded-md bg-danger-bg px-4 py-3 text-ui text-danger">
           <p dir="auto" className="m-0">{errorText(turn, t)}</p>
           {turn.error.retryable && (
             <Button variant="secondary" onClick={onRetry} className="text-[14px]">

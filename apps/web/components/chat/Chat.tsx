@@ -8,6 +8,7 @@ import { AgentMessage, type ChatStrings } from "./AgentMessage";
 import { Composer, type ComposerMode, type ComposerStrings } from "./Composer";
 import { ConversationActions } from "./ConversationActions";
 import { TracePanel } from "./TracePanel";
+import { useSheetFocus } from "./useSheetFocus";
 
 // One tone per starter, in the design's order: ink, stone, salmon, accent (the job check).
 const starterStyles = [
@@ -39,8 +40,10 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
   const conversationId = useRef<string | undefined>(undefined);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const lastQuestion = useRef<HTMLDivElement>(null);
+  const dock = useRef<HTMLDivElement>(null);
   const pageLang = lang === "he" ? "he" : "en";
   const busy = turns.some((t) => t.status === "sending" || t.status === "streaming");
+  useSheetFocus();
 
   // Spike S2: a cold start takes about 9 s, so the page wakes the function, Neon and the
   // embedding model while the visitor reads and types. Nothing depends on the answer.
@@ -95,6 +98,25 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
     };
   }, [traced]);
 
+  // The composer sticks to the bottom, so what gets focus has to stop above it (WCAG 2.4.11).
+  useEffect(() => {
+    const root = document.documentElement;
+    const observer = new ResizeObserver(() => {
+      root.style.scrollPaddingBottom = `${dock.current!.offsetHeight + 8}px`;
+    });
+    observer.observe(dock.current!);
+    return () => {
+      observer.disconnect();
+      root.style.scrollPaddingBottom = "";
+    };
+  }, []);
+
+  // What sent or retried is gone or disabled by now, so the keyboard carries on in the field.
+  // Not on touch screens, where that would open the on-screen keyboard over the answer.
+  function keepFocus() {
+    if (!matchMedia("(pointer: coarse)").matches) requestAnimationFrame(() => inputRef.current?.focus({ preventScroll: true }));
+  }
+
   function update(next: Turn) {
     if (next.conversationId) conversationId.current = next.conversationId;
     setTurns((ts) => ts.map((t) => (t.key === next.key ? next : t)));
@@ -107,9 +129,11 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
     setMode("question");
     requestAnimationFrame(() => lastQuestion.current?.scrollIntoView({ block: "start", behavior: "smooth" }));
     void run(turn, update, { conversationId: conversationId.current, lang: pageLang });
+    keepFocus();
   }
 
   function retry(turn: Turn) {
+    keepFocus();
     void retryTurn(turn, update, { conversationId: conversationId.current, lang: pageLang });
   }
 
@@ -127,21 +151,23 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
     setValue("");
     setMode("question");
     setToast(message);
-    requestAnimationFrame(() => inputRef.current?.focus());
   }
 
+  // A starter is sent as if it were typed (US-1.2); the last one opens the job field.
   function pick(index: number) {
-    if (index === starters.length - 1) {
-      setMode("job");
-      setValue("");
-    } else {
-      setMode("question");
-      setValue(starters[index]);
-    }
+    if (index < starters.length - 1) return send(starters[index]);
+    setMode("job");
+    setValue("");
     requestAnimationFrame(() => inputRef.current?.focus());
   }
 
   const started = turns.length > 0;
+  // Back on the welcome screen the field is a new element, so focus waits for it to exist.
+  const wasStarted = useRef(false);
+  useEffect(() => {
+    if (wasStarted.current && !started) inputRef.current?.focus();
+    wasStarted.current = started;
+  }, [started]);
   const composerStrings = started ? { ...composer, questionPlaceholder: chat.followUpPlaceholder } : composer;
 
   return (
@@ -171,12 +197,13 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
         </>
       ) : (
         <div className="flex flex-col gap-7 pb-6 md:gap-[34px]">
+          <h1 className="sr-only">{agentName}</h1>
           {turns.map((turn, i) => (
             <div key={turn.key} className="flex flex-col gap-3.5 md:gap-[34px]">
               <div
                 ref={i === turns.length - 1 ? lastQuestion : undefined}
                 dir="auto"
-                className="max-w-[85%] scroll-mt-20 self-start whitespace-pre-wrap rounded-[16px] bg-tint-ink px-3.5 py-2 text-[16px] font-semibold leading-[1.6] text-on-ink md:px-[18px] md:py-[11px] md:text-[18px]"
+                className="max-w-[85%] self-start whitespace-pre-wrap rounded-[16px] bg-tint-ink px-3.5 py-2 text-[16px] font-semibold leading-[1.6] text-on-ink md:px-[18px] md:py-[11px] md:text-[18px]"
               >
                 {turn.job ? (
                   <>
@@ -214,6 +241,8 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
       {/* The composer sticks to the bottom once the conversation starts, and on mobile from the
           start, as in the design; on the desktop welcome screen it follows the cards. */}
       <div
+        ref={dock}
+        data-dock
         className={`sticky bottom-0 -mx-4 mt-auto bg-surface px-4 pb-[max(18px,env(safe-area-inset-bottom))] pt-3 ${started ? "md:pb-[22px]" : "md:static md:mx-0 md:mt-6 md:bg-transparent md:p-0"}`}
       >
         {started && (

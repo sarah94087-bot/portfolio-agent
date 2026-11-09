@@ -4,9 +4,10 @@ The trace is built from the same events the visitor's browser got, so the trace 
 and the trace panel in the UI cannot tell different stories. It is sent as OTLP/HTTP JSON with
 httpx, as in S6, so no OpenTelemetry SDK ships in the function.
 
-- The trace id is the answer's message id, so a row in `messages` and its trace find each other.
-- The session id is the conversation id: the daily job deletes a conversation's traces by it
-  (US-12.4), since the Hobby plan has no retention setting (docs/10).
+- The trace id is the answer's message id, so a row in `messages` and its trace find each other,
+  and the daily job deletes a deleted answer's trace by it (US-12.4; retention.py), since the
+  Hobby plan has no retention setting (docs/10).
+- The session id is the conversation id.
 - Emails and phone numbers are masked in everything sent (US-12.3). The answer was already
   masked by the output guard; the visitor's message and tool arguments are masked here.
 - Never sent: the visitor id, the IP or its hash, the system prompt, the canary.
@@ -183,6 +184,24 @@ def build(rec: Recorder, turn: Turn, environment: str) -> dict[str, Any]:
 
 
 @dataclass(frozen=True)
+class LangfuseAccess:
+    origin: str
+    auth: str
+
+
+def langfuse_access(env: dict[str, str] | None = None) -> LangfuseAccess | None:
+    """None without both keys."""
+    env = dict(os.environ) if env is None else env
+    public, secret = env.get("LANGFUSE_PUBLIC_KEY"), env.get("LANGFUSE_SECRET_KEY")
+    if not public or not secret:
+        return None
+    # Only the origin counts: a URL copied from the Langfuse UI carries a /project/ path.
+    url = urlparse(env.get("LANGFUSE_HOST") or "https://cloud.langfuse.com")
+    return LangfuseAccess(origin=f"{url.scheme}://{url.netloc}",
+                          auth=base64.b64encode(f"{public}:{secret}".encode()).decode())
+
+
+@dataclass(frozen=True)
 class Exporter:
     endpoint: str
     auth: str
@@ -191,14 +210,12 @@ class Exporter:
     @classmethod
     def from_env(cls, env: dict[str, str] | None = None) -> "Exporter | None":
         env = dict(os.environ) if env is None else env
-        public, secret = env.get("LANGFUSE_PUBLIC_KEY"), env.get("LANGFUSE_SECRET_KEY")
-        if not public or not secret:
+        access = langfuse_access(env)
+        if access is None:
             return None
-        # Only the origin counts: a URL copied from the Langfuse UI carries a /project/ path.
-        url = urlparse(env.get("LANGFUSE_HOST") or "https://cloud.langfuse.com")
         return cls(
-            endpoint=f"{url.scheme}://{url.netloc}/api/public/otel/v1/traces",
-            auth=base64.b64encode(f"{public}:{secret}".encode()).decode(),
+            endpoint=f"{access.origin}/api/public/otel/v1/traces",
+            auth=access.auth,
             environment=env.get("VERCEL_ENV") or "local",
         )
 
