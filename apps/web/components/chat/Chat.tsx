@@ -155,7 +155,7 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
 
   // A starter is sent as if it were typed (US-1.2); the last one opens the job field.
   function pick(index: number) {
-    if (index < starters.length - 1) return send(starters[index]);
+    if (index < starters.length - 1) return send(starters[index], "question");
     setMode("job");
     setValue("");
     requestAnimationFrame(() => inputRef.current?.focus());
