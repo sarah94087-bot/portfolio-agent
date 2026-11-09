@@ -1,6 +1,6 @@
 # A preview deployment by hand, from the Actions tab: pick the branch and run. Pushes no longer
-# create previews (git.deploymentEnabled in vercel.json), because each one keeps about 440 MB of
-# function files and the free plan holds 10 GB (docs/10-ops-and-costs.md, section 5).
+# create previews (git.deploymentEnabled in vercel.json), because each one keeps its own copy of
+# the function files and the free plan holds 10 GB (docs/10-ops-and-costs.md, section 5).
 #
 # It does not touch production, the database or the model quota. The link it prints is behind
 # Vercel Authentication.
