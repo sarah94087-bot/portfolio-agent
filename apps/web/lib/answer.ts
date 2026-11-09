@@ -120,7 +120,9 @@ export function spoken(parts: Part[]): string {
 
 // Latin words and numbers inside Hebrew are isolated, so "ב-pgvector" and "Recall@5" keep
 // their order (the design's <bdi>). A run may hold several words: "Human-gated translation".
-const LATIN = /[A-Za-z0-9][\w@.\-/+#:%]*(?:[ ]+[A-Za-z0-9][\w@.\-/+#:%]*)*/g;
+// The model often writes a non-breaking hyphen or space there, and those are part of the run too.
+const WORD = String.raw`[A-Za-z0-9][\w@.\-‐-–/+#:%]*`;
+const LATIN = new RegExp(String.raw`${WORD}(?:[     ]+${WORD})*`, "g");
 
 export type Run = { text: string; latin: boolean };
 
