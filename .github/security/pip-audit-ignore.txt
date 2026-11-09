@@ -1,0 +1,4 @@
+# Known findings that pip-audit should not fail on (ADR-0018). One per line:
+#   <vulnerability id>  <end date, YYYY-MM-DD, at most 90 days away>  <why it does not apply here>
+# Example:
+#   GHSA-xxxx-xxxx-xxxx  2027-01-31  The vulnerable parser is only reached with ... , which we never do
