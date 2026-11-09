@@ -40,6 +40,26 @@ def test_the_budget_keeps_whole_chunks_best_first():
     assert len(_within_budget([hit(i, 10) for i in range(9)])) == MAX_RESULTS
 
 
+@pytest.mark.parametrize(
+    ("question", "title"),
+    [
+        ("מה היא בנתה?", "זמן תגובה"),
+        ("מה היא בנתה עם Kafka ו-CLIP embeddings?", "זמן תגובה"),
+        ("What did she build?", "Latency"),
+        ("", "Latency"),
+    ],
+)
+def test_a_project_is_named_in_the_language_of_the_question(question, title):
+    records = {"r1": Record("r1", "project", "Latency", "זמן תגובה")}
+    ctx = PortfolioContext(None, records, (), question=question)
+    assert portfolio._title(hit(1, 1), ctx) == title
+
+
+def test_a_record_with_no_hebrew_title_keeps_its_english_one():
+    ctx = PortfolioContext(None, {"r1": Record("r1", "project", "Latency")}, (), question="מה?")
+    assert portfolio._title(hit(1, 1), ctx) == "Latency"
+
+
 class Embedder:
     def embed_query(self, text):
         return [0.0]
