@@ -1,6 +1,7 @@
 # The daily deletions the privacy page promises (docs/10-ops-and-costs.md, section 5;
-# backend/portfolio_agent/retention.py). It spends no model tokens. A failed run is the alert:
-# GitHub emails it, and anything left over is picked up by the next run.
+# backend/portfolio_agent/retention.py), and the numbers of /stats (daily_metrics.py) just before
+# them. It spends no model tokens. A failed run is the alert: GitHub emails it, and anything left
+# over is picked up by the next run.
 #
 # Scheduled runs happen only from main. GitHub turns a schedule off after 60 days with no activity
 # in a public repository, and asks by email to keep it on.
@@ -32,7 +33,14 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -e backend
+      # Before the deletions, so a 30-day window is still whole.
+      - name: Compute the public metrics
+        run: python -m portfolio_agent.daily_metrics
+        env:
+          DATABASE_URL_DIRECT: ${{ secrets.DATABASE_URL_DIRECT }}
+      # A failure above still fails the run, and the deletions happen regardless.
       - name: Delete what is past its retention period
+        if: ${{ !cancelled() }}
         run: python -m portfolio_agent.retention
         env:
           DATABASE_URL_DIRECT: ${{ secrets.DATABASE_URL_DIRECT }}
