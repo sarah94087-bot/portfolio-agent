@@ -62,6 +62,15 @@ function Section({ id, title, sub, children }: { id: string; title: string; sub?
   );
 }
 
+function cardText(item: Extract<TimelineItem, { kind: "card" }>, lang: string, tr: T): string {
+  if (item.error) return tr.cardRefused;
+  if (item.repeated) return tr.cardRepeated;
+  const n = (v: number | undefined) => (v ?? 0).toLocaleString(lang);
+  return item.card === "diagram"
+    ? fill(tr.cardDiagram, { components: n(item.components), edges: n(item.edges) })
+    : fill(tr.cardProject, { tech: n(item.tech), metrics: n(item.metrics) });
+}
+
 function stepText(item: TimelineItem, lang: string, t: ChatStrings): { name: React.ReactNode; meta: string | null; text: React.ReactNode } {
   const tr = t.trace;
   const fellBack = "restart" in item && item.restart;
@@ -96,6 +105,12 @@ function stepText(item: TimelineItem, lang: string, t: ChatStrings): { name: Rea
         text: item.candidates !== undefined
           ? fill(tr.resultText, { k: item.selected.toLocaleString(lang), n: item.candidates.toLocaleString(lang) })
           : plural(lang, tr.resultShort, item.selected),
+      };
+    case "card":
+      return {
+        name: <>{tr.toolCall} · <Code>{item.tool}</Code></>,
+        meta: seconds(item.ms, lang, t),
+        text: <Sentence text={cardText(item, lang, tr)} vals={{ record: item.record ?? "" }} />,
       };
     case "guard":
       return { name: tr.guard, meta: null, text: tr.guardText };

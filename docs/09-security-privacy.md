@@ -49,7 +49,7 @@
 | T9 | **דליפת מפתחות** | ניצול החשבונות | מפתחות רק בשרת, gitleaks ב-CI, ובדיקה שאין משתנה `NEXT_PUBLIC_` עם סוד | CI |
 | T10 | **חשיפת מידע של מבקרים** | פרטיות | תקופת שמירה, הסתרת מידע מזהה ב-Langfuse, אין שמירה של IP גולמי | pytest |
 | T11 | **הרעלת בסיס הידע** דרך PR | מוניטין | הגנת branch, CODEOWNERS, רק שרה מאשרת merge, ו-CI על forks רץ בלי סודות | הגדרות GitHub |
-| T12 | **XSS דרך פלט המודל** | השתלטות על הדפדפן של מבקר | Markdown עם sanitization ובלי HTML גולמי, Mermaid ב-`securityLevel: strict`, קישורים רק לרשימה מותרת, ו-CSP | בדיקות ממשק |
+| T12 | **XSS דרך פלט המודל** | השתלטות על הדפדפן של מבקר | Markdown עם sanitization ובלי HTML גולמי, Mermaid ב-`securityLevel: strict` ו-SVG שעובר רשימה מותרת (ADR-0018), קישורים רק לרשימה מותרת, ו-CSP | בדיקות ממשק |
 | T13 | **שרשרת אספקה** | קוד זדוני בתלויות | קבצי נעילה, Dependabot, `pip-audit` ו-`npm audit`, ו-GitHub Actions נעולים לפי SHA | CI |
 | T14 | **עקיפת מכסה** במחיקת עוגייה | ניצול מכסות | מכסה נוספת לפי hash של IP | pytest |
 

@@ -11,6 +11,7 @@
 //   and `retry` sends the message again with the same idempotency key. If the server saved the
 //   answer, it replays it from the database at no cost; the new `meta` starts the turn over.
 
+import { addCard, type Cards } from "./cards.ts";
 import { parseReport, type JobReport } from "./job.ts";
 import { streamEvents, type SseEvent } from "./sse.ts";
 
@@ -61,6 +62,7 @@ export type Turn = {
   postingChars?: number; // a restored report no longer has the posting on screen
   report?: JobReport;
   markdown?: string; // the report as a file, made on the server (US-5.3)
+  cards?: Cards; // a project card and its diagram (US-6.1, US-6.2)
   restored?: boolean; // opened from the link in a report: no trace, no feedback
 };
 
@@ -146,10 +148,12 @@ export function apply(turn: Turn, { event, data }: SseEvent): Turn {
         error: undefined,
         report: undefined,
         markdown: undefined,
+        cards: undefined,
       };
     case "card": {
       const report = data.kind === "job_match" ? parseReport(data.data) : undefined;
-      return report ? { ...turn, report, markdown: str(data.markdown) } : turn;
+      if (report) return { ...turn, report, markdown: str(data.markdown) };
+      return { ...turn, cards: addCard(turn.cards, data.kind, data.data) };
     }
     case "token":
       return { ...turn, parts: appendText(turn.parts, str(data.text) ?? "") };

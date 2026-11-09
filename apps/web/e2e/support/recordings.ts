@@ -151,3 +151,81 @@ export const malicious = (): Frame[] => [
   ev("usage", { input_tokens: 1, output_tokens: 1, ttft_ms: 1, total_ms: 2, model: XSS.img, fallback: false, dropped: 0, redacted: 0 }),
   ev("done"),
 ];
+
+// S5: a project card and its diagram (backend/portfolio_agent/tools/cards.py).
+const CARD_TITLE = { en: "Translation system", he: "מערכת תרגום" };
+
+export const projectData = (extra: Record<string, unknown> = {}) => ({
+  record_id: "translation",
+  title: CARD_TITLE,
+  role: "Sole engineer",
+  period: "2025",
+  tech: ["Python", "pgvector"],
+  metrics: [
+    { label: "Recall@5", before: "0.46", after: "0.76", value: null, how_measured: "On 50 labeled questions" },
+    { label: "Reviewers", before: null, after: null, value: "4", how_measured: "Counted from the logs" },
+  ],
+  source: "translation#all",
+  ...extra,
+});
+
+export const diagramData = (extra: Record<string, unknown> = {}) => ({
+  record_id: "translation",
+  title: CARD_TITLE,
+  mermaid: 'flowchart TB\n  n0["Editor"]\n  n1["Agent loop with a long label that has to wrap inside its box"]\n  n2["Postgres"]\n  n3["Glossary"]\n  n4["Reviewer"]\n  n0 -->|"question"| n1\n  n1 --> n2\n  n1 --> n3\n  n1 --> n4',
+  text: ["Components: Editor; Agent loop; Postgres.", "From Editor to Agent loop (question).", "From Agent loop to Postgres."],
+  ...extra,
+});
+
+const cardStep = (id: string, kind: "project" | "diagram", summary: Record<string, unknown>): Frame[] => [
+  ev("step", { step_id: id, kind: "tool_call", status: "start", name: "render_card", args: { record_id: "translation", kind } }),
+  ...(summary.error ? [] : [ev("card", { kind, data: kind === "project" ? projectData() : diagramData() })]),
+  ev("step", { step_id: id, kind: "tool_result", status: "end", name: "render_card", duration_ms: 1, summary: { record_id: "translation", kind, built_from: "frontmatter", ...summary } }),
+];
+
+const roundWithCards = (): Frame =>
+  ev("step", { step_id: "s3", kind: "llm", status: "end", name: "round 2", duration_ms: 300,
+    summary: { tool_calls: ["render_card", "render_card"], model: "openai/gpt-oss-120b", usage: { input_tokens: 1300, output_tokens: 20 } } });
+
+/** An answer with a card and its diagram, sent as they are built, before the text. */
+export const withCards = (lang: Lang = "he", cards: Item[] = [
+  ...cardStep("s4", "project", { tech: 2, metrics: 2 }),
+  ...cardStep("s5", "diagram", { components: 5, edges: 4 }),
+]): Item[] => [
+  meta(),
+  ...searchSteps(lang),
+  roundWithCards(),
+  ...cards,
+  ev("step", { step_id: "s6", kind: "llm", status: "start", name: "round 3" }),
+  ...tokens(lang),
+  ev("step", { step_id: "s6", kind: "llm", status: "end", name: "round 3", duration_ms: 600, summary: { tool_calls: [], model: "openai/gpt-oss-120b", usage: { input_tokens: 1500, output_tokens: 92 } } }),
+  ...closing(lang).slice(1),
+];
+
+export const onlyDiagram = (lang: Lang = "he", data: Record<string, unknown> = {}): Item[] =>
+  withCards(lang, [
+    ev("step", { step_id: "s4", kind: "tool_call", status: "start", name: "render_card", args: { record_id: "translation", kind: "diagram" } }),
+    ev("card", { kind: "diagram", data: diagramData(data) }),
+    ev("step", { step_id: "s4", kind: "tool_result", status: "end", name: "render_card", duration_ms: 1, summary: { record_id: "translation", kind: "diagram", built_from: "frontmatter", components: 5, edges: 4 } }),
+  ]);
+
+export const refusedCard = (lang: Lang = "he"): Item[] =>
+  withCards(lang, cardStep("s4", "project", { error: "not_retrieved" }));
+
+export const maliciousCard = (): Frame[] => [
+  meta(),
+  ev("card", { kind: "project", data: projectData({
+    title: { en: XSS.img, he: XSS.img }, role: XSS.script, period: XSS.svg, tech: [XSS.iframe, XSS.link],
+    metrics: [{ label: XSS.img, value: XSS.svg, how_measured: XSS.script }], source: "x#all",
+  }) }),
+  ev("card", { kind: "diagram", data: diagramData({
+    title: { en: XSS.svg, he: XSS.svg },
+    // A source that tries everything: a directive, HTML in a label and a click handler.
+    mermaid: `%%{init: {"securityLevel": "loose", "flowchart": {"htmlLabels": true}}}%%\nflowchart TB\n  a["<img src=x onerror=window.__xss=1>"]\n  b["<script>window.__xss=2</script>"]\n  a --> b\n  click a href "javascript:window.__xss=3"`,
+    text: [XSS.img, XSS.script],
+  }) }),
+  ev("token", { text: "Hello" }),
+  ev("sources", { sources: [{ chunk_id: "x#all", record_title: XSS.img, section: "all", text: XSS_ALL, commit: "abc" }] }),
+  ev("usage", { input_tokens: 1, output_tokens: 1, ttft_ms: 1, total_ms: 2, model: "m", fallback: false, dropped: 0, redacted: 0 }),
+  ev("done"),
+];

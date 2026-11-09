@@ -5,7 +5,7 @@ import AxeBuilder from "@axe-core/playwright";
 import type { Page } from "@playwright/test";
 
 import { ask, CUT, expect, hydrated, openChat, test } from "./support/fixtures";
-import { answer, ev, failure, meta, TEXT } from "./support/recordings";
+import { answer, ev, failure, meta, TEXT, withCards } from "./support/recordings";
 
 // Every WCAG A and AA rule up to 2.2, and axe's best practices (headings, landmarks).
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"];
@@ -53,6 +53,21 @@ for (const lang of LANGS) {
             await check(page, `${label} /${lang}${path}`);
           });
         }
+
+        test("a project card and its diagram, in both views", async ({ page, api }) => {
+          test.setTimeout(60_000);
+          const text = lang === "he" ? "טקסט" : "Text";
+          const how = lang === "he" ? /איך נמדד/ : /How measured/;
+          api.queue(withCards(lang));
+          await openChat(page, lang);
+          await ask(page, TEXT[lang].question);
+          await expect(page.locator("[role=img] svg")).toBeVisible({ timeout: 15_000 });
+          await expect(page.getByRole("button", { name: t[lang].up, exact: true })).toBeVisible();
+          await check(page, `${label} card`);
+          await page.getByRole("button", { name: how }).first().click();
+          await page.getByRole("button", { name: text, exact: true }).click();
+          await check(page, `${label} card, metric open and text view`);
+        });
 
         test("a conversation, in every state it can be in", async ({ page, api }) => {
           test.setTimeout(90_000);

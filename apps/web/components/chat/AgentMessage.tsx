@@ -10,6 +10,7 @@ import type { Source, Turn } from "@/lib/chat";
 import { jobStages, type Stage } from "@/lib/job";
 import { Feedback } from "./Feedback";
 import { JobReport } from "./JobReport";
+import { ProjectCard } from "./ProjectCard";
 import { Bidi, Cite, fill, Inlines, plural, sectionLabel, SourcePopover, tone, type ChatStrings } from "./sources";
 
 export type { ChatStrings };
@@ -50,6 +51,7 @@ function status(turn: Turn, t: ChatStrings): string | null {
   const last = turn.steps.at(-1);
   if (last?.status === "restart") return t.restarting;
   if (last?.kind === "tool_call" && last.status === "start") {
+    if (last.name === "render_card") return t.card.preparing;
     return last.name === "get_project" ? t.opening : t.searching;
   }
   return turn.parts.length === 0 ? t.thinking : null;
@@ -162,8 +164,12 @@ export function AgentMessage({ turn, lang, t, agentName, agentLine, onRetry, tra
     const id = setTimeout(() => setQuiet(true), 4000);
     return () => clearTimeout(id);
   }, [done]);
+  const shownCard = turn.cards?.project ?? turn.cards?.diagram;
+  const cardLine = shownCard
+    ? `${(turn.cards?.project ? t.card.shownProject : t.card.shownDiagram).replace("{title}", lang === "he" ? shownCard.title.he : shownCard.title.en)} `
+    : "";
   const announce = done && !quiet
-    ? turn.report ? `${t.job.level[turn.report.overall]}. ${turn.report.summary}` : spoken(turn.parts)
+    ? turn.report ? `${t.job.level[turn.report.overall]}. ${turn.report.summary}` : `${cardLine}${spoken(turn.parts)}`
     : "";
 
   const byIndex = new Map<number, Source>();
@@ -225,6 +231,17 @@ export function AgentMessage({ turn, lang, t, agentName, agentLine, onRetry, tra
           lang={lang}
           t={t}
           agentLine={agentLine}
+          onFound={turn.steps.some((s) => s.name === "search_portfolio") ? (from, chunkId) => onTrace(from, chunkId) : undefined}
+        />
+      )}
+
+      {turn.cards && (
+        <ProjectCard
+          cards={turn.cards}
+          sources={turn.sources}
+          citeOf={(chunkId) => numbered.find(([, s]) => s.chunkId === chunkId)?.[0]}
+          lang={lang}
+          t={t}
           onFound={turn.steps.some((s) => s.name === "search_portfolio") ? (from, chunkId) => onTrace(from, chunkId) : undefined}
         />
       )}

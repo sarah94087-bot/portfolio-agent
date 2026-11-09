@@ -56,6 +56,7 @@ from portfolio_agent.providers.openai_compat import ProviderError
 from portfolio_agent.providers.router import AllModelsFailed, from_env
 from portfolio_agent.retrieval import embedder, rerank
 from portfolio_agent.tools import job_match, job_report
+from portfolio_agent.tools.cards import RENDER_CARD, CardTool, card_sources
 from portfolio_agent.tools.job_match import MATCH_JOB, JobResult, JobRuntime, JobTool
 from portfolio_agent.tools.portfolio import GET_PROJECT, SEARCH, PortfolioContext
 from portfolio_agent.tools.registry import Registry
@@ -63,7 +64,7 @@ from portfolio_agent.tools.registry import Registry
 log = logging.getLogger(__name__)
 router = APIRouter()
 
-REGISTRY = Registry.of([SEARCH, GET_PROJECT, MATCH_JOB])
+REGISTRY = Registry.of([SEARCH, GET_PROJECT, MATCH_JOB, RENDER_CARD])
 JOB_CHARS = 8000  # docs/09-security-privacy.md, section 4
 JOB_COST = 3
 
@@ -321,6 +322,12 @@ async def _answer(req: ChatRequest, deps: Deps, caller: Caller, out: _Out) -> No
 
         ctx.job = JobTool(JobRuntime(provider, out.emit, req.lang, quota.spend, publish, charge),
                           docs)
+
+        async def show(card: dict[str, Any]) -> None:
+            await out.emit("card", card)
+
+        ctx.cards = CardTool.of(docs, show)
+        ctx.retrieved.update(chunk.partition("#")[0] for chunk in allowed)
         try:
             result = await run_turn(
                 system_prompt=prompt.system_prompt(), history=history,
@@ -342,6 +349,8 @@ async def _answer(req: ChatRequest, deps: Deps, caller: Caller, out: _Out) -> No
         }
         if out.transcript.card:
             meta["card"] = out.transcript.card
+        if out.transcript.cards:
+            meta["cards"] = out.transcript.cards
         out.dropped = result.dropped
         model = result.models[-1] if result.models else None
         if model:  # all of the turn's tokens go to the model that finished it; a switch is rare
@@ -364,7 +373,8 @@ async def _answer(req: ChatRequest, deps: Deps, caller: Caller, out: _Out) -> No
         if cache_key and clean and out.transcript.text.strip():
             response_cache.put(conn, cache_key, response_cache.Cached(
                 content=out.transcript.content, steps=out.transcript.steps, model=model,
-                allowed_chunks=meta["allowed_chunks"], created_at=now.isoformat()), now)
+                allowed_chunks=meta["allowed_chunks"], created_at=now.isoformat(),
+                cards=out.transcript.cards or None), now)
         await _sources(conn, _cited(out), docs, deps, out)
         # For the trace panel (US-4.3): the time before the model started, and how many
         # citations were removed and contact details hidden before the answer was shown.
@@ -421,7 +431,8 @@ async def _send_card(card: dict[str, Any], lang: str, now: datetime, message_id:
 def _cited(out: _Out) -> list[str]:
     """What the answer cites and what the report cites, for the `sources` event."""
     from_card = job_chunks(out.transcript.card["data"]) if out.transcript.card else []
-    return list(dict.fromkeys([*from_card, *out.transcript.cited]))
+    return list(dict.fromkeys([*from_card, *card_sources(out.transcript.cards),
+                               *out.transcript.cited]))
 
 
 async def _job(conn: psycopg.Connection, req: ChatRequest, deps: Deps, caller: Caller, out: _Out,
@@ -515,16 +526,20 @@ async def _cached(conn: psycopg.Connection, hit: response_cache.Cached,
                             "cached": True, "cached_at": hit.created_at})
     for step in hit.steps:
         await out.emit("step", step)
+    for card in hit.cards or []:
+        await out.emit("card", card)
     await replay(hit.content, out.emit)
+    meta = {"allowed_chunks": hit.allowed_chunks, "cited": out.transcript.cited,
+            "cached": True, "cached_at": hit.created_at}
+    if hit.cards:
+        meta["cards"] = hit.cards
     with contextlib.suppress(psycopg.errors.UniqueViolation):
         db.save_answer(
             conn, message_id=message_id, conversation_id=conversation_id,
             content=hit.content, model=hit.model, prompt_version=prompt.VERSION, usage={},
-            meta={"allowed_chunks": hit.allowed_chunks, "cited": out.transcript.cited,
-                  "cached": True, "cached_at": hit.created_at},
-            idempotency_key=req.idempotency_key, steps=hit.steps,
+            meta=meta, idempotency_key=req.idempotency_key, steps=hit.steps,
         )
-    await _sources(conn, out.transcript.cited, deps.docs(), deps, out)
+    await _sources(conn, _cited(out), deps.docs(), deps, out)
     await out.emit("usage", {"input_tokens": 0, "output_tokens": 0, "ttft_ms": out.ttft_ms,
                              "total_ms": _since(out.started), "model": hit.model,
                              "fallback": False, "cached": True})
@@ -537,6 +552,8 @@ async def _replay(conn: psycopg.Connection, stored: db.StoredAnswer, deps: Deps,
                             "message_id": str(stored.id), "replay": True})
     if card := stored.meta.get("card"):
         await _send_card(card, req.lang, deps.now(), stored.id, caller, conn, deps, out)
+    for visual in stored.meta.get("cards", []):
+        await out.emit("card", visual)
     if not stored.meta.get("direct"):  # a direct report's text is the card's summary
         await replay(stored.content, out.emit)
     await _sources(conn, _cited(out), deps.docs(), deps, out)

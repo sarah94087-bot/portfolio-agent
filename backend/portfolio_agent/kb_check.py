@@ -92,6 +92,11 @@ class Architecture(Strict):
     @model_validator(mode="after")
     def edges_use_known_components(self):
         ids = {c.id for c in self.components}
+        if len(ids) != len(self.components):
+            raise ValueError("two components share an id")
+        for c in self.components:
+            if not c.label.strip():
+                raise ValueError(f"component '{c.id}' has a blank label")
         for e in self.edges:
             for end in (e.from_, e.to):
                 if end not in ids:
