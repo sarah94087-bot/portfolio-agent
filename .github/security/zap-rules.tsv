@@ -8,3 +8,7 @@
 10021	FAIL	(X-Content-Type-Options Header Missing)
 10038	FAIL	(Content Security Policy Header Not Set)
 10063	FAIL	(Permissions Policy Header Not Set)
+#
+# A pull request's scan has only the web build, so /api is that build's 404 page. On the site it
+# is FastAPI's JSON, and the nightly scan of the site has no such exception.
+10038	OUTOFSCOPE	http://localhost:3000/api/.*
