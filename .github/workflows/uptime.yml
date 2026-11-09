@@ -1,0 +1,34 @@
+# Is the site up? docs/10-ops-and-costs.md, section 5. Every hour, the home page and /api/health
+# without `warm`, so it spends no model tokens. One miss is retried a minute later, because a cold
+# start or a deploy can cost one; two in a row fail the run, and GitHub emails the failure.
+#
+# The kill switch is not a failure: it turns the agent off, and the site stays up.
+#
+# Scheduled runs happen only from main. GitHub turns a schedule off after 60 days with no activity
+# in a public repository, and asks by email to keep it on.
+name: uptime
+
+on:
+  schedule:
+    - cron: "7 * * * *"  # off the hour, when GitHub's scheduler is less busy
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SITE: https://portfolio-agent-rosy.vercel.app
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: The page and the API answer
+        run: |
+          check() {
+            curl --silent --show-error --fail --max-time 30 --output /dev/null "$SITE/he" &&
+              curl --silent --show-error --fail --max-time 30 "$SITE/api/health" |
+                jq --exit-status '.db.ok == true' > /dev/null
+          }
+          check || { echo "First check failed, trying again in a minute"; sleep 60; check; }

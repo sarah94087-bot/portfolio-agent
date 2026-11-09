@@ -18,10 +18,39 @@ function preferredLocale(acceptLanguage: string | null): string {
   return ranked.find((r) => locales.includes(r.lang))?.lang ?? defaultLocale;
 }
 
+// docs/09-security-privacy.md, section 5, and ADR-0020. The nonce is new on every request, so a
+// script the page did not send cannot run; `strict-dynamic` lets the scripts that carry it load
+// the page's chunks, Mermaid's among them. Styles stay open to inline: Mermaid puts a <style> in
+// every SVG, and a style cannot run code.
+function contentSecurityPolicy(nonce: string) {
+  const dev = process.env.NODE_ENV === "development"; // React's debugging and hot reload
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${dev ? " 'unsafe-eval'" : ""}`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data:",
+    "font-src 'self'",
+    `connect-src 'self'${dev ? " ws:" : ""}`,
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+  ].join("; ");
+}
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hasLocale = locales.some((l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`));
-  if (hasLocale) return;
+  // A file's address has no language. One that does not exist is a 404 page, so it gets the policy.
+  if (hasLocale || pathname.includes(".") || pathname.startsWith("/_next/")) {
+    const policy = contentSecurityPolicy(Buffer.from(crypto.randomUUID()).toString("base64"));
+    // On the request too: that is where the renderer reads the nonce from.
+    const headers = new Headers(request.headers);
+    headers.set("Content-Security-Policy", policy);
+    const response = NextResponse.next({ request: { headers } });
+    response.headers.set("Content-Security-Policy", policy);
+    return response;
+  }
 
   const url = request.nextUrl.clone();
   url.pathname = `/${preferredLocale(request.headers.get("accept-language"))}${pathname === "/" ? "" : pathname}`;
@@ -29,6 +58,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Skip the backend (/api is routed to FastAPI by vercel.json), Next internals and files.
-  matcher: ["/((?!api|_next|.*\\..*).*)"],
+  // Skip the backend (/api is routed to FastAPI by vercel.json) and the files that exist, so they
+  // stay on the CDN with no function call.
+  matcher: ["/((?!api/|_next/static/[^?]+\\.(?:js|css|woff2?)$|favicon\\.ico$|cv/).*)"],
 };

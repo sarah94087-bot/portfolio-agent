@@ -25,11 +25,12 @@ def test_health_reports_unreachable_database(monkeypatch):
     assert "error" in db
 
 
-def test_spike_stream_sends_protocol_events_in_order():
-    with client.stream("GET", "/api/spike/stream") as response:
-        assert response.headers["content-type"].startswith("text/event-stream")
-        events = [line.removeprefix("event: ") for line in response.iter_lines()
-                  if line.startswith("event: ")]
-    assert events[0] == "meta"
-    assert events[-2:] == ["usage", "done"]
-    assert set(events[1:-2]) == {"token"}
+def test_api_responses_carry_the_security_headers(monkeypatch):
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    headers = client.get("/api/health").headers
+    assert headers["x-content-type-options"] == "nosniff"
+    assert headers["referrer-policy"] == "strict-origin-when-cross-origin"
+
+
+def test_the_m1_streaming_spike_is_gone():
+    assert client.get("/api/spike/stream").status_code == 404
