@@ -167,7 +167,7 @@ flowchart LR
 - כל השערים בפרק 4 פעילים וחוסמים פריסה.
 
 **מצב הסריקות והכותרות (9.11.2026):**
-- `pip-audit`, `npm audit` ו-OWASP ZAP פעילים ב-`security.yml` (ADR-0018). `pip-audit` מכשיל PR. ZAP רק מדווח, עד שהכותרות באתר.
+- `pip-audit`, `npm audit` ו-OWASP ZAP פעילים ב-`security.yml` (ADR-0019). `pip-audit` מכשיל PR. ZAP רק מדווח, עד שהכותרות באתר.
 - **כותרות האבטחה עדיין חסרות:** מתוך חמש הכותרות בפרק 10, סעיף 5, באתר יש רק HSTS, ש-Vercel מוסיף בעצמו.
 
 ---

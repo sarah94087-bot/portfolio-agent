@@ -1,4 +1,4 @@
-# What the ZAP baseline does with each rule (ADR-0018). Tab separated: id, action, note.
+# What the ZAP baseline does with each rule (ADR-0019). Tab separated: id, action, note.
 # FAIL turns the job red, WARN reports, IGNORE silences. A rule not listed here is WARN.
 # Every IGNORE says why it does not apply. The other columns are read by ZAP as a note only.
 #

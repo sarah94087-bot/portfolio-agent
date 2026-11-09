@@ -1,5 +1,5 @@
 # The dependency audits and the OWASP ZAP baseline (docs/09-security-privacy.md, section 8; the
-# decisions are in ADR-0018). A finding turns a pull request red; it does not stop a deploy, since
+# decisions are in ADR-0019). A finding turns a pull request red; it does not stop a deploy, since
 # deploy.yml waits for ci only.
 #
 #   pip-audit   every PR and weekly       any known vulnerability in a runtime dependency fails

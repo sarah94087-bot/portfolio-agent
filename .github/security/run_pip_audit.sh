@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Audits the backend's runtime dependencies with the exceptions in pip-audit-ignore.txt
-# (ADR-0018). An exception needs a reason and an end date at most 90 days away; once the date
+# (ADR-0019). An exception needs a reason and an end date at most 90 days away; once the date
 # passes it stops applying, so the finding turns red again until someone looks at it.
 set -euo pipefail
 
