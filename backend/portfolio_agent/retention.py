@@ -21,7 +21,8 @@ no row to queue. It reads a window a little under 30 days back, because the Hobb
 stops at 30 days: older traces can no longer be found. The window spans more than one day, so a
 missed run loses nothing. A trace goes by age even if its conversation is a little younger.
 
-The repository is public and so are its Actions logs: only counts are printed, never ids.
+The repository is public and so are its Actions logs: no ids, and no counts either. How many
+conversations went today is a usage number, and those are not public (US-9.3).
 """
 
 import logging
@@ -157,19 +158,17 @@ def main() -> int:
         return 2
     now = datetime.now(UTC)
     with psycopg.connect(url, autocommit=True, connect_timeout=10) as conn:
-        counts = purge(conn, now)
-        print("deleted: " + ", ".join(f"{k} {v}" for k, v in counts.items()
-                                      if k != "traces_queued"))
+        purge(conn, now)
+        print("database purge finished")
         access = tracing.langfuse_access()
         if access is None:
-            print(f"no Langfuse keys: {counts['traces_queued']} traces stay queued")
+            print("no Langfuse keys: traces stay queued")
             return 0
         with httpx.Client() as client:
-            done, ok = delete_traces(conn, client, access, now)
-            print(f"traces accepted for deletion: {done}")
+            _, ok = delete_traces(conn, client, access, now)
             if ok:  # after a failure, more calls would only spend the day's quota
-                swept, ok = sweep_old_traces(client, access, now)
-                print(f"old traces accepted for deletion: {swept}")
+                _, ok = sweep_old_traces(client, access, now)
+        print("trace deletions finished" if ok else "trace deletions stopped by a failure")
     return 0 if ok else 1
 
 
