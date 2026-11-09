@@ -23,7 +23,6 @@ permissions:
   contents: read
 
 env:
-  SITE: https://portfolio-agent-rosy.vercel.app
   # Dependabot does not read an image named in a run step: move this by hand with each ZAP release.
   ZAP_IMAGE: ghcr.io/zaproxy/zaproxy:2.17.0@sha256:9624669db72f54d86c4b46a7064518bd9bf79d8c61a4c31befa9923489f328af
 
@@ -60,8 +59,9 @@ jobs:
     timeout-minutes: 20
     env:
       # A pull request is not deployed yet, so it scans its own build. Everything else scans the
-      # site. The spider runs no JavaScript and sends no JSON, so it cannot reach the chat or
-      # spend a model token.
+      # site. The spider finds /api/chat in the page text and requests it with GET, which the
+      # API refuses (405). It only POSTs HTML forms, and the site has none that reach the API,
+      # so it spends no model tokens. Keep it that way: no GET under /api may call a model.
       TARGET: ${{ github.event_name == 'pull_request' && 'http://localhost:3000/' || 'https://portfolio-agent-rosy.vercel.app/' }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
