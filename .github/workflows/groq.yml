@@ -156,7 +156,9 @@ jobs:
   t1:
     if: inputs.job == 't1'
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # Results are written only at the end, so the limit must clear the longest run: the first
+    # live run hit 90 minutes and saved nothing.
+    timeout-minutes: 180
     services:
       db:
         image: pgvector/pgvector:pg17
