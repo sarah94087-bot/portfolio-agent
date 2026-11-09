@@ -193,7 +193,9 @@ jobs:
         working-directory: evals
         env:
           GROQ_API_KEY_EVALS: ${{ secrets.GROQ_API_KEY_EVALS }}
-        run: node answers/run.mjs t1 --no-cache
+        # A minute between cases: one heavy question nearly fills Groq's 8,000 tokens a minute, and
+        # the next one would fall back to another model and measure that one instead.
+        run: node answers/run.mjs t1 --no-cache --delay 60000
       - name: Keep what the run saved
         if: always() && steps.t1.outcome != 'skipped'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
