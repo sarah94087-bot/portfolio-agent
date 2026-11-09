@@ -179,7 +179,7 @@ sequenceDiagram
 | `response_cache` | `key_hash`, `response`, `expires_at` | לפי TTL |
 | `company_links` | `slug`, `company`, `role`, `opening`, `starter_questions` | עד ששרה מוחקת |
 | `contact_requests` | `draft_id`, `conversation_id`, `status`, `sent_at` | 30 יום |
-| `daily_metrics` | `day`, `metric`, `value`, `sample_size` (נוסף בפרק 9) | קבוע, אין בה מידע אישי |
+| `daily_metrics` | `day`, `metric`, `window_days`, `value`, `sample_size` (נוסף בפרק 9) | קבוע, אין בה מידע אישי |
 
 - אינדקסים: `GIN` על `tsv`, `GIN` עם `gin_trgm_ops` על `text` ועל `context_header`, ו-`HNSW` על `embedding`.
 - מיגרציות מנוהלות בקבצי SQL ממוספרים, ונבדקות ב-CI על מסד ריק.
@@ -211,7 +211,7 @@ portfolio/                בסיס הידע (פרק 3)
 scripts/                  company_links.py (מקומי בלבד)
 evals/                    D1–D4, Promptfoo, retrieval, calibration, results
 docs/                     האפיון, ADRs, ניסויים
-.github/workflows/        ci.yml, nightly.yml, deploy.yml, retention.yml
+.github/workflows/        ci.yml, nightly.yml, deploy.yml, retention.yml (כולל daily_metrics)
 docker-compose.yml        Postgres עם pgvector לפיתוח מקומי
 Makefile                  dev, test, eval, ingest
 ```

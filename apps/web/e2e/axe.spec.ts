@@ -31,7 +31,7 @@ async function check(page: Page, state: string) {
 const LANGS = ["he", "en"] as const;
 const THEMES = ["light", "dark"] as const;
 const SIZES = [{ name: "375", width: 375, height: 700 }, { name: "desktop", width: 1280, height: 800 }];
-const PAGES = ["", "/how-it-works", "/quality", "/privacy"];
+const PAGES = ["", "/how-it-works", "/quality", "/stats", "/privacy"];
 
 const t = {
   he: { up: "תשובה מועילה", down: "תשובה לא מועילה", details: "פירוט", remove: "מחיקת השיחה", source: "מקור 1", sources: /^מקורות/, retry: "לנסות שוב", closePanel: "סגירת הפאנל" },

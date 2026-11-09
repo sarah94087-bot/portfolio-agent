@@ -384,7 +384,8 @@ def test_main_runs_the_queue_and_then_the_sweep(monkeypatch, capsys):
     assert run_main_with_keys(monkeypatch, sweep_server([page("old")], deleted)) == 0
     assert deleted == [[trace.hex], ["old"]]
     out = capsys.readouterr().out
-    assert "old traces accepted for deletion: 1" in out and trace.hex not in out
+    assert "trace deletions finished" in out and trace.hex not in out
+    assert not any(c.isdigit() for c in out)  # a count here would be a public usage number
 
 
 @needs_db

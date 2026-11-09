@@ -3,7 +3,7 @@
 import { ask, expect, hydrated, openChat, test } from "./support/fixtures";
 import { answer, answerText, shortAnswer, TEXT } from "./support/recordings";
 
-const PAGES = ["", "/how-it-works", "/quality", "/privacy"];
+const PAGES = ["", "/how-it-works", "/quality", "/stats", "/privacy"];
 
 for (const [lang, dir] of [["he", "rtl"], ["en", "ltr"]] as const) {
   test(`${lang}: every page declares its language and direction`, async ({ page }) => {

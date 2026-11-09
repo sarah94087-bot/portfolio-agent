@@ -25,6 +25,22 @@ export type ChatBody = {
 // The server's frame format (backend/portfolio_agent/sse.py).
 const encode = ({ event, data }: Frame) => `event: ${event}\ndata: ${JSON.stringify({ ...data, v: 1 })}\n\n`;
 
+const MEASURES = {
+  total_ms_p50: 3400,
+  total_ms_p95: 8900,
+  ttft_ms_warm_p50: 1200,
+  ttft_ms_warm_p95: 2400,
+  ttft_ms_cold_p50: null,
+  ttft_ms_cold_p95: null,
+  fallback_rate: 10,
+  unanswered_rate: 15,
+  cache_rate: 25,
+  citation_removed_rate: 5,
+  satisfaction_rate: null,
+  models: [{ model: "openai/gpt-oss-120b", share: 90 }, { model: "qwen/qwen3-32b", share: 10 }],
+};
+export const STATS = { updated: "2026-11-08", windows: { "7": MEASURES, "30": MEASURES } };
+
 export class Api {
   url = "";
   readonly chats: ChatBody[] = [];
@@ -34,6 +50,8 @@ export class Api {
   readonly unexpected: string[] = [];
   feedbackStatus = 204;
   deleteStatus = 204;
+  /** What /api/stats answers. Some measures are under the threshold; null is a 503. */
+  stats: unknown = STATS;
   private script: Script[] = [];
   private gates: (() => void)[] = [];
   private waiting: (() => void)[] = [];
@@ -46,6 +64,10 @@ export class Api {
     if (path.startsWith("/api/health")) {
       this.health.push(path);
       return res.writeHead(200, { "Content-Type": "application/json" }).end('{"status":"ok"}');
+    }
+    if (path === "/api/stats") {
+      if (this.stats === null) return res.writeHead(503).end();
+      return res.writeHead(200, { "Content-Type": "application/json" }).end(JSON.stringify(this.stats));
     }
     if (path === "/api/feedback" && req.method === "POST") {
       this.feedback.push(JSON.parse(body));
