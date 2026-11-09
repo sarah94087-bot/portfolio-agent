@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 
 import { Callout, DocPage, Ext, Section, Term, adrUrl, repoFile, repoUrl } from "@/components/ui/DocPage";
 import { getDictionary, hasLocale, type Locale } from "../dictionaries";
+import { alternates } from "@/lib/site";
 
 // S13 (US-9.4, US-9.5, US-9.6). The text describes the system as built, not as first planned.
 
@@ -226,7 +227,10 @@ function Diagram({ title, alt }: { title: string; alt: string }) {
 export async function generateMetadata({ params }: PageProps<"/[lang]/how-it-works">): Promise<Metadata> {
   const { lang } = await params;
   if (!hasLocale(lang)) return {};
-  return { title: `${copy[lang].title} · ${getDictionary(lang).meta.title}` };
+  return {
+    title: `${copy[lang].title} · ${getDictionary(lang).meta.title}`,
+    alternates: alternates(lang, "/how-it-works"),
+  };
 }
 
 export default async function HowItWorksPage({ params }: PageProps<"/[lang]/how-it-works">) {

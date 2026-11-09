@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { DocPage, Ext, Section, TableFrame, Term, td, th } from "@/components/ui/DocPage";
 import { getDictionary, hasLocale, type Locale } from "../dictionaries";
+import { alternates } from "@/lib/site";
 
 // S12 (US-12.1). This page describes what the system does today, checked against the code and
 // the migrations. Features that are not built (contact form, company links) are left out until
@@ -113,7 +114,10 @@ const copy: Record<Locale, {
 export async function generateMetadata({ params }: PageProps<"/[lang]/privacy">): Promise<Metadata> {
   const { lang } = await params;
   if (!hasLocale(lang)) return {};
-  return { title: `${copy[lang].title} · ${getDictionary(lang).meta.title}` };
+  return {
+    title: `${copy[lang].title} · ${getDictionary(lang).meta.title}`,
+    alternates: alternates(lang, "/privacy"),
+  };
 }
 
 export default async function PrivacyPage({ params }: PageProps<"/[lang]/privacy">) {
