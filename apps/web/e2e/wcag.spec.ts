@@ -5,7 +5,7 @@ import type { Page } from "@playwright/test";
 import { ask, expect, hydrated, openChat, test } from "./support/fixtures";
 import { answer, TEXT } from "./support/recordings";
 
-const PAGES = ["", "/how-it-works", "/quality", "/privacy"];
+const PAGES = ["", "/how-it-works", "/quality", "/stats", "/privacy"];
 const he = TEXT.he;
 
 test("2.4.2 every page has its own title", async ({ page }) => {
@@ -16,7 +16,7 @@ test("2.4.2 every page has its own title", async ({ page }) => {
       titles.add(await page.title());
     }
   }
-  expect(titles.size).toBe(8);
+  expect(titles.size).toBe(10);
 });
 
 async function converse(page: Page, api: import("./support/fixtures").Api) {

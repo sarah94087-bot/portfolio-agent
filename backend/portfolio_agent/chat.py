@@ -210,6 +210,7 @@ class _Out:
     setup_ms: int | None = None  # until `meta`: the database work before the model starts
     dropped: list[str] = field(default_factory=list)
     lang: str = "en"  # the page's, for record titles
+    cold: bool = False  # the first turn this instance served
 
     async def emit(self, event: str, data: dict[str, Any] | None = None) -> None:
         data = data or {}
@@ -227,8 +228,26 @@ class _Out:
         await self.emit("done")
 
 
+_instance_is_new = True
+
+
+def _first_turn() -> bool:
+    """/stats reports the first turn of an instance apart: it pays for the cold start."""
+    global _instance_is_new
+    first, _instance_is_new = _instance_is_new, False
+    return first
+
+
+def _on_backup(provider: Any, switches: list[dict[str, Any]]) -> bool:
+    """Whether a model other than the first answered. A switch is recorded only when a model
+    fails during the turn: one that was already closed is skipped without a trace."""
+    models = getattr(getattr(provider, "router", None), "models", None)
+    current = getattr(provider, "current", None)
+    return bool(switches) or bool(models and current and current != models[0].name)
+
+
 async def _turn(req: ChatRequest, deps: Deps, caller: Caller, queue: asyncio.Queue) -> None:
-    out = _Out(queue, lang=req.lang)
+    out = _Out(queue, lang=req.lang, cold=_first_turn())
     try:
         await _answer(req, deps, caller, out)
     except Exception:  # anything unexpected still ends the stream with a code
@@ -342,6 +361,11 @@ async def _answer(req: ChatRequest, deps: Deps, caller: Caller, out: _Out) -> No
         }
         if out.transcript.card:
             meta["card"] = out.transcript.card
+        # What /stats reads (daily_metrics.py). A card's time is a pipeline's, not a chat turn's.
+        meta["stats"] = {"backup": _on_backup(provider, switches)}
+        if not out.transcript.card:
+            meta["stats"] |= {"ttft_ms": out.ttft_ms, "total_ms": _since(out.started),
+                              "cold": out.cold}
         out.dropped = result.dropped
         model = result.models[-1] if result.models else None
         if model:  # all of the turn's tokens go to the model that finished it; a switch is rare
@@ -487,7 +511,7 @@ async def _job(conn: psycopg.Connection, req: ChatRequest, deps: Deps, caller: C
         await _send_card(card, req.lang, now, message_id, caller, conn, deps, out)
         meta = {"allowed_chunks": found.chunk_ids, "card": card, "direct": True,
                 "dropped": runtime.dropped, "switches": switches, "score": round(found.score, 3),
-                "posting_chars": posting_chars}
+                "posting_chars": posting_chars, "stats": {"backup": _on_backup(provider, switches)}}
         with contextlib.suppress(psycopg.errors.UniqueViolation):
             db.save_answer(conn, message_id=message_id, conversation_id=conversation_id,
                            content=found.summary, model=model, prompt_version=job_match.VERSION,

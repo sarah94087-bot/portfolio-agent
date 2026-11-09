@@ -22,6 +22,7 @@ export function Header({ lang, t }: { lang: Locale; t: Dictionary["header"] }) {
   const links = [
     { href: `/${lang}/how-it-works`, label: t.howItWorks },
     { href: `/${lang}/quality`, label: t.quality },
+    { href: `/${lang}/stats`, label: t.stats },
   ];
   // One CV for both languages (US-7.4).
   const cvHref = "/cv/sara-halevy-cv.pdf";

@@ -1,0 +1,39 @@
+# A preview deployment by hand, from the Actions tab: pick the branch and run. Pushes no longer
+# create previews (git.deploymentEnabled in vercel.json), because each one keeps its own copy of
+# the function files and the free plan holds 10 GB (docs/10-ops-and-costs.md, section 5).
+#
+# It does not touch production, the database or the model quota. The link it prints is behind
+# Vercel Authentication.
+#
+# Secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID.
+name: preview
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: preview
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  VERCEL_CLI: vercel@65.12.1
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: "24"
+      - name: Deploy a preview
+        run: |
+          url=$(npx --yes "$VERCEL_CLI" deploy --yes --token "$VERCEL_TOKEN")
+          echo "Preview: $url" | tee -a "$GITHUB_STEP_SUMMARY"
