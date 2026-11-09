@@ -10,6 +10,8 @@ On the development question set, Recall@5 went from 0.76 with keyword search (50
 
 It runs on free tiers only, with no payment method on any service: Vercel, Neon, Groq and Langfuse.
 
+Built with Claude Code as the coding partner. Sarah Halevy set the requirements and approved each spec chapter, knowledge-base record and architecture decision, and each ADR records that approval.
+
 ## 10-minute review path
 
 | Minutes | Open | What to look for |
