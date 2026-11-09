@@ -59,6 +59,7 @@ class Cached:
     allowed_chunks: list[str]
     created_at: str
     card: dict[str, Any] | None = None  # a job match report; `content` is then its summary
+    cards: list[dict[str, Any]] | None = None  # project cards and diagrams
 
 
 def get(conn: psycopg.Connection, key_hash: str, now: datetime) -> Cached | None:

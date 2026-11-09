@@ -15,6 +15,8 @@ export type TimelineItem =
   | { kind: "tool_call"; tool: string; ms?: number; method?: string; record?: string }
   | { kind: "tool_result"; tool: string; candidates?: number; selected: number }
   | { kind: "job"; stage: string; ms?: number; capped?: number; dropped?: number }
+  | { kind: "card"; tool: string; ms?: number; record?: string; card?: string; error?: string; repeated: boolean;
+      tech?: number; metrics?: number; components?: number; edges?: number }
   | { kind: "guard"; blocked: boolean };
 
 export type Row = {
@@ -121,6 +123,14 @@ export function buildTrace(turn: Turn): TraceView {
       const usage = obj(s.usage);
       if (usage) tokens.push({ decision: tools.length > 0, input: num(usage.input_tokens) ?? 0, output: num(usage.output_tokens) ?? 0 });
       if (!retrieval) beforeTools += step.durationMs ?? 0;
+    } else if (step.name === "render_card") {
+      // Built on the server from the record: the row says that, and what the model chose.
+      timeline.push({
+        kind: "card", tool: step.name, ms: step.durationMs, record: str(s.record_id) ?? str(step.args?.record_id),
+        card: str(s.kind) ?? str(step.args?.kind), error: str(s.error), repeated: s.repeated === true,
+        tech: num(s.tech), metrics: num(s.metrics), components: num(s.components), edges: num(s.edges),
+      });
+      if (step.args) decisions.push({ tool: step.name, args: step.args });
     } else if (step.kind === "tool_call" || step.kind === "tool_result") {
       const tool = step.name ?? "";
       const candidates = rows(step, cites);

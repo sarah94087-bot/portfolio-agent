@@ -71,7 +71,7 @@ export function sectionLabel(s: Source) {
 }
 
 type PopoverProps = {
-  n: number;
+  n: number | null; // null: a source the card shows and the answer did not cite
   source: Source;
   top: number;
   t: ChatStrings;
@@ -114,9 +114,9 @@ export function SourcePopover({ n, source, top, t, onClose, onFound }: PopoverPr
         <div className="flex justify-center pt-2 md:hidden" aria-hidden="true">
           <span className="h-1 w-10 rounded-[2px] bg-text-muted" />
         </div>
-        <div className={`flex items-center gap-3 px-4 py-2.5 md:py-3 ${tone(n)}`}>
+        <div className={`flex items-center gap-3 px-4 py-2.5 md:py-3 ${n === null ? "bg-tint-stone text-on-stone" : tone(n)}`}>
           <h2 id={titleId} className="flex-1 text-[16px] font-extrabold md:text-[15px]">
-            {n} · <Bidi text={sectionLabel(source)} />
+            {n !== null && <>{n} · </>}<Bidi text={sectionLabel(source)} />
           </h2>
           <button type="button" onClick={onClose} aria-label={t.close} className="-me-2 flex size-11 items-center justify-center rounded-md md:size-8">
             <CloseIcon />

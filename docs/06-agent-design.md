@@ -115,9 +115,10 @@ match_job:
 render_card:
   description: Show a visual card for a project. Use when one project is the focus of the answer.
   params:
-    record_id: { type: string, enum: <מזהי הרשומות> }
+    record_id: { type: string, enum: <מזהי הפרויקטים> }
     kind: { enum: [project, diagram] }
   returns: { shown: true }. הנתונים נשלפים מהרשומה, ולא מהמודל
+  note: מוצע רק אחרי שפרויקט נשלף בשיחה. פרויקט אחד בתור, כל סוג פעם אחת (ADR-0018)
 
 request_contact:
   description: Draft a message to Sarah. Use only after the visitor agreed to leave a message.

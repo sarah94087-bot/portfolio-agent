@@ -139,7 +139,7 @@ sequenceDiagram
 | `token` | `text` | התשובה |
 | `citation` | `chunk_id`, `index` | מספר מקור בטקסט |
 | `sources` | רשימת קטעים: `chunk_id`, `record_title`, `section`, `text`, `commit` | פאנל המקורות, ו-commit בסיס הידע במעקב |
-| `card` | `kind` (`project` / `diagram` / `job_match`), `data` | כרטיסים ודוחות (פרק 8) |
+| `card` | `kind` (`project` / `diagram` / `job_match`), `data` | כרטיסים ודוחות (פרק 8). כרטיס פרויקט ותרשים נשלחים לפני הטקסט ונשמרים ב-`meta.cards` (ADR-0018) |
 | `contact_draft` | `draft_id`, `summary` | טיוטת הודעה לאישור (US-7.2) |
 | `usage` | טוקנים בקלט ובפלט, `ttft_ms`, `total_ms`, `setup_ms` (עד `meta`: עבודת המסד), `fallback`, `dropped` (ציטוטים שהוסרו), `redacted` | חלון המעקב |
 | `error` | `code`, `message`, `retryable` | S7 ו-S8 |

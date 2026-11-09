@@ -15,7 +15,7 @@ import json
 import re
 import time
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Literal, Protocol
 
 import psycopg
@@ -61,6 +61,8 @@ class PortfolioContext:
     # is not narrowed, since Groq answers 400 to a tool call outside the schema's enum.
     has_whole_record: bool = False
     job: Any = None  # tools/job_match.py, JobTool: set when this turn may run a job match
+    cards: Any = None  # tools/cards.py, CardTool: set when this turn may show cards
+    retrieved: set[str] = field(default_factory=set)  # records found in this conversation
 
     @classmethod
     def from_docs(cls, conn: psycopg.Connection, docs: Sequence[Doc], **kw) -> "PortfolioContext":
@@ -162,6 +164,7 @@ def search_portfolio(args: SearchArgs, ctx: PortfolioContext) -> ToolResult:
     order = {h.id: h.scores["rerank"] for h in hits if "rerank" in h.scores}
     kept = _within_budget(hits)
     ctx.has_whole_record = ctx.has_whole_record or any(h.id.endswith("#all") for h in kept)
+    ctx.retrieved.update(h.record_id for h in kept)
     views = [_view(h, ctx) for h in kept]
     chosen = {h.id for h in kept}
     trace = {
@@ -200,6 +203,7 @@ def get_project(args: ProjectArgs, ctx: PortfolioContext) -> ToolResult:
         (args.id,),
     ).fetchall()
     hits = [Hit(r[0], r[1], tuple(r[2]), r[3]) for r in rows]
+    ctx.retrieved.update(h.record_id for h in hits)
     views = [_view(h, ctx) for h in hits]
     trace = {"record_id": args.id, "chunks": [v["chunk_id"] for v in views]}
     return ToolResult(_json({"record_id": args.id, "chunks": views}), trace,
