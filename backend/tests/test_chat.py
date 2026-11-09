@@ -4,6 +4,7 @@ Runs only when TEST_DATABASE_URL is set (CI, or local)."""
 import json
 import os
 import uuid
+from datetime import UTC, datetime
 
 import psycopg
 import pytest
@@ -60,13 +61,17 @@ def use(kb, monkeypatch):
     """Point the endpoint at the test database and a provider made per request."""
     providers = []
 
-    def install(*factories, enabled=True, limits=None):
+    def install(*factories, enabled=True, limits=None, frozen=False):
+        """`frozen` holds the clock still: the minute limit counts per calendar minute, so
+        requests on two sides of a minute's end would not add up and the test would fail."""
         providers.extend(factories)
+        moment = datetime.now(UTC)
         monkeypatch.setattr(chat, "DEPS", chat.Deps(
             database_url=lambda: DB_URL, provider=lambda quota: providers.pop(0),
             embedder=lambda: None, ranker=lambda: None, docs=lambda: kb,
             agent_enabled=lambda: enabled,
             limits=lambda: limits or Limits(), tracer=lambda: TRACES, table=TABLE,
+            now=(lambda: moment) if frozen else (lambda: datetime.now(UTC)),
         ))
         BROWSER["client"] = TestClient(app)  # one visitor per test, keeping its cookie
         with psycopg.connect(DB_URL, autocommit=True) as conn:
@@ -286,7 +291,7 @@ def test_a_forged_cookie_is_replaced_by_a_new_visitor(use):
 
 
 def test_past_the_minute_limit_the_error_is_rate_limited_and_nothing_is_saved(use):
-    use(answer(), answer(), NeverCalled(), limits=Limits(visitor_minute=2))
+    use(answer(), answer(), NeverCalled(), limits=Limits(visitor_minute=2), frozen=True)
     post({"message": "one", "idempotency_key": "key-rate-1"})
     post({"message": "two", "idempotency_key": "key-rate-2"})
     _, events = post({"message": "three", "idempotency_key": "key-rate-3"})

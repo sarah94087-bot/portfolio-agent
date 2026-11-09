@@ -120,7 +120,7 @@ def test_a_job_counts_as_three_messages(use):  # noqa: F811
 
 
 def test_a_job_past_the_minute_limit_is_refused_before_any_model_call(use):  # noqa: F811
-    use(Model(), NeverCalled(), limits=Limits(visitor_minute=5))
+    use(Model(), NeverCalled(), limits=Limits(visitor_minute=5), frozen=True)
     assert "error" not in [e for e, _ in post_job("job-minute-01")]
     error = of(post_job("job-minute-02", message=POSTING + "x"), "error")
     assert error["code"] == "rate_limited" and error["limit"] == "minute"
