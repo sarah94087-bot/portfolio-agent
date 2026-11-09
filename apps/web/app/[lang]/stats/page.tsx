@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { StatsBoard, type StatsCopy } from "@/components/StatsBoard";
 import { DocPage, Ext, Section, repoFile } from "@/components/ui/DocPage";
 import { getDictionary, hasLocale, type Locale } from "../dictionaries";
+import { alternates } from "@/lib/site";
 
 // S10 (US-9.3). The numbers are never in this file: they come from GET /api/stats, which applies
 // the threshold and the rounding. docs/08-transparency.md, section 4.
@@ -147,7 +148,10 @@ const copy: Record<Locale, Copy> = {
 export async function generateMetadata({ params }: PageProps<"/[lang]/stats">): Promise<Metadata> {
   const { lang } = await params;
   if (!hasLocale(lang)) return {};
-  return { title: `${copy[lang].title} · ${getDictionary(lang).meta.title}` };
+  return {
+    title: `${copy[lang].title} · ${getDictionary(lang).meta.title}`,
+    alternates: alternates(lang, "/stats"),
+  };
 }
 
 const List = ({ items }: { items: ReactNode[] }) => (

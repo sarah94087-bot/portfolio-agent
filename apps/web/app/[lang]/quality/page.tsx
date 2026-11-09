@@ -6,6 +6,7 @@ import data from "@/data/quality.json";
 import { Callout, DocPage, Ext, Section, TableFrame, Term, adrUrl, repoFile, td, th } from "@/components/ui/DocPage";
 import { interval, num, parseQuality, signed, signedFine, type Experiment, type Quality, type Score } from "@/lib/quality";
 import { getDictionary, hasLocale, type Locale } from "../dictionaries";
+import { alternates } from "@/lib/site";
 
 // S9 (US-9.1, US-9.2). Every number comes from data/quality.json, built from evals/results.
 const quality = parseQuality(data);
@@ -240,7 +241,10 @@ function ExperimentTable({ e, c, label }: { e: Experiment; c: Copy; label: strin
 export async function generateMetadata({ params }: PageProps<"/[lang]/quality">): Promise<Metadata> {
   const { lang } = await params;
   if (!hasLocale(lang)) return {};
-  return { title: `${copy[lang].title} · ${getDictionary(lang).meta.title}` };
+  return {
+    title: `${copy[lang].title} · ${getDictionary(lang).meta.title}`,
+    alternates: alternates(lang, "/quality"),
+  };
 }
 
 export default async function QualityPage({ params }: PageProps<"/[lang]/quality">) {

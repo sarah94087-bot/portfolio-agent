@@ -15,6 +15,8 @@ const he = {
   meta: {
     title: "הסוכן של שרה",
     description: "סוכן AI שעונה על שאלות על הניסיון של שרה הלוי, עם מקורות לכל טענה",
+    shareTitle: "הסוכן של שרה הלוי",
+    shareAlt: "הסוכן של שרה: אני סוכן AI, לא שרה. אני עונה רק ממה שכתוב בתיק שלה.",
   },
   header: {
     agentName: "הסוכן של שרה",
@@ -267,7 +269,9 @@ export type Dictionary = typeof he;
 const en: Dictionary = {
   meta: {
     title: "Sarah's agent",
-    description: "An AI agent that answers questions about Sarah Halevi's experience, with a source for every claim",
+    description: "An AI agent that answers questions about Sarah Halevy's experience, with a source for every claim",
+    shareTitle: "Sarah Halevy's AI agent",
+    shareAlt: "Sarah's agent: I'm an AI agent, not Sarah. I only answer from what's in her portfolio.",
   },
   header: {
     agentName: "Sarah's agent",
@@ -280,7 +284,7 @@ const en: Dictionary = {
     downloadCv: "Download CV",
   },
   welcome: {
-    eyebrow: "Answers from the portfolio of Sarah Halevi",
+    eyebrow: "Answers from the portfolio of Sarah Halevy",
     titleLead: "I'm an AI agent,",
     titleHighlight: "not Sarah.",
     titleRest: "I only answer from what's in her portfolio.",
