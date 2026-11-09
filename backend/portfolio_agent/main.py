@@ -1,14 +1,12 @@
-"""FastAPI app: health, the chat, feedback and stats endpoints (chat.py, feedback.py, stats.py),
-and the M1 spike endpoints S1 and S2."""
+"""FastAPI app: health, and the chat, feedback and stats endpoints (chat.py, feedback.py,
+stats.py)."""
 
-import asyncio
 import time
-from collections.abc import AsyncIterator
+from typing import Any
 
 from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
 
-from portfolio_agent import __version__, chat, feedback, sse, stats
+from portfolio_agent import __version__, chat, feedback, stats
 from portfolio_agent.config import Settings
 
 # Instance bookkeeping for the cold start spike (S2): the first request an instance serves
@@ -20,6 +18,28 @@ app = FastAPI(title="portfolio-agent", version=__version__, docs_url=None, redoc
 app.include_router(chat.router)
 app.include_router(feedback.router)
 app.include_router(stats.router)
+
+
+class _SecurityHeaders:
+    """The headers of docs/09-security-privacy.md, section 5, that apply to an API response. The
+    web service sets its own. Plain ASGI, so a stream passes through chunk by chunk."""
+
+    HEADERS = ((b"x-content-type-options", b"nosniff"),
+               (b"referrer-policy", b"strict-origin-when-cross-origin"))
+
+    def __init__(self, inner: Any) -> None:
+        self.inner = inner
+
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        async def with_headers(message: Any) -> None:
+            if message["type"] == "http.response.start":
+                message = {**message, "headers": [*message["headers"], *self.HEADERS]}
+            await send(message)
+
+        await self.inner(scope, receive, with_headers)
+
+
+app.add_middleware(_SecurityHeaders)
 
 
 def _instance_info() -> dict:
@@ -86,29 +106,3 @@ def health(warm: bool = False) -> dict:
         **_instance_info(),
     }
 
-
-_SPIKE_WORDS = ["זה", "ניסוי", "הזרמה.", "this", "is", "a", "streaming", "spike."]
-
-
-async def _spike_events(started: float, info: dict) -> AsyncIterator[str]:
-    yield sse.encode("meta", {"spike": "s1", **info})
-    ttft_ms = None
-    for word in _SPIKE_WORDS:
-        await asyncio.sleep(0.05)
-        if ttft_ms is None:
-            ttft_ms = round((time.perf_counter() - started) * 1000)
-        yield sse.encode("token", {"text": word + " "})
-    total_ms = round((time.perf_counter() - started) * 1000)
-    yield sse.encode("usage", {"ttft_ms": ttft_ms, "total_ms": total_ms})
-    yield sse.encode("done")
-
-
-@app.get("/api/spike/stream")
-async def spike_stream() -> StreamingResponse:
-    """Fake answer stream for S1: checks SSE survives the Vercel runtime unbuffered."""
-    started = time.perf_counter()
-    return StreamingResponse(
-        _spike_events(started, _instance_info()),
-        media_type="text/event-stream",
-        headers={"Cache-Control": "no-cache, no-transform", "X-Accel-Buffering": "no"},
-    )

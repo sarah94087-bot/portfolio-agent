@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Assistant, IBM_Plex_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 
 import "../globals.css";
 import { directionOf, getDictionary, hasLocale, locales } from "./dictionaries";
@@ -20,7 +21,7 @@ const plexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
-// Other locales 404 through hasLocale below (dynamicParams is not allowed with cacheComponents).
+// Other locales 404 through hasLocale below.
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
@@ -37,6 +38,8 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
 }
 
 export default async function RootLayout({ children, params }: LayoutProps<"/[lang]">) {
+  // Every page renders per request, so its scripts can carry that request's nonce (ADR-0020).
+  await connection();
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
 

@@ -82,7 +82,7 @@
 
 | כותרת | ערך |
 |---|---|
-| `Content-Security-Policy` | `default-src 'self'`, סקריפטים רק מה-origin ועם nonce, `connect-src 'self'`, `frame-ancestors 'none'` |
+| `Content-Security-Policy` | `default-src 'self'`, סקריפטים עם nonce לכל בקשה ו-`strict-dynamic`, `connect-src 'self'`, `frame-ancestors 'none'`. סגנונות גם inline, בשביל Mermaid (ADR-0020) |
 | `Strict-Transport-Security` | מופעל אוטומטית ב-Vercel |
 | `X-Content-Type-Options` | `nosniff` |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` |
