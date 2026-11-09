@@ -45,6 +45,16 @@ for (const path of pages) {
   });
 }
 
+test("a 404 page gets the policy too, and a file that exists stays out of it", async ({ request }) => {
+  for (const path of ["/robots-missing.txt", "/missing.xml", "/_next/missing"]) {
+    const response = await request.get(path);
+    expect(response.status(), path).toBe(404);
+    expect(response.headers()["content-security-policy"], path).toContain("frame-ancestors 'none'");
+    expect(response.headers()["x-powered-by"], path).toBeUndefined();
+  }
+  expect((await request.get("/favicon.ico")).headers()["content-security-policy"]).toBeUndefined();
+});
+
 test("the nonce is new on every request", async ({ request }) => {
   const nonce = async () =>
     /'nonce-([^']+)'/.exec((await request.get("/he")).headers()["content-security-policy"])![1];

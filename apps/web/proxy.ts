@@ -41,7 +41,8 @@ function contentSecurityPolicy(nonce: string) {
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hasLocale = locales.some((l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`));
-  if (hasLocale) {
+  // A file's address has no language. One that does not exist is a 404 page, so it gets the policy.
+  if (hasLocale || pathname.includes(".") || pathname.startsWith("/_next/")) {
     const policy = contentSecurityPolicy(Buffer.from(crypto.randomUUID()).toString("base64"));
     // On the request too: that is where the renderer reads the nonce from.
     const headers = new Headers(request.headers);
@@ -57,6 +58,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Skip the backend (/api is routed to FastAPI by vercel.json), Next internals and files.
-  matcher: ["/((?!api|_next|.*\\..*).*)"],
+  // Skip the backend (/api is routed to FastAPI by vercel.json) and the files that exist, so they
+  // stay on the CDN with no function call.
+  matcher: ["/((?!api/|_next/static/[^?]+\\.(?:js|css|woff2?)$|favicon\\.ico$|cv/).*)"],
 };
