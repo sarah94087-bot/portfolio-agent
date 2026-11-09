@@ -43,7 +43,7 @@ Three structural rules:
 
 1. **One service decides.** Guards, the agent and the tools all live in FastAPI. The web app only displays, and holds no keys.
 2. **One database.** Neon holds the knowledge base, conversations, quotas and cache. At 56 passages, Redis or a search service would add parts with no benefit.
-3. **One definition per tool.** [`tools/registry.py`](backend/portfolio_agent/tools/registry.py) holds each tool's schema and handler. The agent has two read-only tools today, `search_portfolio` and `get_project`.
+3. **One definition per tool.** [`tools/registry.py`](backend/portfolio_agent/tools/registry.py) holds each tool's schema and handler. The agent has four tools today: `search_portfolio`, `get_project`, `match_job` and `render_card`.
 
 **One request, in order:**
 
@@ -116,10 +116,11 @@ The cost of running a model inside a free function is real: one cold start measu
 | Browser | Same | Playwright on recorded streams, axe on every page and state | In `ci.yml` |
 | T1 harness | Same | T1 cases through the real agent, tools and filters, with a scripted model and keyword search only, so it proves the plumbing and not answer quality | In `ci.yml` |
 | Secrets | Same | gitleaks over the full history | In `ci.yml` |
-| Live T1 | By hand | Real model plus a judge from a different model family | Workflow exists in [`groq.yml`](.github/workflows/groq.yml), **never run** |
+| Security | Every PR, nightly, weekly | `pip-audit`, `npm audit`, and the OWASP ZAP baseline, which fails a PR on a missing security header | In [`security.yml`](.github/workflows/security.yml) |
+| Live T1 | By hand | Real model plus a judge from a different model family | Workflow exists in [`groq.yml`](.github/workflows/groq.yml). **No run has finished**: the first hit its time limit |
 | T2, T3 | Planned: nightly and at release | Full sets, and the official score | **Not in CI** |
 
-Production deploys only through [`deploy.yml`](.github/workflows/deploy.yml), after CI passes on `main`: migrations, knowledge base load, deploy, smoke test, automatic rollback. [`retention.yml`](.github/workflows/retention.yml) runs the daily deletions promised on the privacy page.
+Production deploys only through [`deploy.yml`](.github/workflows/deploy.yml), after CI passes on `main`: migrations, knowledge base load, deploy, smoke test, automatic rollback. [`retention.yml`](.github/workflows/retention.yml) runs the daily deletions promised on the privacy page, and [`uptime.yml`](.github/workflows/uptime.yml) checks the site every hour.
 
 Because the repo is public, CI also checks every tracked file against a private list of terms that must never be published ([`publication_check.py`](backend/portfolio_agent/publication_check.py)).
 
@@ -179,18 +180,17 @@ Then run `make web` in a second terminal and open <http://localhost:3000>.
 
 ## Status
 
-**Working on `main`:** streamed chat in Hebrew and English, enforced citations, the trace panel, hybrid search with reranking, quotas and a kill switch, feedback, conversation delete, daily data deletion, and the `/quality`, `/how-it-works` and `/privacy` pages.
+**Working on `main`:** streamed chat in Hebrew and English, enforced citations, the trace panel, hybrid search with reranking, job match, project cards and architecture diagrams, quotas and a kill switch, feedback, conversation delete, daily data deletion, a nonce-based Content Security Policy, and the `/quality`, `/stats`, `/how-it-works` and `/privacy` pages.
 
 **Not done yet:**
 
 | Area | What's missing |
 |---|---|
-| Answer quality | Live T1 has never run, and the judge hasn't been calibrated against human labels |
+| Answer quality | No live T1 run has finished, and the judge hasn't been calibrated against human labels |
 | Official score | T3 hasn't run. `/quality` shows `dev` retrieval numbers and says so |
 | Deploy gates | CI doesn't run the real model yet, so answer-quality thresholds don't block a deploy |
-| Security scanning | No OWASP ZAP or `pip-audit` in CI |
 | Evals in CI | T2 isn't scheduled |
-| Features | Job match passed its two D3 gates on one live run (gap coverage 22 of 24, 92%, interval 74% to 98%; no false strong matches). `/stats`, cards and diagrams, company links, the contact flow and the `/mcp` endpoint aren't built |
+| Features | Job match passed its two D3 gates on one live run (gap coverage 22 of 24, 92%, interval 74% to 98%; no false strong matches). Company links, the contact flow and the `/mcp` endpoint aren't built |
 | Accessibility | Automated checks run in Chromium only. Safari, Firefox and real screen readers need manual testing |
 | Docs | ADRs 0003 and 0008 aren't written. The spec describes the planned system, so where it differs from this README, this README describes what exists |
 
@@ -200,7 +200,7 @@ Then run `make web` in a second terminal and open <http://localhost:3000>.
 apps/web/                 Next.js: pages, chat, trace panel, Playwright tests
 backend/portfolio_agent/
   agent/                  loop, prompts, citation filter, stream guard
-  tools/                  registry and the two tools
+  tools/                  registry and the tools
   retrieval/              keyword, vector, hybrid, rerank, Hebrew normalization
   providers/              one OpenAI-compatible client, routing and fallback
   guards/                 quotas and visitor identity
