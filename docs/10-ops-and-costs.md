@@ -82,8 +82,9 @@ Branch של Neon הוא העתק מיידי של המסד, וזמין בתוכנ
 |---|---|---|
 | `ci.yml` | כל PR | lint, typecheck, gitleaks, audits, מיגרציות על מסד ריק, T0, T1, ו-build |
 | `deploy.yml` | merge ל-`main` | מיגרציות לפרודקשן, קליטת בסיס הידע, `vercel deploy --prod`, smoke test, ו-rollback אוטומטי אם הוא נכשל |
+| `security.yml` | כל PR, כל לילה ושבועי | `pip-audit`, `npm audit` שבועי, ו-OWASP ZAP baseline על build מקומי ועל האתר החי (ADR-0019) |
 | `preview.yml` | ידני | פריסת preview לענף שנבחר. לא נוגע בפרודקשן |
-| `nightly.yml` | כל לילה | T2 ו-OWASP ZAP |
+| `nightly.yml` | כל לילה | T2 |
 | `release.yml` | ידני | T3, ו-commit של התוצאות לעמוד האיכות |
 | `retention.yml` | כל יום | חישוב `daily_metrics` לפני המחיקות, כדי שחלון של 30 יום יישאר שלם (כישלון שלו לא עוצר אותן), ואז מחיקה לפי פרק 10: שיחות אחרי 30 יום, hash של IP אחרי 2 ימים, מונים אחרי 7 ימים, רשומות מטמון שפג תוקפן, traces של תשובות שנמחקו, לפי מזהה התשובה, וכל trace שמתקרב לגיל 30 יום |
 | `uptime.yml` | כל שעה | `GET /api/health`, והתראה אם נכשל פעמיים ברצף |

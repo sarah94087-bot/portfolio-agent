@@ -1,0 +1,103 @@
+# The dependency audits and the OWASP ZAP baseline (docs/09-security-privacy.md, section 8; the
+# decisions are in ADR-0019). A finding turns a pull request red; it does not stop a deploy, since
+# deploy.yml waits for ci only.
+#
+#   pip-audit   every PR and weekly       any known vulnerability in a runtime dependency fails
+#   npm audit   weekly (ci.yml has PRs)   moderate or above fails, as in ci.yml
+#   ZAP         every PR, on a local      passive only, no attacks. Reports, and fails only on
+#               build; nightly on the     the rules marked FAIL in .github/security/zap-rules.tsv
+#               deployed site
+#
+# Known false positives live in .github/security/, each with its reason. The workflow reads no
+# secrets, so it runs the same for forks and Dependabot, and its logs have nothing to leak.
+name: security
+
+on:
+  pull_request:
+  schedule:
+    - cron: "17 2 * * *" # nightly: ZAP on the deployed site
+    - cron: "41 2 * * 1" # Mondays: the dependency audits
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # Dependabot does not read an image named in a run step: move this by hand with each ZAP release.
+  ZAP_IMAGE: ghcr.io/zaproxy/zaproxy:2.17.0@sha256:9624669db72f54d86c4b46a7064518bd9bf79d8c61a4c31befa9923489f328af
+
+jobs:
+  pip-audit:
+    if: github.event_name != 'schedule' || github.event.schedule == '41 2 * * 1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+      - run: pip install pip-audit==2.10.1
+      - run: bash .github/security/run_pip_audit.sh
+
+  npm-audit:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '41 2 * * 1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: "24"
+      - run: npm audit --omit=dev --audit-level=moderate
+
+  zap:
+    if: github.event_name != 'schedule' || github.event.schedule == '17 2 * * *'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # A pull request is not deployed yet, so it scans its own build. Everything else scans the
+      # site. The spider finds /api/chat in the page text and requests it with GET, which the
+      # API refuses (405). It only POSTs HTML forms, and the site has none that reach the API,
+      # so it spends no model tokens. Keep it that way: no GET under /api may call a model.
+      TARGET: ${{ github.event_name == 'pull_request' && 'http://localhost:3000/' || 'https://portfolio-agent-rosy.vercel.app/' }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        if: github.event_name == 'pull_request'
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Build and start the site
+        if: github.event_name == 'pull_request'
+        working-directory: apps/web
+        run: |
+          npm ci
+          npm run build
+          nohup npx next start -p 3000 > "$RUNNER_TEMP/next.log" 2>&1 &
+          curl --silent --show-error --fail --output /dev/null \
+            --retry 30 --retry-delay 2 --retry-connrefused http://localhost:3000/he
+      # -I: warnings do not fail the job, only rules marked FAIL do. A scan that breaks still
+      # fails it (exit code 3), so a green job always means the scan ran.
+      - name: ZAP baseline
+        run: |
+          mkdir zap-out
+          cp .github/security/zap-rules.tsv zap-out/
+          chmod -R a+rwX zap-out
+          docker run --rm --network host -v "$PWD/zap-out:/zap/wrk:rw" "$ZAP_IMAGE" \
+            zap-baseline.py -t "$TARGET" -c zap-rules.tsv -m 1 -T 10 -I \
+            -J report.json -r report.html
+      - name: Summarize the findings
+        if: always()
+        run: python3 .github/security/zap_summary.py zap-out/report.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: zap-report
+          path: |
+            zap-out/report.html
+            zap-out/report.json
+          retention-days: 14

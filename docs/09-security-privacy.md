@@ -143,7 +143,7 @@
 | הגנות, מכסות והרשאות | pytest | T0 |
 | סודות ב-repo | gitleaks | כל commit |
 | תלויות פגיעות | `pip-audit`, `npm audit`, Dependabot | כל PR, ושבועי |
-| כותרות וחולשות web בסיסיות | OWASP ZAP baseline | לילי, מול הסביבה הפרוסה |
+| כותרות וחולשות web בסיסיות | OWASP ZAP baseline | כל PR על build מקומי, ולילי מול הסביבה הפרוסה (ADR-0019) |
 | XSS בפלט המודל | בדיקות ממשק עם פלט זדוני מוקלט | T0 |
 
 ## 9. החלטות
