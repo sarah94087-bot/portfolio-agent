@@ -2,6 +2,9 @@
 
 import asyncio
 
+from portfolio_agent.providers.openai_compat import ProviderError
+from portfolio_agent.tools import job_match
+
 from jobmatch.dataset import Job
 from jobmatch.run import (
     JOB_ESTIMATE,
@@ -13,8 +16,6 @@ from jobmatch.run import (
     run_all,
     write_saved,
 )
-from portfolio_agent.providers.openai_compat import ProviderError
-from portfolio_agent.tools import job_match
 
 
 def job(n, labels):

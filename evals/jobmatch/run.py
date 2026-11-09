@@ -33,9 +33,9 @@ from portfolio_agent.providers.router import GROQ_BASE
 from portfolio_agent.retrieval import embedder
 from portfolio_agent.tools import job_match, job_rules
 from portfolio_agent.tools.portfolio import PortfolioContext
-from stats import cohen_kappa, format_rate, kappa_interval
 
 from jobmatch.dataset import D3_PATH, Job, load_d3, overall
+from stats import cohen_kappa, format_rate, kappa_interval
 
 RESULTS = D3_PATH.parent.parent / "results" / "d3-live.json"
 MAX_TOKENS = int(os.environ.get("JOBMATCH_MAX_TOKENS", "80000"))
