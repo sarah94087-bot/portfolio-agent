@@ -41,7 +41,7 @@ class Model(Protocol):
     name: str
 
     def stream(
-        self, messages: Sequence[Message], tools: Sequence[dict[str, Any]]
+        self, messages: Sequence[Message], tools: Sequence[dict[str, Any]], **options: Any
     ) -> AsyncIterator[Event]: ...
 
 
@@ -139,7 +139,7 @@ class TurnRouter:
         return [m for m in self.router.available() if m.name not in self.dropped]
 
     async def stream(
-        self, messages: Sequence[Message], tools: Sequence[dict[str, Any]]
+        self, messages: Sequence[Message], tools: Sequence[dict[str, Any]], **options: Any
     ) -> AsyncIterator[Event | Restart]:
         attempts: list[tuple[str, str]] = []
         failed_after_text: tuple[str, str] | None = None
@@ -152,7 +152,7 @@ class TurnRouter:
             retried = False
             while True:
                 try:
-                    async for event in model.stream(messages, tools):
+                    async for event in model.stream(messages, tools, **options):
                         started = True
                         yield event
                     return

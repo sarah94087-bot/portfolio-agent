@@ -179,7 +179,7 @@ async def run_turn(
             args = _parse(call.arguments)
             await emit("step", {"step_id": sid, "kind": "tool_call", "status": "start",
                                 "name": call.name, "args": args})
-            result = registry.call(call.name, call.arguments, ctx)
+            result = await registry.acall(call.name, call.arguments, ctx)
             if result.invalid_args:
                 invalid += 1
                 if invalid > MAX_INVALID_ARGS:

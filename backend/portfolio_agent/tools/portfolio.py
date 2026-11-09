@@ -16,7 +16,7 @@ import re
 import time
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Literal, Protocol
+from typing import Any, Literal, Protocol
 
 import psycopg
 from psycopg import sql
@@ -60,6 +60,7 @@ class PortfolioContext:
     # can still reach another project by searching for it. The tool is removed, and its enum
     # is not narrowed, since Groq answers 400 to a tool call outside the schema's enum.
     has_whole_record: bool = False
+    job: Any = None  # tools/job_match.py, JobTool: set when this turn may run a job match
 
     @classmethod
     def from_docs(cls, conn: psycopg.Connection, docs: Sequence[Doc], **kw) -> "PortfolioContext":

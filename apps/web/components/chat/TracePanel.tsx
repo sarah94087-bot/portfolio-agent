@@ -99,6 +99,17 @@ function stepText(item: TimelineItem, lang: string, t: ChatStrings): { name: Rea
       };
     case "guard":
       return { name: tr.guard, meta: null, text: tr.guardText };
+    case "job": {
+      const stage = item.stage as keyof typeof tr.jobStage;
+      return {
+        name: tr.jobStage[stage] ?? item.stage,
+        meta: seconds(item.ms, lang, t),
+        text: fill(tr.jobText[stage] ?? "", {
+          capped: (item.capped ?? 0).toLocaleString(lang),
+          dropped: (item.dropped ?? 0).toLocaleString(lang),
+        }),
+      };
+    }
   }
 }
 
@@ -425,7 +436,7 @@ export function TracePanel({ turn, index, lang, t, highlight, onClose }: Props) 
                 <tbody>
                   {view.tokens.map((c, i) => (
                     <tr key={i}>
-                      <td className="border-b border-border px-1.5 py-[7px]">{fill(c.decision ? tr.callDecision : tr.callAnswer, { n: i + 1 })}</td>
+                      <td className="border-b border-border px-1.5 py-[7px]">{c.stage ? `${(i + 1).toLocaleString(lang)} · ${tr.jobStage[c.stage as keyof typeof tr.jobStage] ?? c.stage}` : fill(c.decision ? tr.callDecision : tr.callAnswer, { n: i + 1 })}</td>
                       <td className="mono border-b border-border px-1.5 py-[7px] text-end">{c.input.toLocaleString(lang)}</td>
                       <td className="mono border-b border-border px-1.5 py-[7px] text-end">{c.output.toLocaleString(lang)}</td>
                     </tr>

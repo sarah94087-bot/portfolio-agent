@@ -11,6 +11,7 @@
 //   and `retry` sends the message again with the same idempotency key. If the server saved the
 //   answer, it replays it from the database at no cost; the new `meta` starts the turn over.
 
+import { parseReport, type JobReport } from "./job.ts";
 import { streamEvents, type SseEvent } from "./sse.ts";
 
 export const MAX_QUESTION = 1000; // US-10.4; the server checks it too
@@ -56,6 +57,11 @@ export type Turn = {
   sources: Source[];
   usage?: Record<string, unknown>;
   error?: TurnError;
+  job?: boolean; // sent from the composer's job mode: `question` is a pasted posting
+  postingChars?: number; // a restored report no longer has the posting on screen
+  report?: JobReport;
+  markdown?: string; // the report as a file, made on the server (US-5.3)
+  restored?: boolean; // opened from the link in a report: no trace, no feedback
 };
 
 export const DISCONNECTED: TurnError = {
@@ -75,8 +81,8 @@ export function newKey(): string {
   return crypto.randomUUID().replaceAll("-", "");
 }
 
-export function newTurn(question: string, key: string = newKey()): Turn {
-  return { key, question, status: "sending", parts: [], steps: [], restarts: [], sources: [] };
+export function newTurn(question: string, key: string = newKey(), job = false): Turn {
+  return { key, question, status: "sending", parts: [], steps: [], restarts: [], sources: [], ...(job ? { job } : {}) };
 }
 
 const chars = (s: string) => [...s].length;
@@ -138,7 +144,13 @@ export function apply(turn: Turn, { event, data }: SseEvent): Turn {
         sources: [],
         usage: undefined,
         error: undefined,
+        report: undefined,
+        markdown: undefined,
       };
+    case "card": {
+      const report = data.kind === "job_match" ? parseReport(data.data) : undefined;
+      return report ? { ...turn, report, markdown: str(data.markdown) } : turn;
+    }
     case "token":
       return { ...turn, parts: appendText(turn.parts, str(data.text) ?? "") };
     case "citation": {
@@ -204,7 +216,7 @@ export function apply(turn: Turn, { event, data }: SseEvent): Turn {
     case "done":
       return turn.status === "error" ? turn : { ...turn, status: "done" };
     default:
-      return turn; // card, contact_draft (M7) and types this client does not know yet
+      return turn; // contact_draft (M7) and types this client does not know yet
   }
 }
 
@@ -239,6 +251,7 @@ export async function run(
     ...(conversationId ? { conversation_id: conversationId } : {}),
     ...(companySlug ? { company_slug: companySlug } : {}),
     ...(lang ? { lang } : {}),
+    ...(turn.job ? { mode: "job" } : {}),
   });
   try {
     await stream(

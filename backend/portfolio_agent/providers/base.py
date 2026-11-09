@@ -35,9 +35,10 @@ Event = TextDelta | ToolCall | Finish
 
 class Provider(Protocol):
     def stream(
-        self, messages: Sequence[Message], tools: Sequence[dict[str, Any]]
+        self, messages: Sequence[Message], tools: Sequence[dict[str, Any]], **options: Any
     ) -> AsyncIterator[Event]:
-        """One model call. Text arrives as deltas, tool calls whole, and Finish comes last."""
+        """One model call. Text arrives as deltas, tool calls whole, and Finish comes last.
+        `options` overrides request fields for this call (temperature, max_tokens, tool_choice)."""
         ...
 
 

@@ -110,6 +110,7 @@ match_job:
   params:
     job_description: { type: string, maxLength: 8000 }
   returns: דוח מובנה (פרק 8). מוצג כ-card ולא כטקסט חופשי
+  note: מצב המשרה ב-composer מריץ את אותו צינור ישירות, בלי לולאת הסוכן (ADR-0016)
 
 render_card:
   description: Show a visual card for a project. Use when one project is the focus of the answer.
@@ -153,7 +154,7 @@ Groq qwen3.8-27b ──► Groq gpt-oss-20b   (בלי Gemini, ADR-0009)
 | פרמטר | תשובות | `match_job` |
 |---|---|---|
 | temperature | 0.2 | 0 |
-| max output tokens | 800 | 1,500 |
+| max output tokens | 800 | 1,500. דירוג: `1,200 + 130 × n` דרישות (ADR-0016) |
 
 ## 5. ניהול הקשר
 

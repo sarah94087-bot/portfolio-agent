@@ -190,9 +190,9 @@ Then run `make web` in a second terminal and open <http://localhost:3000>.
 | Deploy gates | CI doesn't run the real model yet, so answer-quality thresholds don't block a deploy |
 | Security scanning | No OWASP ZAP or `pip-audit` in CI |
 | Evals in CI | T2 isn't scheduled |
-| Features | Job match is on a branch, not on `main`, and hasn't passed its gap-coverage gate. `/stats`, cards and diagrams, company links, the contact flow and the `/mcp` endpoint aren't built |
+| Features | Job match passed its two D3 gates on one live run (gap coverage 22 of 24, 92%, interval 74% to 98%; no false strong matches). `/stats`, cards and diagrams, company links, the contact flow and the `/mcp` endpoint aren't built |
 | Accessibility | Automated checks run in Chromium only. Safari, Firefox and real screen readers need manual testing |
-| Docs | ADRs 0003 and 0008 aren't written, and ADR-0016 is on the job-match branch. The spec describes the planned system, so where it differs from this README, this README describes what exists |
+| Docs | ADRs 0003 and 0008 aren't written. The spec describes the planned system, so where it differs from this README, this README describes what exists |
 
 ## Where things are
 

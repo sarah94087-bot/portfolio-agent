@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CompassIcon, JobIcon, LayersIcon, StarIcon } from "@/components/ui/icons";
-import { newTurn, retry as retryTurn, run, type Turn } from "@/lib/chat";
+import { apply, newTurn, retry as retryTurn, run, type Turn } from "@/lib/chat";
 import { AgentMessage, type ChatStrings } from "./AgentMessage";
 import { Composer, type ComposerMode, type ComposerStrings } from "./Composer";
 import { ConversationActions } from "./ConversationActions";
@@ -26,15 +26,17 @@ type Props = {
   composer: ComposerStrings;
   chat: ChatStrings;
   agentName: string;
+  agentLine: string;
   privacy: React.ReactNode;
 };
 
 // S1 until the first question, then S2 (boards Main, A-S2, S2-States, S2-Mobile). The turns
 // live here; lib/chat.ts turns each answer's events into what AgentMessage shows.
-export function Chat({ lang, intro, starters, startersLabel, composer, chat, agentName, privacy }: Props) {
+export function Chat({ lang, intro, starters, startersLabel, composer, chat, agentName, agentLine, privacy }: Props) {
   const [mode, setMode] = useState<ComposerMode>("question");
   const [value, setValue] = useState("");
   const [turns, setTurns] = useState<Turn[]>([]);
+  const [toast, setToast] = useState("");
   const conversationId = useRef<string | undefined>(undefined);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const lastQuestion = useRef<HTMLDivElement>(null);
@@ -48,6 +50,30 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
   useEffect(() => {
     fetch("/api/health?warm=1", { cache: "no-store" }).catch(() => {});
   }, []);
+
+  // The link in a downloaded report (US-5.3): the report again, in its conversation. Only the
+  // browser that made it gets one; anything else is the same "not available".
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get("report");
+    if (!id) return;
+    const notFound = () => setToast(chat.job.linkGone);
+    fetch(`/api/job-match/${encodeURIComponent(id)}?lang=${pageLang}`, { cache: "no-store", credentials: "same-origin" })
+      .then(async (r) => {
+        if (!r.ok) return notFound();
+        const body = await r.json();
+        const base = newTurn("", `restored${id}`, true);
+        const events = [
+          { event: "meta", data: { conversation_id: body.conversation_id, message_id: body.message_id } },
+          { event: "card", data: body.card },
+          { event: "sources", data: { sources: body.sources } },
+          { event: "done", data: {} },
+        ];
+        const turn = { ...events.reduce(apply, base), restored: true, postingChars: body.posting_chars };
+        conversationId.current = body.conversation_id;
+        setTurns([turn]);
+      })
+      .catch(notFound);
+  }, [chat.job.linkGone, pageLang]);
 
   // S3: one answer's trace at a time. Focus goes back to what opened it.
   const [trace, setTrace] = useState<{ key: string; chunkId?: string } | null>(null);
@@ -96,8 +122,8 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
     setTurns((ts) => ts.map((t) => (t.key === next.key ? next : t)));
   }
 
-  function send(text: string) {
-    const turn = newTurn(text);
+  function send(text: string, as: ComposerMode) {
+    const turn = newTurn(text, undefined, as === "job");
     setTurns((ts) => [...ts, turn]);
     setValue("");
     setMode("question");
@@ -113,7 +139,6 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
 
   // Back to the welcome screen. "New conversation" leaves the old one on the server (it expires
   // in 30 days); after a delete it is already gone, and a toast says so (board S7-S8).
-  const [toast, setToast] = useState("");
   useEffect(() => {
     if (!toast) return;
     const id = setTimeout(() => setToast(""), 4000);
@@ -130,7 +155,7 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
 
   // A starter is sent as if it were typed (US-1.2); the last one opens the job field.
   function pick(index: number) {
-    if (index < starters.length - 1) return send(starters[index]);
+    if (index < starters.length - 1) return send(starters[index], "question");
     setMode("job");
     setValue("");
     requestAnimationFrame(() => inputRef.current?.focus());
@@ -180,13 +205,19 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
                 dir="auto"
                 className="max-w-[85%] self-start whitespace-pre-wrap rounded-[16px] bg-tint-ink px-3.5 py-2 text-[16px] font-semibold leading-[1.6] text-on-ink md:px-[18px] md:py-[11px] md:text-[18px]"
               >
-                {turn.question}
+                {turn.job ? (
+                  <>
+                    {chat.job.pasted.replace("{n}", (turn.postingChars ?? turn.question.length).toLocaleString(lang))}
+                    {turn.question && <span className="mt-1 line-clamp-3 text-[14px] font-normal leading-[1.5] md:text-[15px]">{turn.question}</span>}
+                  </>
+                ) : turn.question}
               </div>
               <AgentMessage
                 turn={turn}
                 lang={lang}
                 t={chat}
                 agentName={agentName}
+                agentLine={agentLine}
                 onRetry={() => retry(turn)}
                 traceOpen={trace?.key === turn.key}
                 onTrace={(from, chunkId) => openTrace(turn, from, chunkId)}
@@ -236,7 +267,7 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
             requestAnimationFrame(() => inputRef.current?.focus());
           }}
           onChange={setValue}
-          onSubmit={(text) => send(text)}
+          onSubmit={(text, as) => send(text, as)}
         />
         <p className="mt-2.5 text-[12.5px] leading-[1.5] text-text-muted md:mt-4 md:text-small">{privacy}</p>
       </div>

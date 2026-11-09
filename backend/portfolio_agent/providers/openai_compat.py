@@ -55,6 +55,9 @@ def classify(status: int, body: str, headers: httpx.Headers) -> ProviderError:
     return ProviderError("bad_request", f"HTTP {status}: {body[:300]}")
 
 
+REASONING_EFFORT_MODELS = ("openai/gpt-oss",)  # those that take "low"
+
+
 class OpenAICompatible:
     def __init__(self, endpoint: Endpoint, client: httpx.AsyncClient,
                  temperature: float = TEMPERATURE, max_tokens: int = MAX_OUTPUT_TOKENS):
@@ -68,8 +71,10 @@ class OpenAICompatible:
         return self.endpoint.name
 
     async def stream(
-        self, messages: Sequence[Message], tools: Sequence[dict[str, Any]]
+        self, messages: Sequence[Message], tools: Sequence[dict[str, Any]], **options: Any
     ) -> AsyncIterator[Event]:
+        """`options` overrides request fields for one call: temperature, max_tokens,
+        tool_choice and reasoning_effort (the job match's structured output, at temperature 0)."""
         body: dict[str, Any] = {
             "model": self.endpoint.model,
             "messages": list(messages),
@@ -77,7 +82,10 @@ class OpenAICompatible:
             "stream_options": {"include_usage": True},
             "temperature": self.temperature,
             "max_tokens": self.max_tokens,
+            **options,
         }
+        if not self.endpoint.model.startswith(REASONING_EFFORT_MODELS):
+            body.pop("reasoning_effort", None)  # a value other models answer 400 to
         if tools:
             body["tools"] = list(tools)
         url = self.endpoint.base_url.rstrip("/") + "/chat/completions"

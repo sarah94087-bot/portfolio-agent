@@ -20,6 +20,7 @@ from portfolio_agent.agent.emit import Emit
 class Transcript:
     parts: list[tuple[str, str]] = field(default_factory=list)  # ("t", text) | ("c", chunk_id)
     steps: list[dict[str, Any]] = field(default_factory=list)
+    card: dict[str, Any] | None = None  # kind and data; the Markdown is made when it is sent
 
     def record(self, event: str, data: dict[str, Any]) -> None:
         if event == "token":
@@ -29,6 +30,8 @@ class Transcript:
                 self.parts.append(("t", data["text"]))
         elif event == "citation":
             self.parts.append(("c", data["chunk_id"]))
+        elif event == "card":
+            self.card = {"kind": data["kind"], "data": data["data"]}
         elif event == "step":
             self.steps.append(data)
             summary = data.get("summary") or {}

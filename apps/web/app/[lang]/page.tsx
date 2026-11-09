@@ -38,6 +38,7 @@ export default async function ChatPage({ params }: PageProps<"/[lang]">) {
             composer={t.composer}
             chat={t.chat}
             agentName={t.header.agentName}
+            agentLine={`${t.header.agentName} · ${t.header.aiTag}`}
             privacy={
               <>
                 {w.privacy}{" "}

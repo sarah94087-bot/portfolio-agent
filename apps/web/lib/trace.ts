@@ -14,6 +14,7 @@ export type TimelineItem =
   | { kind: "answer"; ms?: number; citations: number; restart?: Restart }
   | { kind: "tool_call"; tool: string; ms?: number; method?: string; record?: string }
   | { kind: "tool_result"; tool: string; candidates?: number; selected: number }
+  | { kind: "job"; stage: string; ms?: number; capped?: number; dropped?: number }
   | { kind: "guard"; blocked: boolean };
 
 export type Row = {
@@ -52,7 +53,7 @@ export type TraceView = {
   decisions: { tool: string; args: Record<string, unknown> }[];
   searches: Search[];
   waterfall?: Waterfall;
-  tokens: { decision: boolean; input: number; output: number }[];
+  tokens: { decision: boolean; input: number; output: number; stage?: string }[];
   model?: string;
   promptVersion?: string;
   commit?: string;
@@ -101,7 +102,17 @@ export function buildTrace(turn: Turn): TraceView {
 
   for (const step of turn.steps) {
     const s = step.summary ?? {};
-    if (step.kind === "llm") {
+    const stage = step.name?.startsWith("job.") ? step.name.slice(4) : undefined;
+    if (stage && step.status === "end" && stage !== "requirements") {
+      // A stage of the job match pipeline (lib/job.ts): a model call, or the code's enforcement.
+      const capped = Array.isArray(s.capped) ? s.capped.length : undefined;
+      timeline.push({ kind: "job", stage, ms: step.durationMs, capped, dropped: num(s.dropped) });
+      const usage = obj(s.usage);
+      if (usage) tokens.push({ decision: false, input: num(usage.input_tokens) ?? 0, output: num(usage.output_tokens) ?? 0, stage });
+      if (!retrieval) beforeTools += step.durationMs ?? 0;
+    } else if (stage) {
+      continue;
+    } else if (step.kind === "llm") {
       const tools = Array.isArray(s.tool_calls) ? s.tool_calls.filter((x): x is string => typeof x === "string") : [];
       const restart = restartOf.get(step.id);
       timeline.push(tools.length
