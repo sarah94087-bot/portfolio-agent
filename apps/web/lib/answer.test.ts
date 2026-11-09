@@ -48,6 +48,24 @@ test("Latin words and numbers inside Hebrew are separate runs", () => {
   ]);
 });
 
+test("a non-breaking hyphen or space stays inside the Latin run", () => {
+  for (const name of ["plant\u2011health\u2011classification", "AWS\u00A0EC2", "AWS\u202FEC2", "2020\u20132024"]) {
+    assert.deepEqual(runs(`בפרויקט ${name} היא`), [
+      { text: "בפרויקט ", latin: false },
+      { text: name, latin: true },
+      { text: " היא", latin: false },
+    ]);
+  }
+});
+
+test("a dash between Latin words and a Hebrew word still ends the run", () => {
+  assert.deepEqual(runs("FastAPI \u2014 וגם Docker"), [
+    { text: "FastAPI", latin: true },
+    { text: " \u2014 וגם ", latin: false },
+    { text: "Docker", latin: true },
+  ]);
+});
+
 test("the spoken answer has no Markdown and names each citation", () => {
   assert.equal(spoken([t("the **project** is"), c(1), t("\n\n- one\n- two")]),
     "the project is [1]\none\ntwo");
