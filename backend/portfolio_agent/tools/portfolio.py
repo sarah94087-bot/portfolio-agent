@@ -22,6 +22,7 @@ import psycopg
 from psycopg import sql
 from pydantic import BaseModel, ConfigDict, Field
 
+from portfolio_agent.agent.guard import language
 from portfolio_agent.ingest import Doc, count_tokens
 from portfolio_agent.retrieval import hybrid, lexical
 from portfolio_agent.retrieval.lexical import CANDIDATES, Hit
@@ -43,6 +44,7 @@ class Record:
     id: str
     type: str
     title: str
+    title_he: str | None = None
 
 
 @dataclass
@@ -70,7 +72,8 @@ class PortfolioContext:
         for d in docs:
             title = getattr(d.record, "title", None)
             records[d.record.id] = Record(
-                d.record.id, d.record.type, title.en if title else d.record.id
+                d.record.id, d.record.type, title.en if title else d.record.id,
+                getattr(title, "he", None),
             )
         return cls(conn, records, owner_names(d.record for d in docs), **kw)
 
@@ -94,8 +97,13 @@ def _excerpt(text: str) -> str:
 
 
 def _title(hit: Hit, ctx: PortfolioContext) -> str:
+    """The name the model copies into its answer, so in the language it will answer in: that of
+    the visitor's message. A Hebrew sentence full of English terms counts as "mixed"."""
     record = ctx.records.get(hit.record_id)
-    return record.title if record else hit.record_id
+    if record is None:
+        return hit.record_id
+    hebrew = language(ctx.question) in ("he", "mixed")
+    return (record.title_he if hebrew else None) or record.title
 
 
 def _view(hit: Hit, ctx: PortfolioContext) -> dict:
