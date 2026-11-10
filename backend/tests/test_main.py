@@ -25,6 +25,14 @@ def test_health_reports_unreachable_database(monkeypatch):
     assert "error" in db
 
 
+def test_health_can_skip_the_database(monkeypatch):
+    # The external monitor's check: an unreachable database is not even tried.
+    monkeypatch.setenv("DATABASE_URL", "postgresql://nobody@127.0.0.1:1/none")
+    body = client.get("/api/health", params={"db": 0}).json()
+    assert body["db"] == {"ok": None, "skipped": True}
+    assert body["agent_enabled"] is True
+
+
 def test_api_responses_carry_the_security_headers(monkeypatch):
     monkeypatch.delenv("DATABASE_URL", raising=False)
     headers = client.get("/api/health").headers
