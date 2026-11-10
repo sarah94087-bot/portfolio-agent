@@ -4,9 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CompassIcon, JobIcon, LayersIcon, StarIcon } from "@/components/ui/icons";
 import { apply, newTurn, retry as retryTurn, run, type Turn } from "@/lib/chat";
+import { checkPaused } from "@/lib/health";
 import { AgentMessage, type ChatStrings } from "./AgentMessage";
 import { Composer, type ComposerMode, type ComposerStrings } from "./Composer";
 import { ConversationActions } from "./ConversationActions";
+import { Paused } from "./Paused";
 import { TracePanel } from "./TracePanel";
 import { useSheetFocus } from "./useSheetFocus";
 
@@ -37,6 +39,7 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
   const [value, setValue] = useState("");
   const [turns, setTurns] = useState<Turn[]>([]);
   const [toast, setToast] = useState("");
+  const [paused, setPaused] = useState(false);
   const conversationId = useRef<string | undefined>(undefined);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const lastQuestion = useRef<HTMLDivElement>(null);
@@ -46,9 +49,10 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
   useSheetFocus();
 
   // Spike S2: a cold start takes about 9 s, so the page wakes the function, Neon and the
-  // embedding model while the visitor reads and types. Nothing depends on the answer.
+  // embedding model while the visitor reads and types. The same answer says whether the kill
+  // switch is on (docs/10, section 7); if it is, S7's page state replaces the composer.
   useEffect(() => {
-    fetch("/api/health?warm=1", { cache: "no-store" }).catch(() => {});
+    void checkPaused(true).then(setPaused);
   }, []);
 
   // The link in a downloaded report (US-5.3): the report again, in its conversation. Only the
@@ -119,6 +123,9 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
 
   function update(next: Turn) {
     if (next.conversationId) conversationId.current = next.conversationId;
+    // The switch may have been turned on after the page loaded; this error is what the agent
+    // answers then, so ask once more.
+    if (next.error?.code === "provider_unavailable") void checkPaused(false).then((p) => p && setPaused(true));
     setTurns((ts) => ts.map((t) => (t.key === next.key ? next : t)));
   }
 
@@ -172,7 +179,9 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
 
   return (
     <>
-      {!started ? (
+      {paused && !started ? (
+        <Paused t={chat.paused} heading="h1" />
+      ) : !started ? (
         <>
           {intro}
           <ul aria-label={startersLabel} className="mt-5 grid grid-cols-1 gap-2 md:mt-7 md:grid-cols-2 md:gap-3">
@@ -240,8 +249,10 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
 
       {/* The composer sticks to the bottom once the conversation starts, and on mobile from the
           start, as in the design; on the desktop welcome screen it follows the cards. */}
+      {paused && started && <Paused t={chat.paused} heading="h2" />}
       <div
         ref={dock}
+        hidden={paused}
         data-dock
         className={`sticky bottom-0 -mx-4 mt-auto bg-surface px-4 pb-[max(18px,env(safe-area-inset-bottom))] pt-3 ${started ? "md:pb-[22px]" : "md:static md:mx-0 md:mt-6 md:bg-transparent md:p-0"}`}
       >

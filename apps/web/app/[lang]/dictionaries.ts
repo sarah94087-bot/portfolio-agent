@@ -110,6 +110,12 @@ const he = {
       tooLong: "ההודעה ארוכה מדי. המגבלה היא 1,000 תווים.",
       internal: "משהו השתבש אצלנו.",
     },
+    // The kill switch, in S7's page state (board S7-S8).
+    paused: {
+      title: "הסוכן נח כרגע",
+      body: "הסוכן כבוי זמנית לתחזוקה, ולכן הוא לא עונה עכשיו. אפשר להוריד את קורות החיים, ויש בהם מייל וקישור ל-LinkedIn.",
+      cv: "הורדת קו״ח",
+    },
     // S4 (boards S4-Report, S4-Print). Impersonal wording, and never a percentage.
     job: {
       pasted: "תיאור משרה הודבק · {n} תווים",
@@ -363,6 +369,11 @@ const en: Dictionary = {
       unavailable: "No model can answer right now. Try again in a few minutes, or download the CV.",
       tooLong: "The message is too long. The limit is 1,000 characters.",
       internal: "Something went wrong on our side.",
+    },
+    paused: {
+      title: "The agent is resting",
+      body: "The agent is switched off for maintenance, so it can't answer right now. You can download the CV, which has an email address and a LinkedIn link.",
+      cv: "Download CV",
     },
     job: {
       pasted: "Job posting pasted · {n} characters",

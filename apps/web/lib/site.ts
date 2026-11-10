@@ -2,6 +2,10 @@
 
 export const SITE_URL = "https://portfolio-agent-rosy.vercel.app";
 
+// One CV for both languages (US-7.4). It holds the email address and the LinkedIn link.
+export const CV_HREF = "/cv/sara-halevy-cv.pdf";
+export const CV_NAME = "Sara Halevy cv.pdf";
+
 export const PAGES = ["", "/how-it-works", "/quality", "/stats", "/privacy"] as const;
 
 /** The canonical address of a page in one language, and its address in each. */
