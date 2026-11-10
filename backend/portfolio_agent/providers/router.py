@@ -4,6 +4,8 @@ Models are tried in the order of ADR-0005. A model whose minute ran out is skipp
 minute (or for Retry-After); one whose day ran out is skipped until the reset. Requests that
 come later go straight to the next model, without spending a call to learn the same thing.
 A 5xx or a timeout moves the call to the next model without opening the breaker for long.
+A 413 (the request is larger than the model's per-minute limit, which differs by model)
+moves the call on and leaves the breaker shut: a smaller request still fits that model.
 
 A minute limit that clears within seconds is waited out, before anything was sent and for at
 most MAX_MINUTE_WAIT in a turn: one question can pass 8,000 tokens by a little, and a short
@@ -162,7 +164,8 @@ class TurnRouter:
                     if not started and not retried and await self._waited_out(e):
                         retried = True
                         continue
-                    self.router.trip(model, e, self.store)
+                    if e.kind != "too_large":
+                        self.router.trip(model, e, self.store)
                     attempts.append((model.name, e.kind))
                     self.switches.append({"from": model.name, "reason": e.kind})
                     if started:

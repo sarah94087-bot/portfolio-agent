@@ -32,7 +32,7 @@ class ProviderError(Exception):
 
     def __init__(self, kind: str, message: str, retry_after: float | None = None):
         super().__init__(f"{kind}: {message}")
-        self.kind = kind  # rate_minute | rate_day | unavailable | bad_request
+        self.kind = kind  # rate_minute | rate_day | too_large | unavailable | bad_request
         self.retry_after = retry_after
 
 
@@ -50,6 +50,8 @@ def classify(status: int, body: str, headers: httpx.Headers) -> ProviderError:
     if status == 429:
         kind = "rate_day" if _DAY.search(body) else "rate_minute"
         return ProviderError(kind, body[:300], retry_after)
+    if status == 413:  # larger than this model takes in a minute; a model with more room may not be
+        return ProviderError("too_large", f"HTTP {status}: {body[:300]}", retry_after)
     if status >= 500:
         return ProviderError("unavailable", f"HTTP {status}", retry_after)
     return ProviderError("bad_request", f"HTTP {status}: {body[:300]}")
