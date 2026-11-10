@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import type { Dictionary, Locale } from "@/app/[lang]/dictionaries";
+import { CV_HREF as cvHref, CV_NAME as cvName } from "@/lib/site";
 import { buttonClass } from "./Button";
 import { DownloadIcon } from "./icons";
 import { LangToggle } from "./LangToggle";
@@ -24,10 +25,6 @@ export function Header({ lang, t }: { lang: Locale; t: Dictionary["header"] }) {
     { href: `/${lang}/quality`, label: t.quality },
     { href: `/${lang}/stats`, label: t.stats },
   ];
-  // One CV for both languages (US-7.4).
-  const cvHref = "/cv/sara-halevy-cv.pdf";
-  const cvName = "Sara Halevy cv.pdf";
-
   return (
     <header className="sticky top-0 z-10 flex h-14 flex-none items-center gap-2 border-b-[3px] border-accent bg-surface px-4 md:h-[68px] md:gap-4 md:px-10">
       <Link href={`/${lang}`} className="flex items-center gap-2 rounded-sm md:gap-3">
