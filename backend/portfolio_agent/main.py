@@ -92,16 +92,23 @@ def _warm_knowledge() -> dict:
 
 
 @app.get("/api/health")
-def health(warm: bool = False) -> dict:
+def health(warm: bool = False, db: bool = True) -> dict:
     """`warm` is what the page sends when it loads (spike S2): one request wakes the function,
     Neon and the embedding model while the visitor reads and types. Without it the check stays
-    cheap, for the uptime and smoke checks."""
+    cheap, for the uptime and smoke checks.
+
+    `db=0` is for the external monitor, every 5 minutes: it answers without touching Neon.
+    Neon sleeps after 5 minutes idle, so a database check that often would keep it awake all
+    month, about 180 of the free plan's 100 CU-hours (docs/10, section 6)."""
     settings = Settings.from_env()
-    db = _check_db(settings.database_url) if settings.database_url else {"ok": None}
+    if not db:
+        result = {"ok": None, "skipped": True}
+    else:
+        result = _check_db(settings.database_url) if settings.database_url else {"ok": None}
     return {
         "version": __version__,
         "agent_enabled": settings.agent_enabled,
-        "db": db,
+        "db": result,
         **({"embedder": _warm_embedder(), "knowledge": _warm_knowledge()} if warm else {}),
         **_instance_info(),
     }
