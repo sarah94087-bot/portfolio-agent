@@ -79,6 +79,7 @@ def test_tool_call_fragments_are_joined_in_index_order():
     (429, "Rate limit reached ... tokens per minute (TPM): Limit 8000", "rate_minute"),
     (429, "Rate limit reached ... requests per day (RPD): Limit 1000", "rate_day"),
     (429, "Rate limit reached ... tokens per day (TPD)", "rate_day"),
+    (413, "Request too large for model ... (ITPM): Limit 7000, Requested 7315", "too_large"),
     (503, "busy", "unavailable"),
     (400, "bad tool schema", "bad_request"),
 ])

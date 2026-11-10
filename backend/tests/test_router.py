@@ -192,6 +192,22 @@ def test_a_bad_request_is_raised_not_routed():
     assert b.calls == 0
 
 
+def test_a_request_too_large_for_one_model_moves_on_and_leaves_it_open():
+    # groq T1 run 11, case d1-027: qwen's 7,000 input tokens a minute could not take 7,315,
+    # and the 413 failed the whole turn instead of reaching the next model.
+    a, b = Fake("a", "too_large"), Fake("b")
+    router = Router([a, b])
+    events = run(router.for_turn())
+    assert text(events) == "b"
+    assert router.available() == [a, b]  # a smaller request still fits a
+
+
+def test_when_every_model_is_too_small_the_error_is_provider_unavailable():
+    with pytest.raises(AllModelsFailed) as e:
+        run(Router([Fake("a", "too_large"), Fake("b", "too_large")]).for_turn())
+    assert e.value.code == "provider_unavailable"
+
+
 def test_fall_back_drops_the_model_for_this_turn_only():
     a, b = Fake("a"), Fake("b")
     router = Router([a, b])

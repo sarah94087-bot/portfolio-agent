@@ -130,5 +130,14 @@ async def run_turns(turns: list[str]) -> list[dict[str, Any]]:
     return out
 
 
+@cache
+def _loop() -> asyncio.AbstractEventLoop:
+    """One event loop for the whole run. The router's client is cached across cases, so its
+    pooled connections belong to the loop they were opened on: with asyncio.run per case, the
+    first one closed after its loop was gone raised "Event loop is closed" (groq T1 run 11,
+    case d1-033)."""
+    return asyncio.new_event_loop()
+
+
 def run(turns: list[str]) -> list[dict[str, Any]]:
-    return asyncio.run(run_turns(turns))
+    return _loop().run_until_complete(run_turns(turns))
