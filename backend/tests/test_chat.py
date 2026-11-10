@@ -160,7 +160,7 @@ def test_a_full_turn_streams_in_order_and_saves_what_the_visitor_saw(use):
     assert "1234567" not in stored
     assert rows[1][2]["dropped"] == ["made-up#all"] and rows[1][2]["redacted"] == 1
     assert "git-mcp-server#all" in rows[1][2]["allowed_chunks"]
-    assert rows[1][3] == "system.v3"
+    assert rows[1][3] == "system.v4"
     measured = rows[1][2]["stats"]  # what /stats reads: daily_metrics.py
     assert measured["backup"] is False and isinstance(measured["cold"], bool)
     assert 0 <= measured["ttft_ms"] <= measured["total_ms"]
