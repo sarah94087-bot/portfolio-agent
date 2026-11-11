@@ -84,7 +84,12 @@ jobs:
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      # Chromium only, no `--with-deps`: that runs apt against the Ubuntu mirrors, and on
+      # 2026-11-11 the runner could not reach them five times in a row (PR 30, main, PR 31),
+      # hanging 10 minutes each time. The runner image ships Google Chrome, so the system
+      # libraries Chromium needs are already there.
+      - run: npx playwright install chromium
+        timeout-minutes: 5
       # builds the site, starts it and runs everything in e2e/
       - run: npm run test:e2e
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
