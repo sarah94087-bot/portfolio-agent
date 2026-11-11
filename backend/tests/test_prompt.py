@@ -39,3 +39,18 @@ def test_the_language_rule_comes_before_the_first_section():
     text = (PROMPTS / f"{VERSION}.md").read_text(encoding="utf-8")
     rule = text.index("Answer in the language of the visitor's last message")
     assert rule < text.index("\n## ")
+
+
+def test_every_example_has_an_english_version():
+    # The model copies examples. system.v4 gave the "no information" example in Hebrew only,
+    # and an English question got that sentence in Hebrew (groq T1 run 12, d1-054).
+    text = (PROMPTS / f"{VERSION}.md").read_text(encoding="utf-8")
+    hebrew = re.compile(r"[֐-׿]")
+    lines = text.splitlines()
+    for i, line in enumerate(lines):
+        if "Example" not in line or not hebrew.search(line):
+            continue
+        if any(not hebrew.search(q) for q in re.findall(r'"([^"]+)"', line)):
+            continue  # the English version is on the same line
+        assert line.startswith("- Example, Hebrew question"), line
+        assert lines[i - 1].startswith("- Example, English question"), line

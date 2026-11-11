@@ -34,7 +34,10 @@ def call_api(prompt, options, context):
     models = ",".join(dict.fromkeys(str(r["model"]) for r in results))
     total = sum(r["tokens"]["input"] + r["tokens"]["output"] for r in results)
     fallback = any(r["fallback"] for r in results)
-    _progress(case, f"model {models}, fallback {fallback}, {total} tokens", started)
+    switches = ",".join(s for r in results for s in r.get("switches", [])) or "none"
+    errors = ",".join(str(r["error"]) for r in results if r.get("error")) or "none"
+    _progress(case, f"model {models}, fallback {fallback}, {total} tokens, "
+                    f"switches {switches}, error {errors}", started)
     last = results[-1]
     output = {**last, "turns": [{"user": r["user"], "answer": r["answer"]} for r in results]}
     tokens = [r["tokens"] for r in results]

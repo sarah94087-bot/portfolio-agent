@@ -69,12 +69,20 @@ def _ranker():
     return rerank.from_env(httpx.Client(), env)
 
 
+_turn_routers: list[Any] = []  # the turn's router, for its model switches
+
+
+def _remember(turn_router):
+    _turn_routers.append(turn_router)
+    return turn_router
+
+
 def deps() -> chat.Deps:
     scripted = os.environ.get("EVAL_MODEL") == "scripted"
     return chat.Deps(
         database_url=lambda: os.environ.get("EVAL_DATABASE_URL") or os.environ.get("DATABASE_URL"),
         provider=(lambda quota: Scripted()) if scripted
-        else (lambda quota: _router().for_turn(quota)),
+        else (lambda quota: _remember(_router().for_turn(quota))),
         ranker=(lambda: None) if scripted else _ranker,
         limits=lambda: UNLIMITED,
         tracer=lambda: None,
@@ -92,7 +100,11 @@ async def _turn(message: str, conversation_id: str | None, caller: chat.Caller,
                 d: chat.Deps) -> dict[str, Any]:
     req = chat.ChatRequest(message=message, conversation_id=conversation_id,
                            idempotency_key=f"eval-{uuid.uuid4().hex}")
+    _turn_routers.clear()
     events = [_events(f) async for f in chat._frames(req, d, caller)]
+    # Which model failed and why (rate_minute, too_large...), also when the turn failed and
+    # sent no usage: groq T1 run 12, d2-007, ended in provider_unavailable with no trace of it.
+    switches = [f"{s['from']}:{s['reason']}" for r in _turn_routers for s in r.switches]
     meta = next((v for e, v in events if e == "meta"), {})
     usage = next((v for e, v in events if e == "usage"), {})
     error = next((v for e, v in events if e == "error"), None)
@@ -113,6 +125,7 @@ async def _turn(message: str, conversation_id: str | None, caller: chat.Caller,
         "words": len(answer.split()),
         "model": usage.get("model"),
         "fallback": bool(usage.get("fallback")),
+        "switches": switches,
         "tokens": {"input": usage.get("input_tokens", 0), "output": usage.get("output_tokens", 0)},
         "conversation_id": meta.get("conversation_id"),
     }
