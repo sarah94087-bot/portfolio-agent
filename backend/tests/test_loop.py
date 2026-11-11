@@ -159,7 +159,7 @@ def test_an_answer_fed_by_a_search_that_cites_nothing_is_written_again_once():
     assert third["tools"] == []
     assert third["messages"][-2] == {"role": "assistant", "content": LONG}
     note = third["messages"][-1]
-    assert note["role"] == "system" and "[[chunk_id]]" in note["content"]
+    assert note["role"] == "user" and "[[chunk_id]]" in note["content"]
     # The visitor's text is cut back to where the uncited answer began, and not as a restart.
     starts = [d for e, d in events if e == "step" and d["kind"] == "llm" and d["status"] == "start"]
     assert starts[-1]["summary"] == {"reason": "uncited", "replace_from": 0, "citations_from": 0}
@@ -198,6 +198,65 @@ def test_the_revision_may_follow_the_last_round():
                         [TextDelta("cited [[rec#q1]]"), Finish("m")])
     result, _ = run(provider)
     assert result.rounds == MAX_ROUNDS + 1 and result.text == "cited [[rec#q1]]"
+
+
+def test_what_is_saved_after_a_revision_is_only_the_revised_answer():
+    # The transcript is what the database keeps and a resent message replays. Before the fix
+    # it cut only on a restart or the guard, so both answers would have been saved.
+    from portfolio_agent.agent.transcript import Transcript
+
+    provider = Scripted([call(1, "rag"), Finish("m")],
+                        [TextDelta(LONG), Finish("m")],
+                        [TextDelta("She built it [[rec#rag]]."), Finish("m")])
+    _, events = run(provider)
+    seen = Transcript()
+    for e, d in events:
+        seen.record(e, d)
+    assert seen.content == "She built it [[rec#rag]]." and seen.cited == ["rec#rag"]
+
+
+class Failing(Scripted):
+    """Plays its rounds, then fails the next call the way the router does."""
+
+    def __init__(self, error, *rounds):
+        super().__init__(*rounds)
+        self.error = error
+
+    async def stream(self, messages, tools):
+        if not self.rounds:
+            self.calls.append({"messages": [dict(m) for m in messages], "tools": list(tools)})
+            yield TextDelta("half an ans")  # it may fail after some text, too
+            raise self.error
+        async for event in super().stream(messages, tools):
+            yield event
+
+
+@pytest.mark.parametrize("error", ["provider", "all_failed"])
+def test_a_failed_revision_gives_the_first_answer_back_instead_of_an_error(error):
+    from portfolio_agent.agent.transcript import Transcript
+    from portfolio_agent.providers.openai_compat import ProviderError
+    from portfolio_agent.providers.router import AllModelsFailed
+
+    exc = (ProviderError("bad_request", "HTTP 400") if error == "provider"
+           else AllModelsFailed("quota_exhausted", [("m", "rate_minute")]))
+    provider = Failing(exc, [call(1, "rag"), Finish("m")], [TextDelta(LONG), Finish("m")])
+    result, events = run(provider)
+    assert result.text == LONG and result.uncited and not result.revised
+    seen = Transcript()
+    for e, d in events:
+        seen.record(e, d)
+    assert seen.text == LONG  # the partial revision was cut, and the first answer shown again
+    cut = [d for e, d in events if e == "step" and (d.get("summary") or {}).get("reason")
+           == "revision_failed"]
+    assert cut and cut[0]["summary"]["replace_from"] == 0
+
+
+def test_a_failure_outside_a_revision_still_raises():
+    from portfolio_agent.providers.openai_compat import ProviderError
+
+    provider = Failing(ProviderError("bad_request", "HTTP 400"))
+    with pytest.raises(ProviderError):
+        run(provider)
 
 
 class Switching(Scripted):

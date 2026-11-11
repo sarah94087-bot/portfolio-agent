@@ -24,6 +24,7 @@ import httpx
 from portfolio_agent import chat
 from portfolio_agent.agent import prompt
 from portfolio_agent.agent.guard import HEBREW, PRIVATE, language
+from portfolio_agent.agent.transcript import Transcript
 from portfolio_agent.guards.quotas import Limits
 from portfolio_agent.providers.base import Finish, TextDelta, ToolCall
 from portfolio_agent.providers.router import from_env
@@ -108,13 +109,19 @@ async def _turn(message: str, conversation_id: str | None, caller: chat.Caller,
     meta = next((v for e, v in events if e == "meta"), {})
     usage = next((v for e, v in events if e == "usage"), {})
     error = next((v for e, v in events if e == "error"), None)
-    answer = "".join(v["text"] for e, v in events if e == "token")
+    # What the visitor ends up reading, with the same cuts the UI makes: joining every token
+    # would keep an answer that a restart or the citation revision (ADR-0021) replaced.
+    seen = Transcript()
+    for e, v in events:
+        seen.record(e, v)
+    answer = seen.text
     sources = next((v["sources"] for e, v in events if e == "sources"), [])
     steps = [v for e, v in events if e == "step"]
     return {
         "user": message,
         "answer": answer,
-        "citations": [v["chunk_id"] for e, v in events if e == "citation"],
+        "citations": seen.cited,
+        "revised": bool(usage.get("revised")), "uncited": bool(usage.get("uncited")),
         "sources": [{"chunk_id": s["chunk_id"], "text": s["text"]} for s in sources],
         "tools": [s["name"] for s in steps if s.get("kind") == "tool_call"],
         "error": error and error.get("code"),

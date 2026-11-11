@@ -169,6 +169,31 @@ def test_a_full_turn_streams_in_order_and_saves_what_the_visitor_saw(use):
     assert tool[3]["method"] == "R1"  # summary from its end
 
 
+UNCITED = " ".join(["She built an MCP server where every write needs approval."] * 4)
+
+
+def test_a_revised_answer_is_what_is_saved_flagged_and_replayed(use):
+    # ADR-0021 through the whole path: the first answer cites nothing, the revision cites.
+    model = Scripted([search("human approval MCP server"), Finish("m1")],
+                     [TextDelta(UNCITED), Finish("m1")],
+                     [TextDelta("She built it [[git-mcp-server#all]]."), Finish("m1")])
+    use(model, NeverCalled())
+    _, events = post({"message": "What did she build?", "idempotency_key": "key-revise-1"})
+    assert "error" not in [e for e, _ in events]
+    usage = next(d for e, d in events if e == "usage")
+    assert usage["revised"] is True and usage["uncited"] is False
+    assert model.calls[-1][-1]["role"] == "user"  # the note, not a system message
+    meta = events[0][1]
+    with psycopg.connect(DB_URL) as conn:
+        stored, saved_meta = conn.execute(
+            "select content, meta from messages where conversation_id = %s and role = 'assistant'",
+            (meta["conversation_id"],)).fetchone()
+    assert stored == "She built it [[git-mcp-server#all]]."
+    assert saved_meta["revised"] is True and saved_meta["uncited"] is False
+    _, again = post({"message": "What did she build?", "idempotency_key": "key-revise-1"})
+    assert text(again) == "She built it ."  # the replay holds only the revised answer
+
+
 def test_a_resent_message_is_replayed_without_calling_the_model(use):
     model = Scripted([search("MCP"), Finish("m1")],
                      [TextDelta("It is here [[git-mcp-server#all]]."), Finish("m1")])

@@ -394,7 +394,8 @@ async def _answer(req: ChatRequest, deps: Deps, caller: Caller, out: _Out) -> No
                 usage=result.usage, meta=meta, idempotency_key=req.idempotency_key,
                 steps=out.transcript.steps,
             )
-        clean = not (result.blocked or switches or result.hit_max_rounds or out.transcript.card)
+        clean = not (result.blocked or switches or result.hit_max_rounds or out.transcript.card
+                     or result.uncited)  # an answer that cites nothing is not served again
         if cache_key and clean and out.transcript.text.strip():
             response_cache.put(conn, cache_key, response_cache.Cached(
                 content=out.transcript.content, steps=out.transcript.steps, model=model,
@@ -406,7 +407,8 @@ async def _answer(req: ChatRequest, deps: Deps, caller: Caller, out: _Out) -> No
         await out.emit("usage", {**result.usage, "ttft_ms": out.ttft_ms,
                                  "total_ms": _since(out.started), "setup_ms": out.setup_ms,
                                  "model": model, "fallback": bool(switches),
-                                 "dropped": len(result.dropped), "redacted": result.redacted})
+                                 "dropped": len(result.dropped), "redacted": result.redacted,
+                                 "revised": result.revised, "uncited": result.uncited})
         await out.emit("done")
 
 

@@ -36,8 +36,11 @@ def call_api(prompt, options, context):
     fallback = any(r["fallback"] for r in results)
     switches = ",".join(s for r in results for s in r.get("switches", [])) or "none"
     errors = ",".join(str(r["error"]) for r in results if r.get("error")) or "none"
+    revised = sum(bool(r.get("revised")) for r in results)
+    uncited = sum(bool(r.get("uncited")) for r in results)
     _progress(case, f"model {models}, fallback {fallback}, {total} tokens, "
-                    f"switches {switches}, error {errors}", started)
+                    f"switches {switches}, error {errors}, revised {revised}, "
+                    f"uncited {uncited}", started)
     last = results[-1]
     output = {**last, "turns": [{"user": r["user"], "answer": r["answer"]} for r in results]}
     tokens = [r["tokens"] for r in results]
