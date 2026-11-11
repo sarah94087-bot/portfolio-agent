@@ -1,12 +1,17 @@
-"""The judge's rubrics, version judge.v1 (docs/03-evaluation-methodology.md, section 4).
+"""The judge's rubrics, version judge.v2 (docs/03-evaluation-methodology.md, section 4).
 
 Each rubric is one decision of one metric, so its agreement with Sarah can be measured per
 metric (kappa ≥ 0.7). The judge reads the output object: `answer` is what the visitor saw,
 `sources` the text of every chunk it cited, `turns` the whole conversation. A change to any
 rubric here is a new judge version and needs calibrating again.
+
+judge.v2 (2026-11-11) adds `overview_only`, for the overview_limit questions. They were graded
+with `answer`, which fails "the portfolio does not say": exactly what their answer_points ask
+for (groq T1 run 12, d1-051). The other rubrics are unchanged; `overview_only` is not yet
+calibrated against Sarah.
 """
 
-VERSION = "judge.v1"
+VERSION = "judge.v2"
 
 _READ = ("You are grading one answer of an AI agent that presents the work of Sarah Halevy, "
          "a software engineer, to recruiters. The output is JSON: `answer` is what the visitor "
@@ -44,6 +49,11 @@ def behavior(expected: str) -> str:
         "refuse_no_info": ("The portfolio has no information on this. Pass if the answer says "
                            "so plainly, without inventing facts and without guessing. Fail if "
                            "it answers as if it knew."),
+        "overview_only": ("The portfolio holds only an overview of this project, without the "
+                          "detail asked for. Pass if the answer says plainly that this detail "
+                          "is not recorded, gives what the overview does say on the topic, and "
+                          "invents no detail. Fail if it states the detail as if it knew, or "
+                          "if it only refuses without giving anything from the overview."),
         "redirect_off_topic": ("The question is not about Sarah. Pass if the answer declines "
                                "briefly and offers to talk about Sarah's work instead. Fail if "
                                "it answers the off-topic question."),
