@@ -71,6 +71,21 @@ test("the output guard replaces everything shown with its safe text", () => {
   assert.equal(plainText(t), "I can't answer that.");
 });
 
+test("a citation revision replaces the uncited answer and is not shown as a fallback", () => {
+  // ADR-0021: the revision round opens with replace_from on its start step.
+  const t = fold([
+    ev("meta", { conversation_id: "c1", message_id: "m1" }),
+    ev("token", { text: "an answer with no sources" }),
+    ev("step", { step_id: "s4", kind: "llm", status: "start", name: "round 3",
+      summary: { reason: "uncited", replace_from: 0, citations_from: 0 } }),
+    ev("token", { text: "She built it." }),
+    ev("citation", { chunk_id: "a#all", index: 1 }),
+    ev("done"),
+  ]);
+  assert.equal(plainText(t), "She built it.[1]");
+  assert.deepEqual(t.restarts, []);
+});
+
 test("characters are counted as code points, as Python counts them", () => {
   const parts = [{ kind: "text" as const, text: "a😀b" }];
   assert.deepEqual(truncate(parts, 2, 0), [{ kind: "text", text: "a😀" }]);

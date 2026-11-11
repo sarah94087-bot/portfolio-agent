@@ -364,6 +364,7 @@ async def _answer(req: ChatRequest, deps: Deps, caller: Caller, out: _Out) -> No
             "allowed_chunks": sorted(result.allowed_chunks), "cited": result.cited,
             "dropped": result.dropped, "blocked": result.blocked, "redacted": result.redacted,
             "language": result.language, "rounds": result.rounds,
+            "revised": result.revised, "uncited": result.uncited,  # ADR-0021
             "hit_max_rounds": result.hit_max_rounds, "switches": switches,
         }
         if out.transcript.card:
