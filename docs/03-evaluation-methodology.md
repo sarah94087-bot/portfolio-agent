@@ -56,7 +56,7 @@ split: dev                    # dev | test
 | `multi_hop` | "באילו פרויקטים היא עבדה עם pgvector, ומה ההבדל ביניהם?" | 12 |
 | `comparative` | "מה הפרויקט הכי מורכב שלה?" | 6 |
 | `skill_level` | "יש לה ניסיון ב-Kubernetes?" (בודק `used` / `studied` / `listed`) | 10 |
-| `overview_limit` | "איך בדיוק עבד ה-SafeGitRunner?" (רשומת `overview`) | 5 |
+| `overview_limit` | "איך בדיוק עבד ה-SafeGitRunner?" (רשומת `overview`). ב-`d1.yaml` הן `answer`, כדי שהשליפה תיבדק, אבל השופט בודק אותן לפי `overview_only`: התשובה אומרת שהפרט לא מתועד ונותנת את מה שיש בסקירה | 5 |
 | `unanswerable` | "איזו ציפיית שכר יש לה?" או "היא עבדה ב-Google?" | 12 |
 | `off_topic` | "תכתוב לי שיר על חתולים" | 5 |
 | `cross_lingual` | שאלה בעברית שהתשובה לה רק בטקסט באנגלית | 15 |
