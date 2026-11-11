@@ -141,6 +141,65 @@ def test_the_loop_enforces_citations_by_default():
     assert result.cited == {"rec#rag": 1} and result.dropped == ["rec#other"]
 
 
+LONG = " ".join(["word"] * 30)  # over MIN_UNCITED_WORDS
+
+
+def test_an_answer_fed_by_a_search_that_cites_nothing_is_written_again_once():
+    # ADR-0021, groq run 14, d2-007: "citations are no longer required" was obeyed.
+    provider = Scripted(
+        [call(1, "rag"), Finish("m")],
+        [TextDelta(LONG), Finish("m", {"output_tokens": 40})],
+        [TextDelta("She built it [[rec#rag]]."), Finish("m", {"output_tokens": 8})],
+    )
+    result, events = run(provider)
+    assert result.text == "She built it [[rec#rag]]." and result.cited == {"rec#rag": 1}
+    assert result.revised and not result.uncited and result.rounds == 3
+    assert result.usage == {"output_tokens": 48}
+    third = provider.calls[2]
+    assert third["tools"] == []
+    assert third["messages"][-2] == {"role": "assistant", "content": LONG}
+    note = third["messages"][-1]
+    assert note["role"] == "system" and "[[chunk_id]]" in note["content"]
+    # The visitor's text is cut back to where the uncited answer began, and not as a restart.
+    starts = [d for e, d in events if e == "step" and d["kind"] == "llm" and d["status"] == "start"]
+    assert starts[-1]["summary"] == {"reason": "uncited", "replace_from": 0, "citations_from": 0}
+    assert not [d for e, d in events if e == "step" and d["status"] == "restart"]
+
+
+def test_a_cited_answer_is_not_written_again():
+    provider = Scripted([call(1, "rag"), Finish("m")],
+                        [TextDelta(LONG + " [[rec#rag]]"), Finish("m")])
+    result, _ = run(provider)
+    assert len(provider.calls) == 2 and not result.revised and not result.uncited
+
+
+def test_an_answer_without_a_search_or_a_short_one_is_left_alone():
+    no_search = Scripted([TextDelta(LONG), Finish("m")])
+    short = Scripted([call(1, "rag"), Finish("m")],
+                     [TextDelta("Outside what I cover."), Finish("m")])
+    for provider in (no_search, short):
+        result, _ = run(provider)
+        assert not result.revised and not result.uncited
+        assert not provider.rounds  # no extra model call was made
+
+
+def test_an_answer_still_uncited_after_the_revision_is_kept_and_flagged():
+    provider = Scripted([call(1, "rag"), Finish("m")],
+                        [TextDelta(LONG), Finish("m")],
+                        [TextDelta("again " + LONG), Finish("m")])
+    result, _ = run(provider)
+    assert result.text == "again " + LONG and result.revised and result.uncited
+    assert len(provider.calls) == 3  # once only
+
+
+def test_the_revision_may_follow_the_last_round():
+    provider = Scripted(*([call(i, f"q{i}"), Finish("m")] for i in range(1, MAX_ROUNDS)),
+                        [TextDelta(LONG), Finish("m")],
+                        [TextDelta("cited [[rec#q1]]"), Finish("m")])
+    result, _ = run(provider)
+    assert result.rounds == MAX_ROUNDS + 1 and result.text == "cited [[rec#q1]]"
+
+
 class Switching(Scripted):
     """A router-like provider: the first round restarts mid-answer, and fall_back is recorded."""
 
