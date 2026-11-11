@@ -29,7 +29,8 @@ from portfolio_agent.providers.base import (
     TextDelta,
     ToolCall,
 )
-from portfolio_agent.providers.router import Restart
+from portfolio_agent.providers.openai_compat import ProviderError
+from portfolio_agent.providers.router import AllModelsFailed, Restart
 from portfolio_agent.tools.registry import Registry
 
 MAX_ROUNDS = 4
@@ -126,6 +127,7 @@ async def run_turn(
     fall_back = getattr(provider, "fall_back", None)
     found: set[str] = set()  # chunks the tools returned in this turn
     revising: dict[str, int] | None = None  # where the uncited answer started, while revising
+    original: str | None = None  # the uncited answer, given back if the revision fails
     revised = uncited = False
 
     async def out(event: str, data: dict[str, Any]) -> None:
@@ -154,33 +156,52 @@ async def run_turn(
         round_model: str | None = None
         round_usage: dict[str, int] = {}
         mark, state = dict(shown), text_filter.checkpoint()
-        async for event in provider.stream(messages, tools):
-            if isinstance(event, TextDelta):
-                round_text.append(event.text)
-                await text_filter.feed(event.text, frozenset(allowed), out)
-                if getattr(text_filter, "blocked", None):
-                    break  # the guard stopped the answer; nothing more is read or run
-            elif isinstance(event, Restart):
-                # The model failed mid-answer and the next one starts this round over. The
-                # visitor is told, and the UI drops what this round showed (section 4).
-                round_text.clear()
-                calls.clear()
-                text_filter.rollback(state)
-                shown.update(mark)
-                await emit("step", {"step_id": llm_step, "kind": "llm", "status": "restart",
-                                    "name": f"round {rounds}",
-                                    "summary": {"failed": event.failed, "to": event.to,
-                                                "reason": event.reason,
-                                                "replace_from": mark["chars"],
-                                                "citations_from": mark["citations"]}})
-            elif isinstance(event, ToolCall):
-                calls.append(event)
-            elif isinstance(event, Finish):
-                models.append(event.model)
-                round_model = event.model
-                for key, value in event.usage.items():
-                    usage[key] = usage.get(key, 0) + value
-                    round_usage[key] = round_usage.get(key, 0) + value
+        revision_failed = False
+        try:
+            async for event in provider.stream(messages, tools):
+                if isinstance(event, TextDelta):
+                    round_text.append(event.text)
+                    await text_filter.feed(event.text, frozenset(allowed), out)
+                    if getattr(text_filter, "blocked", None):
+                        break  # the guard stopped the answer; nothing more is read or run
+                elif isinstance(event, Restart):
+                    # The model failed mid-answer and the next one starts this round over. The
+                    # visitor is told, and the UI drops what this round showed (section 4).
+                    round_text.clear()
+                    calls.clear()
+                    text_filter.rollback(state)
+                    shown.update(mark)
+                    await emit("step", {"step_id": llm_step, "kind": "llm", "status": "restart",
+                                        "name": f"round {rounds}",
+                                        "summary": {"failed": event.failed, "to": event.to,
+                                                    "reason": event.reason,
+                                                    "replace_from": mark["chars"],
+                                                    "citations_from": mark["citations"]}})
+                elif isinstance(event, ToolCall):
+                    calls.append(event)
+                elif isinstance(event, Finish):
+                    models.append(event.model)
+                    round_model = event.model
+                    for key, value in event.usage.items():
+                        usage[key] = usage.get(key, 0) + value
+                        round_usage[key] = round_usage.get(key, 0) + value
+        except (ProviderError, AllModelsFailed, NeedsFallback) as e:
+            if revising is None or original is None:
+                raise
+            # The revision itself failed (a limit, a refused request): the visitor gets the
+            # first answer back, uncited, rather than an error for a turn that had an answer.
+            revision_failed = True
+            round_text, calls = [original], []
+            text_filter.rollback(state)
+            shown.update(mark)
+            await emit("step", {"step_id": llm_step, "kind": "llm", "status": "start",
+                                "name": f"round {rounds}",
+                                "summary": {"reason": "revision_failed",
+                                            "error": getattr(e, "kind", None)
+                                            or getattr(e, "code", None) or type(e).__name__,
+                                            "replace_from": mark["chars"],
+                                            "citations_from": mark["citations"]}})
+            await text_filter.feed(original, frozenset(allowed), out)
         await emit("step", {"step_id": llm_step, "kind": "llm", "status": "end",
                             "name": f"round {rounds}", "duration_ms": _ms(started),
                             "summary": {"tool_calls": [c.name for c in calls],
@@ -191,7 +212,9 @@ async def run_turn(
             break
         if not calls:
             text = "".join(round_text)
-            if revising is not None:
+            if revision_failed:
+                uncited = True
+            elif revising is not None:
                 revised, uncited = True, not _cites(text, found)
             elif (found and len(text.split()) >= MIN_UNCITED_WORDS
                   and not _cites(text, found)):
@@ -199,9 +222,12 @@ async def run_turn(
                 text_filter.rollback(state)
                 shown.update(mark)
                 del answer[len(answer) - len(round_text):]
-                revising = dict(mark)
+                revising, original = dict(mark), text
                 messages.append({"role": "assistant", "content": text})
-                messages.append({"role": "system", "content": CITE_AGAIN})
+                # As a user turn: Groq's docs say nothing on a system message after an
+                # assistant one, and a 400 there would fail the whole turn (bad_request is
+                # never retried on another model).
+                messages.append({"role": "user", "content": CITE_AGAIN})
                 continue
             break
         if last:

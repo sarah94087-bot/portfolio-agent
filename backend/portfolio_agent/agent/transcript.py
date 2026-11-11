@@ -2,8 +2,8 @@
 
 The raw model text is never stored: it can hold invalid citations, a phone number the guard
 replaced, a round that a backup model answered over, or the canary. The transcript records the
-events instead, applies the same replacements the UI applies (a `restart` or `guard` step cuts
-back to `replace_from` characters and `citations_from` citations), and serializes the result
+events instead, applies the same replacements the UI applies (any step with `replace_from` cuts
+back to that many characters and `citations_from` citations), and serializes the result
 with valid citations as [[chunk_id]]. Fed back through the citation filter with those ids
 allowed, it gives the same token and citation events, which is how a resent message is
 answered without calling the model again (US-10.5).
@@ -38,7 +38,9 @@ class Transcript:
         elif event == "step":
             self.steps.append(data)
             summary = data.get("summary") or {}
-            if data.get("status") == "restart" or data.get("kind") == "guard":
+            # Any step that says where to cut, as the UI does (apps/web/lib/chat.ts): a restart,
+            # the guard, and the citation revision of ADR-0021, which is none of those two.
+            if "replace_from" in summary or data.get("kind") == "guard":
                 self._cut(summary.get("replace_from", 0), summary.get("citations_from", 0))
 
     def _cut(self, chars: int, citations: int) -> None:
