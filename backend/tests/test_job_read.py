@@ -55,6 +55,13 @@ def test_the_text_is_cut_hides_contacts_and_none_means_no_posting():
     assert len(job_read._text("a" * 20_000)) == job_read.MAX_READ
 
 
+def test_hebrew_is_told_from_english_by_the_share_of_hebrew_letters():
+    assert job_read.is_hebrew("דרישות: ניסיון בפיתוח צד שרת בפייתון")
+    assert not job_read.is_hebrew("Requirements: 5 years of Python, REST APIs and SQL")
+    assert not job_read.is_hebrew("Backend Engineer at חברה, Tel Aviv. " + "Python services " * 10)
+    assert not job_read.is_hebrew("") and not job_read.is_hebrew("12345 ...")
+
+
 class Vision:
     def __init__(self, text):
         self.text, self.calls = text, []

@@ -60,7 +60,7 @@ const he = {
     attachImage: "צירוף צילום מסך",
     removeImage: "הסרת התמונה",
     imageAlt: "צילום המסך של המשרה שצורף",
-    imageHint: "אפשר גם להדביק תמונה (Ctrl+V) או לגרור אותה לכאן. קוראים ממנה את הטקסט בלבד.",
+    imageHint: "אפשר גם להדביק תמונה (Ctrl+V) או לגרור אותה לכאן. קוראים ממנה את הטקסט בלבד, ורק משרות באנגלית. למשרה בעברית צריך להדביק טקסט.",
     imageErrors: { type: "אפשר לצרף PNG, JPEG או WebP.", size: "התמונה גדולה מדי. אפשר לצלם חלק קטן יותר מהמסך.", decode: "לא הצלחנו לפתוח את התמונה." },
   },
   // S2. Impersonal wording, never a gendered "you" (docs/06-agent-design.md, section 10).
@@ -330,7 +330,7 @@ const en: Dictionary = {
     attachImage: "Attach a screenshot",
     removeImage: "Remove the image",
     imageAlt: "The attached screenshot of the job posting",
-    imageHint: "You can also paste an image (Ctrl+V) or drop it here. Only its text is read.",
+    imageHint: "You can also paste an image (Ctrl+V) or drop it here. Only its text is read, and only postings in English.",
     imageErrors: { type: "Attach a PNG, JPEG or WebP.", size: "The image is too large. Try capturing a smaller part of the screen.", decode: "The image could not be opened." },
   },
   chat: {

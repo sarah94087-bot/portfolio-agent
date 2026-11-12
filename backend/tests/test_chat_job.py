@@ -282,6 +282,16 @@ def test_a_picture_without_a_posting_costs_no_matching_tokens(use):  # noqa: F81
     assert model.calls == []
 
 
+def test_a_hebrew_posting_in_a_picture_is_not_matched_and_asks_for_the_text(use):  # noqa: F811
+    model = Model()
+    hebrew = "דרישות: ניסיון בפיתוח צד שרת בפייתון, עבודה עם מסדי נתונים ושירותי ענן. " * 5
+    use(model, vision=vision(hebrew))
+    _, events = post_image("shot-0009", lang="he")
+    assert not any(e == "card" for e, _ in events)
+    assert "באנגלית" in "".join(d["text"] for e, d in events if e == "token")
+    assert model.calls == []
+
+
 def test_a_picture_that_cannot_be_read_says_so_and_asks_for_the_text(use):  # noqa: F811
     class Down:
         async def stream(self, messages, tools, **options):

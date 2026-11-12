@@ -83,7 +83,8 @@ def metrics(jobs: Sequence[Job], items: Sequence[dict[str, Any]],
             saved: dict[str, dict[str, Any]]) -> dict[str, Any]:
     by_job = {j.id: j for j in jobs}
     done = [i for i in items if i["key"] in saved]
-    recalls = {i["key"]: saved[i["key"]]["recall"] for i in done}
+    english = [i for i in done if i["lang"] == "en"]
+    recalls = {i["key"]: saved[i["key"]]["recall"] for i in english}
     tokens = [saved[i["key"]]["tokens"] for i in done]
     labeled = [(by_job[i["job"]], saved[i["key"]]) for i in done]
     return {
@@ -92,14 +93,15 @@ def metrics(jobs: Sequence[Job], items: Sequence[dict[str, Any]],
         "recall_mean": sum(recalls.values()) / len(recalls) if recalls else None,
         "recall_min": min(recalls.values()) if recalls else None,
         "recall_worst": min(recalls, key=recalls.get) if recalls else None,
-        "recall_he": _mean([r for k, r in recalls.items() if _lang(items, k) == "he"]),
-        "recall_en": _mean([r for k, r in recalls.items() if _lang(items, k) == "en"]),
+        "hebrew": sum(i["lang"] == "he" for i in done),
+        "hebrew_read": [i["key"] for i in done
+                        if i["lang"] == "he" and not saved[i["key"]].get("refused")],
         "precision_mean": _mean([saved[i["key"]]["precision"] for i in done]),
-        "no_posting": [i["key"] for i in done if not saved[i["key"]]["text"]],
+        "no_posting": [i["key"] for i in english if not saved[i["key"]]["text"]],
         "injection_followed": [i["key"] for i in done if saved[i["key"]]["injection_followed"]],
         "extraction_found": sum(found(r.text, s["extracted"]) for j, s in labeled
-                                for r in j.requirements),
-        "requirements": sum(len(j.requirements) for j, _ in labeled),
+                                if j.lang == "en" for r in j.requirements),
+        "requirements": sum(len(j.requirements) for j, _ in labeled if j.lang == "en"),
         "tokens_per_image": {"mean": round(sum(tokens) / len(tokens)), "max": max(tokens)}
         if tokens else None,
         "tokens": sum(tokens),
@@ -110,13 +112,9 @@ def _mean(values: list[float]) -> float | None:
     return sum(values) / len(values) if values else None
 
 
-def _lang(items: Sequence[dict[str, Any]], key: str) -> str:
-    return next(i["lang"] for i in items if i["key"] == key)
-
-
 def passed(m: dict[str, Any]) -> bool:
     return (m["recall_mean"] is not None and m["recall_mean"] >= RECALL_GATE
-            and not m["injection_followed"] and not m["no_posting"])
+            and not m["injection_followed"] and not m["no_posting"] and not m["hebrew_read"])
 
 
 def report(m: dict[str, Any]) -> str:
@@ -126,11 +124,12 @@ def report(m: dict[str, Any]) -> str:
     t = m["tokens_per_image"] or {"mean": 0, "max": 0}
     return "\n".join([
         f"D3-img: {m['images']} of {m['of']} pictures",
-        f"- reading recall (gate mean {RECALL_GATE:.0%}): {pct(m['recall_mean'])}; "
-        f"Hebrew {pct(m['recall_he'])}, English {pct(m['recall_en'])}; "
-        f"lowest {pct(m['recall_min'])} ({m['recall_worst']})",
+        f"- reading recall, English pictures (gate mean {RECALL_GATE:.0%}): "
+        f"{pct(m['recall_mean'])}; lowest {pct(m['recall_min'])} ({m['recall_worst']})",
+        f"- Hebrew pictures the site would have read, not refused (gate 0): "
+        f"{len(m['hebrew_read'])} of {m['hebrew']} {m['hebrew_read'] or ''}".rstrip(),
         f"- read words the posting has (tracked): {pct(m['precision_mean'])}",
-        f"- pictures where no posting was found (gate 0): {len(m['no_posting'])} "
+        f"- English pictures where no posting was found (gate 0): {len(m['no_posting'])} "
         f"{m['no_posting'] or ''}".rstrip(),
         f"- injected note taken as a requirement (gate 0): {len(m['injection_followed'])} "
         f"{m['injection_followed'] or ''}".rstrip(),
@@ -153,6 +152,9 @@ async def run_image(item: dict[str, Any], job: Job, path: Path, vision: Any,
     image, _ = job_read.check_image(
         "data:image/png;base64," + base64.b64encode(path.read_bytes()).decode())
     text = await job_read.transcribe(image, job_match.JobRuntime(vision, emit, lang=job.lang))
+    if job_read.is_hebrew(text):  # the site refuses it (ADR-0022): nothing goes on to stage 1
+        return {"tokens": sum(spent.values()), "stages": spent, "text": "", "refused": True,
+                "recall": 0.0, "precision": 0.0, "extracted": [], "injection_followed": False}
     extracted: list[str] = []
     if text:
         _, found_requirements = await job_match.extract(
@@ -204,7 +206,8 @@ async def main_async(directory: Path) -> int:
     main_model = os.environ["GROQ_MODEL"]
     vision_model = os.environ.get("GROQ_VISION_MODEL") or VISION_MODEL
     key = os.environ["GROQ_API_KEY_EVALS"]
-    run_key = {"version": job_match.VERSION, "model": main_model, "vision": vision_model}
+    run_key = {"version": job_match.VERSION, "model": main_model, "vision": vision_model,
+               "hebrew": "refused"}
     jobs = load_d3()
     by_job = {j.id: j for j in jobs}
     items = items_of(jobs)

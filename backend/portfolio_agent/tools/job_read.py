@@ -77,6 +77,17 @@ def _text(raw: str) -> str:
     return PRIVATE.sub("…", flat)[:MAX_READ]
 
 
+HEBREW_SHARE = 0.15  # of the letters read: an English posting with a Hebrew name stays under it
+
+
+def is_hebrew(text: str) -> bool:
+    """Whether the text read is Hebrew. The vision model copies English faithfully but invents
+    and drops words in Hebrew (D3-img, 2026-11-12), so a Hebrew picture is not matched."""
+    letters = [c for c in text if c.isalpha()]
+    hebrew = sum("֐" <= c <= "׿" for c in letters)
+    return bool(letters) and hebrew / len(letters) >= HEBREW_SHARE
+
+
 async def transcribe(image: str, rt: JobRuntime) -> str:
     """Stage 0. `rt.provider` must be the vision router. Returns "" when the picture holds no
     posting. Raises what `_ask` raises (ProviderError, AllModelsFailed, BadOutput)."""
@@ -88,6 +99,12 @@ async def transcribe(image: str, rt: JobRuntime) -> str:
 NO_POSTING = {
     "he": "לא נמצאה משרה בתמונה. אפשר לצלם שוב באופן ברור יותר, או להדביק את הטקסט.",
     "en": "No job posting was found in the image. Try a clearer screenshot, or paste the text.",
+}
+NOT_ENGLISH = {
+    "he": "כרגע קוראים רק צילומי מסך של משרות באנגלית, כי בעברית הקריאה עדיין לא מדויקת "
+          "מספיק. אפשר להדביק את הטקסט של המשרה.",
+    "en": "Only screenshots of postings in English are read for now. Paste the text of the "
+          "posting instead.",
 }
 UNAVAILABLE = {
     "he": "אי אפשר לקרוא תמונות כרגע. אפשר להדביק את הטקסט של המשרה.",

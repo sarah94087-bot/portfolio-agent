@@ -1,4 +1,4 @@
-"""The D3-img runner's arithmetic, budget and resume, with no model."""
+﻿"""The D3-img runner's arithmetic, budget and resume, with no model."""
 
 import asyncio
 import json
@@ -29,7 +29,8 @@ ITEMS = items_of(JOBS)
 def saved_for(items, **over):
     base = {"tokens": 3000, "text": "x" * 300, "recall": 0.97, "precision": 0.99,
             "extracted": [], "injection_followed": False}
-    return {i["key"]: {**base, **over} for i in items}
+    hebrew = {"text": "", "recall": 0.0, "precision": 0.0, "refused": True}
+    return {i["key"]: {**base, **over, **(hebrew if i["lang"] == "he" else {})} for i in items}
 
 
 def test_every_posting_is_a_picture_and_three_are_also_a_phone_page():
@@ -66,9 +67,33 @@ def test_a_low_recall_a_followed_injection_or_an_empty_read_each_fail():
     followed["d3-09-plain"]["injection_followed"] = True
     assert not passed(metrics(JOBS, ITEMS, followed))
     empty = saved_for(ITEMS)
-    empty["d3-03-plain"]["text"] = ""
+    english = next(i["key"] for i in ITEMS if i["lang"] == "en")
+    empty[english]["text"] = ""
     m = metrics(JOBS, ITEMS, empty)
-    assert m["no_posting"] == ["d3-03-plain"] and not passed(m)
+    assert m["no_posting"] == [english] and not passed(m)
+
+
+def test_a_hebrew_picture_the_site_would_read_fails_and_the_recall_is_of_english_only():
+    he = next(i["key"] for i in ITEMS if i["lang"] == "he")
+    read = saved_for(ITEMS)
+    read[he]["refused"] = False
+    m = metrics(JOBS, ITEMS, read)
+    assert m["hebrew_read"] == [he] and not passed(m)
+    ok = metrics(JOBS, ITEMS, saved_for(ITEMS))
+    assert ok["hebrew_read"] == [] and abs(ok["recall_mean"] - 0.97) < 1e-9
+
+
+def test_a_hebrew_picture_is_refused_after_the_read_and_stage_1_never_runs(tmp_path):
+    job = next(j for j in JOBS if j.lang == "he")
+    vision = Scripted([TextDelta(job.description), Finish("v", {"input_tokens": 2100,
+                                                                 "output_tokens": 300})])
+    main = Scripted()
+    path = tmp_path / "p.png"
+    path.write_bytes(PNG)
+    item = next(i for i in ITEMS if i["job"] == job.id)
+    result = asyncio.run(run_image(item, job, path, vision, main))
+    assert result["refused"] and result["text"] == "" and result["tokens"] == 2400
+    assert main.calls == []
 
 
 def test_only_pictures_that_ran_count_and_none_yet_is_not_a_pass():

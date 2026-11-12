@@ -519,6 +519,8 @@ async def _job(conn: psycopg.Connection, req: ChatRequest, deps: Deps, caller: C
             return await out.error("provider_unavailable", job_read.UNAVAILABLE[req.lang], True)
         if not posting:
             notice = job_read.NO_POSTING[req.lang]
+        elif job_read.is_hebrew(posting):
+            posting, notice = "", job_read.NOT_ENGLISH[req.lang]
     posting_chars = len(posting)
     cache_key = None
     if deps.use_cache and posting:
