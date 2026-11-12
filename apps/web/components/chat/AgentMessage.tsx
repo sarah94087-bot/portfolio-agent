@@ -45,7 +45,7 @@ function status(turn: Turn, t: ChatStrings): string | null {
   if (turn.status === "sending") return t.thinking;
   if (turn.status !== "streaming") return null;
   if (turn.job && !turn.report) {
-    const run = jobStages(turn.steps).find((s) => s.state === "run");
+    const run = jobStages(turn.steps, !!turn.image).find((s) => s.state === "run");
     return run ? t.job.stages[run.key] : t.thinking;
   }
   const last = turn.steps.at(-1);
@@ -67,12 +67,15 @@ function errorText(turn: Turn, t: ChatStrings): string {
     case "rate_limited":
       if (e.limit === "minute") return fill(t.errors.minute, e.retryAfter ?? 60);
       if (e.limit === "conversation") return t.errors.conversation;
+      if (e.limit === "image_day") return t.job.imageDay;
       return t.errors.day;
     case "quota_exhausted":
     case "provider_unavailable":
       return t.errors.unavailable;
+    case "bad_image":
+      return t.job.imageBad;
     case "input_too_long":
-      return turn.job ? t.job.tooLong : t.errors.tooLong;
+      return turn.image ? t.job.imageTooBig : turn.job ? t.job.tooLong : t.errors.tooLong;
     default:
       return t.errors.internal;
   }
@@ -220,7 +223,7 @@ export function AgentMessage({ turn, lang, t, agentName, agentLine, onRetry, tra
       </div>
 
       {turn.job && streaming && turn.steps.length > 0 && !turn.report && (
-        <JobProgress stages={jobStages(turn.steps)} t={t} lang={lang} />
+        <JobProgress stages={jobStages(turn.steps, !!turn.image)} t={t} lang={lang} />
       )}
 
       {turn.report && (

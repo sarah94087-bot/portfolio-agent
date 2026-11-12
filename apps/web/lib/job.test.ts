@@ -123,3 +123,12 @@ test("the trace names the job stages and their tokens", () => {
   assert.ok(enforce?.kind === "job" && enforce.capped === 1 && enforce.dropped === 2);
   assert.equal(view.searches.length, 1);
 });
+
+test("a screenshot adds a first line, reading the picture", () => {
+  const states = (s: Step[]) => jobStages(s, true).map((x) => `${x.key}:${x.state}`).join(" ");
+  assert.equal(states([]), "read:run extract:wait evidence:wait rate:wait summary:wait");
+  const read = step("job.read", "end");
+  assert.equal(states([read]), "read:done extract:run evidence:wait rate:wait summary:wait");
+  // A text posting has no such line.
+  assert.deepEqual(jobStages([]).map((x) => x.key), ["extract", "evidence", "rate", "summary"]);
+});

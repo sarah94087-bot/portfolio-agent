@@ -1,9 +1,10 @@
 "use client";
 
-import { forwardRef, useId } from "react";
+import { forwardRef, useId, useRef } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { BackIcon, DocumentIcon, SendIcon } from "@/components/ui/icons";
+import { ACCEPT, firstImage } from "@/lib/image";
 
 export type ComposerMode = "question" | "job";
 
@@ -25,6 +26,11 @@ export type ComposerStrings = {
   jobMode: string;
   jobHint: string;
   runMatch: string;
+  attachImage: string;
+  removeImage: string;
+  imageAlt: string;
+  imageHint: string;
+  imageErrors: Record<"type" | "size" | "decode", string>;
 };
 
 type Props = {
@@ -40,10 +46,16 @@ type Props = {
   // In a conversation a question gets one line, as on board A-S2, so the composer does not cover
   // the answers on a short screen. A job posting keeps the full layout.
   compact?: boolean;
+  // A screenshot of a posting (ADR-0022): attached by pasting, dropping or the button. The page
+  // makes it ready to send; here it is only shown, and replaces the text field while it is there.
+  image?: string | null;
+  imageError?: string;
+  onImage?: (file: File) => void;
+  onRemoveImage?: () => void;
 };
 
 export const Composer = forwardRef<HTMLTextAreaElement, Props>(function Composer(
-  { lang, t, mode, value, onModeChange, onChange, onSubmit, disabled, busy, compact },
+  { lang, t, mode, value, onModeChange, onChange, onSubmit, disabled, busy, compact, image, imageError, onImage, onRemoveImage },
   ref,
 ) {
   const id = useId();
@@ -51,12 +63,22 @@ export const Composer = forwardRef<HTMLTextAreaElement, Props>(function Composer
   const length = value.length;
   const near = length >= limit * NEAR_LIMIT;
   const over = length > limit;
-  const canSend = !disabled && !busy && value.trim().length > 0 && !over;
+  const hasImage = mode === "job" && !!image;
+  const canSend = !disabled && !busy && (hasImage || (value.trim().length > 0 && !over));
+  const picker = useRef<HTMLInputElement>(null);
   const fmt = (n: number) => n.toLocaleString(lang);
 
   function submit() {
-    if (canSend) onSubmit?.(value.trim(), mode);
+    if (canSend) onSubmit?.(hasImage ? "" : value.trim(), mode);
   }
+
+  // A pasted picture is taken wherever the visitor pastes; pasted text goes on as usual.
+  const paste = (e: React.ClipboardEvent) => {
+    const file = firstImage(e.clipboardData.files);
+    if (!file) return;
+    e.preventDefault();
+    onImage?.(file);
+  };
 
   const keyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // A question sends on Enter. A job posting is multi-line, so Enter stays a newline there.
@@ -93,6 +115,7 @@ export const Composer = forwardRef<HTMLTextAreaElement, Props>(function Composer
           aria-invalid={over || undefined}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={keyDown}
+          onPaste={paste}
           className="max-h-40 min-h-10 flex-1 resize-none self-center bg-transparent py-1.5 text-[16px] leading-[1.6] text-text outline-offset-[6px] [field-sizing:content] placeholder:text-text-muted md:text-[18px]"
         />
         {near && (
@@ -120,31 +143,64 @@ export const Composer = forwardRef<HTMLTextAreaElement, Props>(function Composer
           submit();
         }}
         className="flex flex-col gap-2.5 rounded-[14px] border-[1.5px] border-accent bg-surface-raised px-3.5 py-3 md:px-4 md:py-3.5"
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          const file = firstImage(e.dataTransfer.files);
+          if (!file) return;
+          e.preventDefault();
+          onImage?.(file);
+        }}
       >
         <div className="flex flex-wrap items-center gap-2.5">
           <span className="inline-flex items-center rounded-full bg-accent px-[9px] py-px text-[12px] font-bold text-on-accent">{t.jobMode}</span>
-          <span id={`${id}-hint`} className="text-[13px] text-text-muted">{t.jobHint}</span>
-          <span dir="ltr" className={`mono ms-auto text-[12.5px] ${over ? "font-medium text-text" : "text-text-muted"}`}>
-            {fmt(length)} / {fmt(limit)}
-          </span>
+          <span id={`${id}-hint`} className="text-[13px] text-text-muted">{t.jobHint} {t.imageHint}</span>
+          {!image && (
+            <span dir="ltr" className={`mono ms-auto text-[12.5px] ${over ? "font-medium text-text" : "text-text-muted"}`}>
+              {fmt(length)} / {fmt(limit)}
+            </span>
+          )}
         </div>
-        <label htmlFor={id} className="sr-only">{t.jobLabel}</label>
-        <textarea
-          ref={ref}
-          id={id}
-          dir="auto"
-          rows={5}
-          value={value}
-          disabled={disabled}
-          placeholder={t.jobPlaceholder}
-          aria-describedby={`${id}-hint`}
-          aria-invalid={over || undefined}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full resize-none rounded-[10px] border border-border-input bg-surface px-3 py-2.5 text-[16px] leading-[1.6] text-text placeholder:text-text-muted md:text-[15px]"
-        />
+        {image ? (
+          <div className="flex items-start gap-3 rounded-[10px] border border-border-input bg-surface p-2.5">
+            {/* eslint-disable-next-line @next/next/no-img-element -- a local data URL, not a file to optimize */}
+            <img src={image} alt={t.imageAlt} className="max-h-40 max-w-[70%] rounded-md border border-border object-contain" />
+            <Button variant="ghost" className="min-h-10" onClick={onRemoveImage}>{t.removeImage}</Button>
+          </div>
+        ) : (
+          <>
+            <label htmlFor={id} className="sr-only">{t.jobLabel}</label>
+            <textarea
+              ref={ref}
+              id={id}
+              dir="auto"
+              rows={5}
+              value={value}
+              disabled={disabled}
+              placeholder={t.jobPlaceholder}
+              aria-describedby={`${id}-hint`}
+              aria-invalid={over || undefined}
+              onChange={(e) => onChange(e.target.value)}
+              onPaste={paste}
+              className="w-full resize-none rounded-[10px] border border-border-input bg-surface px-3 py-2.5 text-[16px] leading-[1.6] text-text placeholder:text-text-muted md:text-[15px]"
+            />
+          </>
+        )}
+        <span role="status" className="text-[13px] text-text-muted empty:hidden">{imageError}</span>
         <span role="status" className="sr-only">{over ? t.overLimit : ""}</span>
         <div className="flex flex-wrap items-center gap-2.5">
           <Button type="submit" className="min-h-10" disabled={!canSend}>{t.runMatch}</Button>
+          <Button variant="ghost" className="min-h-10" onClick={() => picker.current?.click()}>{t.attachImage}</Button>
+          <input
+            ref={picker}
+            type="file"
+            accept={ACCEPT}
+            hidden
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              e.target.value = "";
+              if (file) onImage?.(file);
+            }}
+          />
           <Button variant="ghost" className="min-h-10" onClick={() => onModeChange("question")}>
             <BackIcon />
             {t.backToQuestion}
@@ -177,6 +233,7 @@ export const Composer = forwardRef<HTMLTextAreaElement, Props>(function Composer
         aria-invalid={over || undefined}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={keyDown}
+        onPaste={paste}
         className="w-full resize-none bg-transparent text-[16px] leading-[1.7] text-text outline-offset-[6px] placeholder:text-text-muted md:text-[19px]"
       />
       <div className="flex items-center gap-3">

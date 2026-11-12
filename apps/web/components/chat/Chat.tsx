@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { CompassIcon, JobIcon, LayersIcon, StarIcon } from "@/components/ui/icons";
 import { apply, newTurn, retry as retryTurn, run, type Turn } from "@/lib/chat";
 import { checkPaused } from "@/lib/health";
+import { ImageProblem, prepareImage } from "@/lib/image";
 import { AgentMessage, type ChatStrings } from "./AgentMessage";
 import { Composer, type ComposerMode, type ComposerStrings } from "./Composer";
 import { ConversationActions } from "./ConversationActions";
@@ -37,6 +38,8 @@ type Props = {
 export function Chat({ lang, intro, starters, startersLabel, composer, chat, agentName, agentLine, privacy }: Props) {
   const [mode, setMode] = useState<ComposerMode>("question");
   const [value, setValue] = useState("");
+  const [image, setImage] = useState<string | null>(null); // a screenshot, ready to send
+  const [imageError, setImageError] = useState("");
   const [turns, setTurns] = useState<Turn[]>([]);
   const [toast, setToast] = useState("");
   const [paused, setPaused] = useState(false);
@@ -129,10 +132,24 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
     setTurns((ts) => ts.map((t) => (t.key === next.key ? next : t)));
   }
 
+  // A pasted, dropped or chosen picture goes to the job field, whichever field it came to.
+  async function attach(file: File) {
+    setMode("job");
+    setImageError("");
+    try {
+      setImage(await prepareImage(file));
+      setValue("");
+    } catch (e) {
+      setImageError(composer.imageErrors[e instanceof ImageProblem ? e.code : "decode"]);
+    }
+  }
+
   function send(text: string, as: ComposerMode) {
-    const turn = newTurn(text, undefined, as === "job");
+    const turn = newTurn(text, undefined, as === "job", (as === "job" && image) || undefined);
     setTurns((ts) => [...ts, turn]);
     setValue("");
+    setImage(null);
+    setImageError("");
     setMode("question");
     requestAnimationFrame(() => lastQuestion.current?.scrollIntoView({ block: "start", behavior: "smooth" }));
     void run(turn, update, { conversationId: conversationId.current, lang: pageLang });
@@ -156,6 +173,8 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
     conversationId.current = undefined;
     setTrace(null);
     setValue("");
+    setImage(null);
+    setImageError("");
     setMode("question");
     setToast(message);
   }
@@ -214,7 +233,13 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
                 dir="auto"
                 className="max-w-[85%] self-start whitespace-pre-wrap rounded-[16px] bg-tint-ink px-3.5 py-2 text-[16px] font-semibold leading-[1.6] text-on-ink md:px-[18px] md:py-[11px] md:text-[18px]"
               >
-                {turn.job ? (
+                {turn.image ? (
+                  <>
+                    {chat.job.pastedImage}
+                    {/* eslint-disable-next-line @next/next/no-img-element -- a local data URL, not a file to optimize */}
+                    <img src={turn.image} alt="" className="mt-1.5 max-h-40 rounded-md" />
+                  </>
+                ) : turn.job ? (
                   <>
                     {chat.job.pasted.replace("{n}", (turn.postingChars ?? turn.question.length).toLocaleString(lang))}
                     {turn.question && <span className="mt-1 line-clamp-3 text-[14px] font-normal leading-[1.5] md:text-[15px]">{turn.question}</span>}
@@ -273,7 +298,19 @@ export function Chat({ lang, intro, starters, startersLabel, composer, chat, age
           value={value}
           busy={busy}
           compact={started}
+          image={image}
+          imageError={imageError}
+          onImage={(file) => void attach(file)}
+          onRemoveImage={() => {
+            setImage(null);
+            setImageError("");
+            requestAnimationFrame(() => inputRef.current?.focus());
+          }}
           onModeChange={(m) => {
+            if (m === "question") {
+              setImage(null);
+              setImageError("");
+            }
             setMode(m);
             requestAnimationFrame(() => inputRef.current?.focus());
           }}

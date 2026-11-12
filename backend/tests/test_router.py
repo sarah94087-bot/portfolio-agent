@@ -279,3 +279,18 @@ def test_when_the_store_closes_every_model_the_error_is_quota_exhausted():
     with pytest.raises(AllModelsFailed) as e:
         run(Router([a, b], Clock(), wall).for_turn(store))
     assert e.value.code == "quota_exhausted" and a.calls == b.calls == 0
+
+
+def test_the_vision_router_has_one_model_named_like_the_main_routers():
+    import httpx
+
+    from portfolio_agent.providers.router import from_env, vision_from_env
+
+    env = {"GROQ_API_KEY": "k", "GROQ_MODEL": "openai/gpt-oss-120b",
+           "GROQ_FALLBACK_MODELS": "qwen/qwen3.8-27b"}
+    client = httpx.AsyncClient()
+    vision = vision_from_env(client, env)
+    assert [m.name for m in vision.models] == ["groq/qwen/qwen3.8-27b"]
+    # The same name means the same token count and the same closed-until state.
+    assert vision.models[0].name in [m.name for m in from_env(client, env).models]
+    assert vision_from_env(client, {**env, "GROQ_VISION_MODEL": "x/y"}).models[0].name == "groq/x/y"

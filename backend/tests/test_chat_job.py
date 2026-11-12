@@ -220,3 +220,99 @@ def test_a_posting_pasted_as_a_question_uses_the_tool_and_counts_three(use):  # 
     assert counters("visitor") - before == 3
     assert of(events, "usage")["input_tokens"] == 5000
     assert [s["chunk_id"] for s in of(events, "sources")["sources"]] == [EVIDENCE]
+
+
+# --- A posting from a screenshot (ADR-0022) ---
+
+import base64  # noqa: E402
+
+from test_job_read import PNG  # noqa: E402
+
+SHOT = "data:image/png;base64," + base64.b64encode(PNG).decode()
+
+
+def vision(text):
+    return Model([TextDelta(text), Finish("v1", {"input_tokens": 2100, "output_tokens": 300})])
+
+
+def post_image(key, image=SHOT, **extra):
+    response = BROWSER["client"].post("/api/chat", json={
+        "image": image, "idempotency_key": key, "mode": "job", "lang": "en", **extra})
+    return response, (parse(response.text) if response.status_code == 200 else None)
+
+
+def test_a_screenshot_is_read_then_matched_like_a_pasted_posting(use):  # noqa: F811
+    reader, model = vision(POSTING), Model()
+    use(model, vision=reader)
+    _, events = post_image("shot-0001")
+    names = [d.get("name") for e, d in events if e == "step"]
+    assert names.index("job.read") < names.index("job.extract")
+    assert [e for e, _ in events].count("meta") == 1
+    assert of(events, "card")["data"]["role_title"] == "Backend Engineer"
+    # Only the vision model saw the picture; the usual models got the text it read.
+    assert "image_url" in json.dumps(reader.calls[0])
+    assert "image_url" not in json.dumps(model.calls)
+    assert "Must have Python" in model.calls[0][1]["content"]
+    assert counters("image") == 1 and counters("visitor") == 4
+    with psycopg.connect(DB_URL) as conn:
+        saved = conn.execute("select content, meta from messages where role = 'user'"
+                             " order by created_at desc limit 1").fetchone()
+    assert saved[0] == "[job posting image]" and saved[1] == {"kind": "job_posting"}
+    assert "base64" not in json.dumps(of(events, "usage"))
+
+
+def test_a_screenshot_of_a_posting_pasted_before_answers_from_the_cache(use):  # noqa: F811
+    first, second = Model(), Model()
+    use(first, second, vision=vision(POSTING))
+    post_job("paste-0001", message=POSTING)
+    _, events = post_image("shot-0002")
+    assert second.calls == []  # the text the picture gave is the text pasted: same key
+    assert [e for e, _ in events].count("meta") == 1
+    assert of(events, "card")["data"]["role_title"] == "Backend Engineer"
+    assert "job.read" in [d.get("name") for e, d in events if e == "step"]
+
+
+def test_a_picture_without_a_posting_costs_no_matching_tokens(use):  # noqa: F811
+    model = Model()
+    use(model, vision=vision("NONE"))
+    _, events = post_image("shot-0003")
+    assert not any(e == "card" for e, _ in events)
+    assert "No job posting was found" in "".join(d["text"] for e, d in events if e == "token")
+    assert model.calls == []
+
+
+def test_a_picture_that_cannot_be_read_says_so_and_asks_for_the_text(use):  # noqa: F811
+    class Down:
+        async def stream(self, messages, tools, **options):
+            from portfolio_agent.providers.openai_compat import ProviderError
+            raise ProviderError("unavailable", "HTTP 503")
+            yield  # pragma: no cover
+
+    use(Model(), vision=Down())
+    _, events = post_image("shot-0004", lang="he")
+    error = of(events, "error")
+    assert error["code"] == "provider_unavailable" and "להדביק" in error["message"]
+
+
+def test_a_file_that_is_not_an_image_is_refused_before_anything_is_counted(use):  # noqa: F811
+    use(Model(), vision=NeverCalled())
+    _, events = post_image("shot-0005", image="data:image/png;base64,"
+                           + base64.b64encode(b"<html>" + b"x" * 64).decode())
+    assert of(events, "error")["code"] == "bad_image"
+    assert counters("visitor") == 0 and counters("image") == 0
+
+
+def test_a_visitor_reads_only_so_many_screenshots_a_day(use):  # noqa: F811
+    use(Model(), vision=vision(POSTING), limits=Limits(image_day=1, visitor_day=30))
+    post_image("shot-0006")
+    use(Model(), vision=vision(POSTING), limits=Limits(image_day=1, visitor_day=30))
+    _, events = post_image("shot-0007")
+    assert of(events, "error")["limit"] == "image_day"
+    assert counters("image") == 1  # the refused one rolled back
+
+
+def test_an_image_with_a_text_is_a_bad_request(use):  # noqa: F811
+    use(Model(), vision=NeverCalled())
+    response = BROWSER["client"].post("/api/chat", json={
+        "image": SHOT, "message": "x", "idempotency_key": "shot-0008", "mode": "job"})
+    assert response.status_code == 422

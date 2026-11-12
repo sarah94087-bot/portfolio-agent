@@ -61,13 +61,14 @@ def use(kb, monkeypatch):
     """Point the endpoint at the test database and a provider made per request."""
     providers = []
 
-    def install(*factories, enabled=True, limits=None, frozen=False):
+    def install(*factories, enabled=True, limits=None, frozen=False, vision=None):
         """`frozen` holds the clock still: the minute limit counts per calendar minute, so
         requests on two sides of a minute's end would not add up and the test would fail."""
         providers.extend(factories)
         moment = datetime.now(UTC)
         monkeypatch.setattr(chat, "DEPS", chat.Deps(
             database_url=lambda: DB_URL, provider=lambda quota: providers.pop(0),
+            vision=lambda quota: vision,
             embedder=lambda: None, ranker=lambda: None, docs=lambda: kb,
             agent_enabled=lambda: enabled,
             limits=lambda: limits or Limits(), tracer=lambda: TRACES, table=TABLE,

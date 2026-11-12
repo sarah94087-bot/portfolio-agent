@@ -28,6 +28,7 @@ class Limits:
     ip_day: int = 60
     conversation: int = 30
     feedback_day: int = 50  # ratings and comments per visitor; a change of mind counts too
+    image_day: int = 3  # screenshots read per visitor a day; the model is the backup's (ADR-0022)
     model_day_tokens: int = 200_000  # Groq, per model per org (verified in M1)
     visitor_share: float = 0.8
 
@@ -40,7 +41,7 @@ class Limits:
         env = dict(os.environ) if env is None else env
         names = {"visitor_day": "LIMIT_VISITOR_DAY", "visitor_minute": "LIMIT_VISITOR_MINUTE",
                  "ip_day": "LIMIT_IP_DAY", "conversation": "LIMIT_CONVERSATION",
-                 "feedback_day": "LIMIT_FEEDBACK_DAY",
+                 "feedback_day": "LIMIT_FEEDBACK_DAY", "image_day": "LIMIT_IMAGE_DAY",
                  "model_day_tokens": "MODEL_DAY_TOKENS"}
         return cls(**{field: int(env[var]) for field, var in names.items() if env.get(var)})
 
@@ -72,7 +73,8 @@ def _to_midnight(now: datetime) -> int:
 
 
 def admit(conn: psycopg.Connection, *, visitor_id: str, ip_hash: str, conversation_id: UUID,
-          now: datetime, limits: Limits, cost: int = 1, resent: bool = False) -> None:
+          now: datetime, limits: Limits, cost: int = 1, resent: bool = False,
+          image: bool = False) -> None:
     """Counts one message, or raises Denied and counts nothing. `cost` is 3 for a job match.
     `resent`: the question is already saved in the conversation (chat.py), so it is not a new
     one there; the visitor and IP limits still count it, as the model runs again."""
@@ -91,6 +93,9 @@ def admit(conn: psycopg.Connection, *, visitor_id: str, ip_hash: str, conversati
             raise Denied("visitor_day", "The daily message limit is reached.", _to_midnight(now))
         if bump(conn, "ip", ip_hash, day, cost) > limits.ip_day:
             raise Denied("ip_day", "The daily message limit is reached.", _to_midnight(now))
+        if image and bump(conn, "image", visitor_id, day) > limits.image_day:
+            raise Denied("image_day", "The daily screenshot limit is reached. Paste the text "
+                         "instead.", _to_midnight(now))
 
 
 @dataclass

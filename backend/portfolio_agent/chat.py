@@ -39,7 +39,7 @@ import httpx
 import psycopg
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, Response, StreamingResponse
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from portfolio_agent import sse, tracing
 from portfolio_agent.agent import prompt
@@ -53,9 +53,9 @@ from portfolio_agent.guards.quotas import Denied, Limits, ProviderQuota, admit
 from portfolio_agent.ingest import Doc, load
 from portfolio_agent.providers.base import NeedsFallback
 from portfolio_agent.providers.openai_compat import ProviderError
-from portfolio_agent.providers.router import AllModelsFailed, from_env
+from portfolio_agent.providers.router import AllModelsFailed, from_env, vision_from_env
 from portfolio_agent.retrieval import embedder, rerank
-from portfolio_agent.tools import job_match, job_report
+from portfolio_agent.tools import job_match, job_read, job_report
 from portfolio_agent.tools.cards import RENDER_CARD, CardTool, card_sources
 from portfolio_agent.tools.job_match import MATCH_JOB, JobResult, JobRuntime, JobTool
 from portfolio_agent.tools.portfolio import GET_PROJECT, SEARCH, PortfolioContext
@@ -67,11 +67,14 @@ router = APIRouter()
 REGISTRY = Registry.of([SEARCH, GET_PROJECT, MATCH_JOB, RENDER_CARD])
 JOB_CHARS = 8000  # docs/09-security-privacy.md, section 4
 JOB_COST = 3
+JOB_IMAGE_COST = 4  # a posting read from a screenshot: the read is one unit more (ADR-0022)
+IMAGE_PLACEHOLDER = "[job posting image]"
 
 
 class ChatRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    message: str = Field(min_length=1, max_length=20_000)  # the 1,000 rule is an SSE error
+    # The 1,000 rule is an SSE error. Empty only with an image, which `_has_input` checks.
+    message: str = Field(default="", max_length=20_000)
     conversation_id: UUID | None = None
     company_slug: str | None = Field(default=None, max_length=64)
     idempotency_key: str = Field(min_length=8, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
@@ -79,11 +82,28 @@ class ChatRequest(BaseModel):
     # follows the question (US-11.1), not this.
     lang: Literal["he", "en"] = "en"
     mode: Literal["question", "job"] = "question"  # "job": the composer's paste-a-posting mode
+    # A screenshot of a posting, as a data URL, in job mode only (ADR-0022).
+    image: str | None = Field(default=None, max_length=job_read.MAX_DATA_URL)
+
+    @model_validator(mode="after")
+    def _has_input(self) -> "ChatRequest":
+        if self.image and self.mode != "job":
+            raise ValueError("an image is for the job mode")
+        if self.image and self.message:
+            raise ValueError("send an image or a text, not both")
+        if not self.image and not self.message:
+            raise ValueError("message is empty")
+        return self
 
 
 @cache
 def _router():
     return from_env(httpx.AsyncClient())
+
+
+@cache
+def _vision_router():
+    return vision_from_env(httpx.AsyncClient())
 
 
 @cache
@@ -107,6 +127,7 @@ class Deps:
 
     database_url: Callable[[], str | None] = lambda: Settings.from_env().database_url
     provider: Callable[[ProviderQuota], Any] = lambda quota: _router().for_turn(quota)
+    vision: Callable[[ProviderQuota], Any] = lambda quota: _vision_router().for_turn(quota)
     embedder: Callable[[], Any] = embedder.from_env
     ranker: Callable[[], Any] = _ranker  # None without a Groq key: the search stays R3
     docs: Callable[[], list[Doc]] = _docs
@@ -257,8 +278,11 @@ async def _turn(req: ChatRequest, deps: Deps, caller: Caller, queue: asyncio.Que
     try:  # after done, before the stream closes (tracing.py says why)
         meta = next((d for _, e, d in out.trace.events if e == "meta"), {})
         # A posting goes to the extraction call only, so the trace gets its size, not its text.
-        asked = f"[job posting, {len(req.message)} characters]" if req.mode == "job" \
-            else req.message
+        asked = req.message
+        if req.image:
+            asked = f"[job posting image, {len(req.image) * 3 // 4 // 1024} KB]"
+        elif req.mode == "job":
+            asked = f"[job posting, {len(req.message)} characters]"
         answer = out.transcript.card["data"]["summary"] if out.transcript.card \
             else out.transcript.text
         await tracing.export(out.trace, tracing.Turn(
@@ -280,6 +304,12 @@ async def _answer(req: ChatRequest, deps: Deps, caller: Caller, out: _Out) -> No
     if len(req.message) > max_chars:
         return await out.error(
             "input_too_long", f"The message is longer than {max_chars} characters.", False)
+    image = None
+    if req.image:
+        try:
+            image, _ = job_read.check_image(req.image)
+        except job_read.BadImage as e:
+            return await out.error(e.code, e.message, False)
     url = deps.database_url()
     if not url:
         return await out.error("internal", "No database is configured.", True)
@@ -300,19 +330,20 @@ async def _answer(req: ChatRequest, deps: Deps, caller: Caller, out: _Out) -> No
             admit(conn, visitor_id=caller.visitor_id,
                   ip_hash=visitor.ip_hash(conn, caller.ip, now.date()),
                   conversation_id=conversation_id, now=now, limits=limits,
-                  cost=JOB_COST if is_job else 1, resent=pending is not None)
+                  cost=(JOB_IMAGE_COST if image else JOB_COST) if is_job else 1,
+                  resent=pending is not None, image=image is not None)
         except Denied as e:
             return await out.error(e.code, e.message, e.retryable, limit=e.limit,
                                    retry_after=e.retry_after)
         history = db.history(conn, conversation_id, exclude=pending and pending.message_id)
         allowed = db.retrieved_chunks(conn, conversation_id)
         if not pending:
-            db.save_user(conn, conversation_id, req.message, req.idempotency_key,
-                         job_posting=is_job)
+            db.save_user(conn, conversation_id, req.message or IMAGE_PLACEHOLDER,
+                         req.idempotency_key, job_posting=is_job)
         message_id = uuid.uuid4()
         if is_job:
             return await _job(conn, req, deps, caller, out, conversation_id, message_id, now,
-                              limits)
+                              limits, image)
         cache_key = None
         if deps.use_cache and not history:  # only a first question, from the cache
             kb = response_cache.kb_version(conn, deps.table)
@@ -463,20 +494,41 @@ def _cited(out: _Out) -> list[str]:
 
 
 async def _job(conn: psycopg.Connection, req: ChatRequest, deps: Deps, caller: Caller, out: _Out,
-               conversation_id: UUID, message_id: UUID, now: datetime, limits: Limits) -> None:
+               conversation_id: UUID, message_id: UUID, now: datetime, limits: Limits,
+               image: str | None = None) -> None:
     """The composer's job mode: the pipeline with no agent loop, so the posting reaches one
     model call only (docs/07, section 2; ADR-0016). The result is kept by the posting's hash."""
     docs = deps.docs()
     meta_event = {"conversation_id": str(conversation_id), "message_id": str(message_id),
                   "prompt_version": job_match.VERSION}
-    posting_chars = len(req.message)
+    quota = ProviderQuota(conn, now, limits)
+    posting = req.message
+    runtime: JobRuntime | None = None
+    meta_sent = False
+    notice = None  # what the visitor is told when there is nothing to match
+    if image:
+        # Stage 0 (ADR-0022). `meta` goes first and once: it starts the turn on the client.
+        await out.emit("meta", meta_event)
+        meta_sent = True
+        try:
+            runtime = JobRuntime(deps.vision(quota), out.emit, req.lang, quota.spend)
+            posting = await job_read.transcribe(image, runtime)
+        except (AllModelsFailed, NeedsFallback, ProviderError, job_match.BadOutput,
+                ValueError) as e:
+            log.warning("job image read failed: %s", e)
+            return await out.error("provider_unavailable", job_read.UNAVAILABLE[req.lang], True)
+        if not posting:
+            notice = job_read.NO_POSTING[req.lang]
+    posting_chars = len(posting)
     cache_key = None
-    if deps.use_cache:
+    if deps.use_cache and posting:
         kb = response_cache.kb_version(conn, deps.table)
-        cache_key = response_cache.key(req.message, f"{job_match.VERSION}:{req.lang}", kb)
+        cache_key = response_cache.key(posting, f"{job_match.VERSION}:{req.lang}", kb)
         hit = response_cache.get(conn, cache_key, now)
         if hit and hit.card:
-            await out.emit("meta", {**meta_event, "cached": True, "cached_at": hit.created_at})
+            if not meta_sent:
+                await out.emit("meta", {**meta_event, "cached": True,
+                                        "cached_at": hit.created_at})
             for step in hit.steps:
                 await out.emit("step", step)
             await _send_card(hit.card, req.lang, now, message_id, caller, conn, deps, out)
@@ -495,14 +547,17 @@ async def _job(conn: psycopg.Connection, req: ChatRequest, deps: Deps, caller: C
                                      "fallback": False, "cached": True})
             return await out.emit("done")
 
-    await out.emit("meta", meta_event)
-    quota = ProviderQuota(conn, now, limits)
+    if not meta_sent:
+        await out.emit("meta", meta_event)
     ctx = PortfolioContext.from_docs(conn, docs, embedder=deps.embedder(), table=deps.table,
                                      ranker=None, quota=quota, question="")
     provider = deps.provider(quota)
-    runtime = JobRuntime(provider, out.emit, req.lang, quota.spend)
+    if runtime is None:
+        runtime = JobRuntime(provider, out.emit, req.lang, quota.spend)
+    else:  # the picture is read; the rest runs on the usual models
+        runtime.provider = provider
     try:
-        found = await job_match.run(req.message, ctx, docs, runtime)
+        found = None if notice else await job_match.run(posting, ctx, docs, runtime)
     except AllModelsFailed as e:
         return await out.error(e.code, "No model can answer right now.", True)
     except (NeedsFallback, ProviderError, job_match.BadOutput) as e:
@@ -513,7 +568,7 @@ async def _job(conn: psycopg.Connection, req: ChatRequest, deps: Deps, caller: C
     model = runtime.models[-1] if runtime.models else None
     out.dropped = runtime.dropped
     if found is None:
-        text = job_match.NO_REQUIREMENTS[req.lang]
+        text = notice or job_match.NO_REQUIREMENTS[req.lang]
         await out.emit("token", {"text": text})
         with contextlib.suppress(psycopg.errors.UniqueViolation):
             db.save_answer(conn, message_id=message_id, conversation_id=conversation_id,
@@ -533,7 +588,8 @@ async def _job(conn: psycopg.Connection, req: ChatRequest, deps: Deps, caller: C
                            steps=out.transcript.steps)
         if cache_key and not switches:
             response_cache.put(conn, cache_key, response_cache.Cached(
-                content=found.summary, steps=out.transcript.steps, model=model,
+                content=found.summary, model=model,
+                steps=[x for x in out.transcript.steps if x.get("name") != "job.read"],
                 allowed_chunks=found.chunk_ids, created_at=now.isoformat(), card=card), now)
     await _sources(conn, _cited(out), docs, deps, out)
     await out.emit("usage", {**runtime.usage, "ttft_ms": None, "total_ms": _since(out.started),
