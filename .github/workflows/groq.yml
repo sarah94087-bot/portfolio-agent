@@ -12,6 +12,11 @@
 # - d3: the job match set (evals/jobmatch/run.py) on the branch it is started from. About 7,000
 #   tokens a job, at most `max_tokens`. Its results stay in the run: the summary and an artifact.
 #
+# - d3img: the same postings as screenshots (evals/jobmatch/image_run.py, ADR-0022): the vision
+#   model reads 14 pictures, and stage 1 runs on what it read. About 3,500 tokens a picture, 2,048
+#   of them the picture. The vision model is also the chat's backup model, so it shares that
+#   day's 200,000 tokens with the live site: check the day's other runs first.
+#
 # One at a time: the Groq quota is per model and per day, shared by both jobs.
 name: groq
 
@@ -19,15 +24,15 @@ on:
   workflow_dispatch:
     inputs:
       job:
-        description: "stage4, t1 or d3"
+        description: "stage4, t1, d3 or d3img"
         type: choice
-        options: [stage4, t1, d3]
+        options: [stage4, t1, d3, d3img]
         default: stage4
       run:
         description: "stage4: the run number (2 or 3)"
         default: "2"
       max_tokens:
-        description: "stage4 and d3: Groq tokens this invocation may spend"
+        description: "stage4, d3 and d3img: Groq tokens this invocation may spend"
         default: "60000"
       ref:
         description: "stage4: the full commit SHA to run on (run 1's corpus)"
@@ -281,3 +286,48 @@ jobs:
           if-no-files-found: warn
       - if: always()
         run: cat "$RUNNER_TEMP/d3.txt" >> "$GITHUB_STEP_SUMMARY" || true
+
+  d3img:
+    if: inputs.job == 'd3img'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: pip install -e "backend[dev]"
+      # The pictures are drawn with the Playwright of apps/web. Chromium only, as in ci.yml.
+      - run: npm ci
+        working-directory: apps/web
+      - run: npx playwright install chromium
+        working-directory: apps/web
+        timeout-minutes: 5
+      - name: Draw the postings
+        working-directory: evals
+        run: |
+          echo "DRAWN=$RUNNER_TEMP/d3-pictures" >> "$GITHUB_ENV"
+          python -m jobmatch.image_run --export "$RUNNER_TEMP/d3-pictures"
+          node jobmatch/render.mjs "$RUNNER_TEMP/d3-pictures"
+      - name: D3-img, live
+        id: d3img
+        working-directory: evals
+        env:
+          GROQ_API_KEY_EVALS: ${{ secrets.GROQ_API_KEY_EVALS }}
+          JOBMATCH_IMAGE_MAX_TOKENS: ${{ inputs.max_tokens }}
+        shell: bash  # with pipefail, so that tee does not hide a failure
+        run: python -m jobmatch.image_run "$DRAWN" 2>&1 | tee "$RUNNER_TEMP/d3img.txt"
+      - name: Keep what the run saved
+        if: always() && steps.d3img.outcome != 'skipped'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: d3img
+          path: evals/results/d3-image.json
+          if-no-files-found: warn
+      - if: always()
+        run: cat "$RUNNER_TEMP/d3img.txt" >> "$GITHUB_STEP_SUMMARY" || true

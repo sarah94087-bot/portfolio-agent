@@ -227,7 +227,7 @@ class BadOutput(Exception):
     """The model's answer was not in the schema, twice."""
 
 
-async def _ask(rt: JobRuntime, name: str, system: str, user: str, tool: dict[str, Any] | None,
+async def _ask(rt: JobRuntime, name: str, system: str, user: Any, tool: dict[str, Any] | None,
                max_tokens: int, parse: Callable[[str], Any]) -> tuple[Any, dict[str, Any]]:
     """One stage's model call, at temperature 0. Tries once more on a bad answer. Returns what
     `parse` made of the tool's arguments (or of the text, without a tool) and the step summary."""

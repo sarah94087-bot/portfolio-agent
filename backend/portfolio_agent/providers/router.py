@@ -205,3 +205,18 @@ def from_env(client: httpx.AsyncClient, env: dict[str, str] | None = None) -> Ro
     return Router([
         OpenAICompatible(Endpoint(f"groq/{m}", GROQ_BASE, key, m), client) for m in names
     ])
+
+
+VISION_MODEL = "qwen/qwen3.8-27b"  # Groq's only vision model we can use (ADR-0022)
+
+
+def vision_from_env(client: httpx.AsyncClient, env: dict[str, str] | None = None) -> Router:
+    """One model, no fallback: a model without sight would answer the picture with nothing.
+    Its name is the one the main router gives the same model, so the day's token count and the
+    closed-until state are shared (guards/quotas.py)."""
+    env = dict(os.environ) if env is None else env
+    key = env.get("GROQ_API_KEY")
+    if not key:
+        raise ValueError("GROQ_API_KEY is not set")
+    model = env.get("GROQ_VISION_MODEL") or VISION_MODEL
+    return Router([OpenAICompatible(Endpoint(f"groq/{model}", GROQ_BASE, key, model), client)])

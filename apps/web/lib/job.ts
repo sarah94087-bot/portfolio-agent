@@ -76,23 +76,25 @@ export function gapsOf(report: JobReport): JobRequirement[] {
   return [...gaps.filter((g) => g.kind === "must"), ...gaps.filter((g) => g.kind !== "must")];
 }
 
-export type StageKey = "extract" | "evidence" | "rate" | "summary";
+export type StageKey = "read" | "extract" | "evidence" | "rate" | "summary";
 export type Stage = { key: StageKey; state: "done" | "run" | "wait"; done?: number; total?: number };
 
 const ended = (steps: Step[], name: string) => steps.some((s) => s.name === name && s.status === "end");
 
-/** The four lines the visitor watches, from the steps as they arrive (board S4-Report). */
-export function jobStages(steps: Step[]): Stage[] {
+/** The four lines the visitor watches, from the steps as they arrive (board S4-Report). A
+ * screenshot adds a first line, reading the picture (ADR-0022). */
+export function jobStages(steps: Step[], fromImage = false): Stage[] {
   const total = steps.find((s) => s.name === "job.requirements")?.summary?.count;
   const requirements = typeof total === "number" ? total : undefined;
   const searched = steps.filter((s) => s.name === "search_portfolio" && s.status === "end").length;
   const flags: Record<StageKey, boolean> = {
+    read: ended(steps, "job.read") || requirements !== undefined,
     extract: requirements !== undefined,
     evidence: requirements !== undefined && searched >= requirements,
     rate: ended(steps, "job.rate"),
     summary: ended(steps, "job.summary"),
   };
-  const keys: StageKey[] = ["extract", "evidence", "rate", "summary"];
+  const keys: StageKey[] = fromImage ? ["read", "extract", "evidence", "rate", "summary"] : ["extract", "evidence", "rate", "summary"];
   const first = keys.find((k) => !flags[k]);
   return keys.map((key) => {
     const state = flags[key] ? "done" : key === first ? "run" : "wait";

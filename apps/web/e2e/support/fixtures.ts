@@ -16,7 +16,9 @@ export const CUT = "cut" as const;
 
 type Script = { items: Item[]; status?: number; bytesPerWrite?: number };
 export type ChatBody = {
-  message: string;
+  message?: string; // not with an image
+  image?: string;
+  mode?: string;
   idempotency_key: string;
   conversation_id?: string;
   lang?: string;

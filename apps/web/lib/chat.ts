@@ -59,6 +59,7 @@ export type Turn = {
   usage?: Record<string, unknown>;
   error?: TurnError;
   job?: boolean; // sent from the composer's job mode: `question` is a pasted posting
+  image?: string; // or a screenshot of one, as a data URL (ADR-0022): kept for a retry, never stored
   postingChars?: number; // a restored report no longer has the posting on screen
   report?: JobReport;
   markdown?: string; // the report as a file, made on the server (US-5.3)
@@ -83,8 +84,8 @@ export function newKey(): string {
   return crypto.randomUUID().replaceAll("-", "");
 }
 
-export function newTurn(question: string, key: string = newKey(), job = false): Turn {
-  return { key, question, status: "sending", parts: [], steps: [], restarts: [], sources: [], ...(job ? { job } : {}) };
+export function newTurn(question: string, key: string = newKey(), job = false, image?: string): Turn {
+  return { key, question, status: "sending", parts: [], steps: [], restarts: [], sources: [], ...(job ? { job } : {}), ...(image ? { image } : {}) };
 }
 
 const chars = (s: string) => [...s].length;
@@ -250,7 +251,7 @@ export async function run(
   // A retry starts as `sending` with no error, and keeps the old parts until `meta`.
   let current: Turn = { ...turn, status: "sending", error: undefined };
   const body = JSON.stringify({
-    message: turn.question,
+    ...(turn.image ? { image: turn.image } : { message: turn.question }),
     idempotency_key: turn.key,
     ...(conversationId ? { conversation_id: conversationId } : {}),
     ...(companySlug ? { company_slug: companySlug } : {}),
