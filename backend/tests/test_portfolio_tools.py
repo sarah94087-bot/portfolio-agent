@@ -322,3 +322,69 @@ def test_with_an_embedder_search_runs_r3_and_reports_every_timing(docs):
             assert first["scores"]["vector"] is not None and first["scores"]["lexical"] is not None
         finally:
             conn.execute("drop table r")
+
+
+def sized(i, tokens):
+    return Hit(f"r{i}#all", f"r{i}", ("all",), "w " * tokens,
+               {"lexical": 0.1, "vector": 0.2, "rrf": 0.3})
+
+
+def turn(monkeypatch, ranker=None):
+    """One turn's context, whose searches return whatever `results` holds at the time."""
+    results: list[Hit] = []
+    monkeypatch.setattr(portfolio.hybrid, "search", lambda *a, **k: list(results))
+    records = {f"r{i}": Record(f"r{i}", "project", f"R{i}") for i in range(10)}
+    ctx = PortfolioContext(None, records, (), embedder=Embedder(), ranker=ranker, quota=Quota())
+
+    def search(*hits):
+        results[:] = hits
+        out = portfolio.search_portfolio(portfolio.SearchArgs(query="q"), ctx)
+        return json.loads(out.model_view), out
+    return ctx, search
+
+
+def test_a_chunk_already_given_this_turn_is_named_not_sent_again(monkeypatch):
+    ctx, search = turn(monkeypatch)
+    search(sized(1, 100), sized(2, 100))
+    body, out = search(sized(2, 100), sized(3, 100))
+    assert [r["chunk_id"] for r in body["results"]] == ["r3#all"]
+    assert body["already_given"] == ["r2#all"]
+    assert "r2#all" in out.chunk_ids  # still citable
+    assert ctx.sent_tokens == 300
+
+
+def test_only_repeats_tell_the_model_to_answer_from_them(monkeypatch):
+    _, search = turn(monkeypatch)
+    search(sized(1, 100))
+    body, _ = search(sized(1, 100))
+    assert body["results"] == [] and body["already_given"] == ["r1#all"]
+    assert "already given" in body["note"]
+
+
+def test_all_searches_in_a_turn_share_one_budget(monkeypatch):
+    ctx, search = turn(monkeypatch)
+    search(sized(1, 2400))
+    body, _ = search(sized(2, 400), sized(3, 400))  # 600 left: only one fits
+    assert [r["chunk_id"] for r in body["results"]] == ["r2#all"]
+    assert ctx.sent_tokens == 2800
+    body, _ = search(sized(4, 400))
+    assert body["results"] == [] and "limit" in body["note"]
+    assert ctx.sent_tokens <= portfolio.TURN_MAX_TOKENS
+
+
+def test_the_first_result_of_the_turn_stays_even_when_larger_than_the_budget(monkeypatch):
+    _, search = turn(monkeypatch)
+    body, _ = search(sized(1, 4000))
+    assert [r["chunk_id"] for r in body["results"]] == ["r1#all"]
+
+
+def test_only_the_first_search_of_a_turn_is_reranked(monkeypatch):
+    ranker = Ranker(Ranking(["r2#all", "r1#all"], 2300))
+    _, search = turn(monkeypatch, ranker)
+    _, first = search(sized(1, 10), sized(2, 10))
+    assert first.trace_view["method"] == "R4"
+    ranker.got = None
+    _, second = search(sized(3, 10), sized(4, 10))
+    assert ranker.got is None
+    assert second.trace_view["method"] == "R3"
+    assert second.trace_view["rerank"]["fallback"] == "later_search"
