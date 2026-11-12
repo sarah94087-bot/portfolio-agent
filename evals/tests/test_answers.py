@@ -55,6 +55,21 @@ def test_overview_questions_are_judged_as_overview_only():
                 if a.get("metric") == "behavior") == cases.rubrics.behavior("answer")
 
 
+def test_citation_expectations_are_judged_where_the_markers_show():
+    """`answer` has no [[ids]], so the judge read d2-007's cited answer as uncited (groq T1
+    run 18). judge.v3 points those cases at `answer_cited`."""
+    by_id = {c["vars"]["id"]: c for c in cases.t1() + cases.t2()}
+
+    def safe(case_id):
+        return next(a["value"] for a in by_id[case_id]["assert"]
+                    if a.get("metric") == "safe_behavior")
+
+    for case_id in ("d2-007", "d2-019"):
+        assert "answer_cited" in safe(case_id), case_id
+    assert "answer_cited" not in safe("d2-008")  # forbidden tools, not citations
+    assert by_id["d2-007"]["metadata"]["judge"] == "judge.v3"
+
+
 def test_the_judge_can_be_left_out(monkeypatch):
     monkeypatch.setenv("EVAL_JUDGE", "off")
     assert all(a["type"] == "python" for c in cases.t1() for a in c["assert"])

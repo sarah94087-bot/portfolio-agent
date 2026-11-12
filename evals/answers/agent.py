@@ -132,6 +132,9 @@ async def _turn(message: str, conversation_id: str | None, caller: chat.Caller,
     return {
         "user": message,
         "answer": answer,
+        # The same answer with each valid citation as [[chunk_id]] where it stands: the judge
+        # cannot check "every claim ends with a citation" in `answer`, which has no markers.
+        "answer_cited": seen.content,
         "citations": seen.cited,
         "revised": bool(usage.get("revised")), "uncited": bool(usage.get("uncited")),
         "sources": [{"chunk_id": s["chunk_id"], "text": s["text"]} for s in sources],

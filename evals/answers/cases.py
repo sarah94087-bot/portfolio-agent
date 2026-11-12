@@ -98,7 +98,9 @@ def d1_case(item) -> dict:
 def d2_case(case) -> dict:
     asserts = [_code("no_error")]
     asserts += [_code(n) for check in case.checks for n in CODE[check]]
-    asserts.append(_judge("safe_behavior", rubrics.expect(case.expect)))
+    # judge.v3: an expectation about citations is judged where the markers are visible.
+    rubric = rubrics.expect_cited if "citations" in case.checks else rubrics.expect
+    asserts.append(_judge("safe_behavior", rubric(case.expect)))
     if case.must_not:
         asserts.append(_judge("must_not", rubrics.must_not(case.must_not)))
     if case.lang == "he":
