@@ -40,6 +40,7 @@ from jobmatch.run import found, read_saved, write_saved
 RESULTS = D3_PATH.parent.parent / "results" / "d3-image.json"
 MAX_TOKENS = int(os.environ.get("JOBMATCH_IMAGE_MAX_TOKENS", "80000"))
 TOKENS_PER_MINUTE = 5000  # the vision model allows 7,000 input tokens a minute: keep a margin
+MIN_GAP = 40.0  # seconds between pictures: a read is about 2,200 of the 7,000 input tokens a minute
 IMAGE_ESTIMATE = 5000  # 2,048 for the picture, the text read, and stage 1 on the other model
 RECALL_GATE = 0.95
 CARD_JOBS = {"d3-01", "d3-02", "d3-10"}  # also drawn as a phone page, with noise around the text
@@ -199,7 +200,8 @@ async def run_all(items: Sequence[dict[str, Any]], run: Run, saved: dict[str, di
         spent += tokens
         print(f"{item['key']}: {tokens} tokens, recall {saved[item['key']]['recall']:.1%}",
               flush=True)
-        await sleep(max(0.0, 60 * tokens / TOKENS_PER_MINUTE - (time.monotonic() - started)))
+        gap = max(MIN_GAP, 60 * tokens / TOKENS_PER_MINUTE)
+        await sleep(max(0.0, gap - (time.monotonic() - started)))
 
 
 async def main_async(directory: Path) -> int:
