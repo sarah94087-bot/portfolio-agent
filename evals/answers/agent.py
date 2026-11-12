@@ -97,6 +97,14 @@ def _events(frame: str) -> tuple[str, dict[str, Any]]:
     return lines["event"], json.loads(lines["data"])
 
 
+def _switch(s: dict[str, Any]) -> str:
+    text = f"{s['from']}:{s['reason']}"
+    if "at" not in s:  # a dropped model (invalid tool calls), not a provider error
+        return text
+    retry = s.get("retry_after")
+    return f"{text}(retry {'?' if retry is None else f'{retry:g}s'}, at {s['at']:g}s)"
+
+
 async def _turn(message: str, conversation_id: str | None, caller: chat.Caller,
                 d: chat.Deps) -> dict[str, Any]:
     req = chat.ChatRequest(message=message, conversation_id=conversation_id,
@@ -105,7 +113,11 @@ async def _turn(message: str, conversation_id: str | None, caller: chat.Caller,
     events = [_events(f) async for f in chat._frames(req, d, caller)]
     # Which model failed and why (rate_minute, too_large...), also when the turn failed and
     # sent no usage: groq T1 run 12, d2-007, ended in provider_unavailable with no trace of it.
-    switches = [f"{s['from']}:{s['reason']}" for r in _turn_routers for s in r.switches]
+    # With the Retry-After Groq gave and when, in seconds into the turn (run 17: was a longer
+    # wait enough to keep the first model?). "retry ?" means Groq gave none.
+    switches = [_switch(s) for r in _turn_routers for s in r.switches]
+    waits = [f"{w['model']}:{w['seconds']:g}s@{w['at']:g}s" for r in _turn_routers
+             for w in getattr(r, "waits", [])]
     meta = next((v for e, v in events if e == "meta"), {})
     usage = next((v for e, v in events if e == "usage"), {})
     error = next((v for e, v in events if e == "error"), None)
@@ -133,6 +145,7 @@ async def _turn(message: str, conversation_id: str | None, caller: chat.Caller,
         "model": usage.get("model"),
         "fallback": bool(usage.get("fallback")),
         "switches": switches,
+        "waits": waits,
         "tokens": {"input": usage.get("input_tokens", 0), "output": usage.get("output_tokens", 0)},
         "conversation_id": meta.get("conversation_id"),
     }
