@@ -116,8 +116,20 @@ class TurnRouter:
     store: QuotaStore | None = None
     dropped: set[str] = field(default_factory=set)
     current: str | None = None
-    switches: list[dict[str, str]] = field(default_factory=list)  # for the trace and usage
+    # For the trace and usage. A provider error adds the Retry-After it gave (None when it gave
+    # none) and `at`, seconds into the turn: T1 logs these to tell whether waiting longer for a
+    # minute limit would have kept the first model (run 17, d2-007).
+    switches: list[dict[str, Any]] = field(default_factory=list)
     waited: float = 0.0  # seconds this turn already spent waiting for a minute limit
+    waits: list[dict[str, Any]] = field(default_factory=list)  # each wait that was taken
+    started: float | None = None  # the router's clock when the turn began
+
+    def __post_init__(self) -> None:
+        if self.started is None:
+            self.started = self.router.clock()
+
+    def _at(self) -> float:
+        return round(self.router.clock() - (self.started or 0.0), 1)
 
     async def _waited_out(self, error: ProviderError) -> bool:
         """Waits when the limit clears soon enough. False means move on to the next model."""
@@ -125,6 +137,7 @@ class TurnRouter:
         if error.kind != "rate_minute" or pause is None or self.waited + pause > MAX_MINUTE_WAIT:
             return False
         self.waited += pause
+        self.waits.append({"model": self.current, "seconds": pause, "at": self._at()})
         await self.router.sleep(pause)
         return True
 
@@ -167,7 +180,8 @@ class TurnRouter:
                     if e.kind != "too_large":
                         self.router.trip(model, e, self.store)
                     attempts.append((model.name, e.kind))
-                    self.switches.append({"from": model.name, "reason": e.kind})
+                    self.switches.append({"from": model.name, "reason": e.kind,
+                                          "retry_after": e.retry_after, "at": self._at()})
                     if started:
                         failed_after_text = (model.name, e.kind)
                     break

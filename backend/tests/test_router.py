@@ -279,3 +279,19 @@ def test_when_the_store_closes_every_model_the_error_is_quota_exhausted():
     with pytest.raises(AllModelsFailed) as e:
         run(Router([a, b], Clock(), wall).for_turn(store))
     assert e.value.code == "quota_exhausted" and a.calls == b.calls == 0
+
+
+def test_a_switch_keeps_the_retry_after_and_when_it_came():
+    clock = Clock()
+    a, b = Fake("a", "rate_minute", retry_after=23.0), Fake("b")
+    turn = Router([a, b], clock=clock).for_turn()
+    clock.t += 4.0
+    assert text(run(turn)) == "b"
+    assert turn.switches == [{"from": "a", "reason": "rate_minute", "retry_after": 23.0, "at": 4.0}]
+
+
+def test_a_wait_that_was_taken_is_kept_too():
+    slept, sleep = sleeper()
+    turn = Router([Busy("a", 7.0), Fake("b")], sleep=sleep).for_turn()
+    run(turn)
+    assert turn.waits == [{"model": "a", "seconds": 7.0, "at": 0.0}]
