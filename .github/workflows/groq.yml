@@ -291,8 +291,6 @@ jobs:
     if: inputs.job == 'd3img'
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    env:
-      DRAWN: ${{ runner.temp }}/d3-pictures
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
@@ -313,8 +311,9 @@ jobs:
       - name: Draw the postings
         working-directory: evals
         run: |
-          python -m jobmatch.image_run --export "$DRAWN"
-          node jobmatch/render.mjs "$DRAWN"
+          echo "DRAWN=$RUNNER_TEMP/d3-pictures" >> "$GITHUB_ENV"
+          python -m jobmatch.image_run --export "$RUNNER_TEMP/d3-pictures"
+          node jobmatch/render.mjs "$RUNNER_TEMP/d3-pictures"
       - name: D3-img, live
         id: d3img
         working-directory: evals

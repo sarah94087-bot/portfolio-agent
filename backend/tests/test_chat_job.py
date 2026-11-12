@@ -244,6 +244,7 @@ def post_image(key, image=SHOT, **extra):
 def test_a_screenshot_is_read_then_matched_like_a_pasted_posting(use):  # noqa: F811
     reader, model = vision(POSTING), Model()
     use(model, vision=reader)
+    before = counters("visitor"), counters("image")
     _, events = post_image("shot-0001")
     names = [d.get("name") for e, d in events if e == "step"]
     assert names.index("job.read") < names.index("job.extract")
@@ -253,7 +254,7 @@ def test_a_screenshot_is_read_then_matched_like_a_pasted_posting(use):  # noqa: 
     assert "image_url" in json.dumps(reader.calls[0])
     assert "image_url" not in json.dumps(model.calls)
     assert "Must have Python" in model.calls[0][1]["content"]
-    assert counters("image") == 1 and counters("visitor") == 4
+    assert counters("image") - before[1] == 1 and counters("visitor") - before[0] == 4
     with psycopg.connect(DB_URL) as conn:
         saved = conn.execute("select content, meta from messages where role = 'user'"
                              " order by created_at desc limit 1").fetchone()
@@ -263,7 +264,7 @@ def test_a_screenshot_is_read_then_matched_like_a_pasted_posting(use):  # noqa: 
 
 def test_a_screenshot_of_a_posting_pasted_before_answers_from_the_cache(use):  # noqa: F811
     first, second = Model(), Model()
-    use(first, second, vision=vision(POSTING))
+    use(first, second, vision=vision(POSTING), limits=Limits(visitor_minute=100))
     post_job("paste-0001", message=POSTING)
     _, events = post_image("shot-0002")
     assert second.calls == []  # the text the picture gave is the text pasted: same key
@@ -296,19 +297,21 @@ def test_a_picture_that_cannot_be_read_says_so_and_asks_for_the_text(use):  # no
 
 def test_a_file_that_is_not_an_image_is_refused_before_anything_is_counted(use):  # noqa: F811
     use(Model(), vision=NeverCalled())
+    before = counters("visitor"), counters("image")
     _, events = post_image("shot-0005", image="data:image/png;base64,"
                            + base64.b64encode(b"<html>" + b"x" * 64).decode())
     assert of(events, "error")["code"] == "bad_image"
-    assert counters("visitor") == 0 and counters("image") == 0
+    assert (counters("visitor"), counters("image")) == before
 
 
 def test_a_visitor_reads_only_so_many_screenshots_a_day(use):  # noqa: F811
-    use(Model(), vision=vision(POSTING), limits=Limits(image_day=1, visitor_day=30))
+    limits = Limits(image_day=1, visitor_minute=100)
+    use(Model(), Model(), vision=vision(POSTING), limits=limits)
     post_image("shot-0006")
-    use(Model(), vision=vision(POSTING), limits=Limits(image_day=1, visitor_day=30))
+    before = counters("image"), counters("visitor")
     _, events = post_image("shot-0007")
     assert of(events, "error")["limit"] == "image_day"
-    assert counters("image") == 1  # the refused one rolled back
+    assert (counters("image"), counters("visitor")) == before  # the refused one rolled back
 
 
 def test_an_image_with_a_text_is_a_bad_request(use):  # noqa: F811
