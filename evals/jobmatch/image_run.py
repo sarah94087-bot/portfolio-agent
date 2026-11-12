@@ -1,4 +1,4 @@
-"""D3-img: the screenshot path of the job match (ADR-0022), on D3's own postings.
+﻿"""D3-img: the screenshot path of the job match (ADR-0022), on D3's own postings.
 
     python -m jobmatch.image_run --export DIR   # writes DIR/jobs.json for render.mjs
     node jobmatch/render.mjs DIR                # draws DIR/<job>-<layout>.png
@@ -39,7 +39,7 @@ from jobmatch.run import found, read_saved, write_saved
 
 RESULTS = D3_PATH.parent.parent / "results" / "d3-image.json"
 MAX_TOKENS = int(os.environ.get("JOBMATCH_IMAGE_MAX_TOKENS", "80000"))
-TOKENS_PER_MINUTE = 7000
+TOKENS_PER_MINUTE = 5000  # the vision model allows 7,000 input tokens a minute: keep a margin
 IMAGE_ESTIMATE = 5000  # 2,048 for the picture, the text read, and stage 1 on the other model
 RECALL_GATE = 0.95
 CARD_JOBS = {"d3-01", "d3-02", "d3-10"}  # also drawn as a phone page, with noise around the text
