@@ -4,6 +4,13 @@ docs/06-agent-design.md, section 3, and the search_portfolio contract in
 docs/04-retrieval-design.md, section 8: at most 5 chunks and 3,000 tokens per call, each with
 the chunk_id the answer cites and the scores the trace panel shows.
 
+A turn has the same 3,000 tokens for all its tool results together (docs/06-agent-design.md,
+section 5), not 3,000 for each call: the model may search several times, and every result stays
+in the next round's request. Without this cap three searches made the answer round larger than
+any model's minute (T1 runs 15 and 16, case d2-007). A chunk this turn already returned is not
+sent again; its id is listed, so it can still be cited. Only the turn's first search is
+reranked: the reranker spends the answer model's own minute (ADR-0014), and the answer needs it.
+
 Retrieval is the configuration M3 chose: R3 (ADR-0011) with e5-small (ADR-0012) and Q1 with
 the owner's name stripped (ADR-0013), then R4 (ADR-0014). `method` in the trace is the one that
 ordered the results: R3 when the reranker is off or failed, and `rerank.fallback` says why.
@@ -32,6 +39,7 @@ from portfolio_agent.tools.registry import Tool, ToolResult
 
 MAX_RESULTS = 5
 MAX_TOKENS = 3000
+TURN_MAX_TOKENS = MAX_TOKENS  # every tool result in one turn together (docs/06, section 5)
 RecordType = Literal["project", "experience", "skills", "education", "profile", "faq"]
 
 
@@ -65,6 +73,9 @@ class PortfolioContext:
     job: Any = None  # tools/job_match.py, JobTool: set when this turn may run a job match
     cards: Any = None  # tools/cards.py, CardTool: set when this turn may show cards
     retrieved: set[str] = field(default_factory=set)  # records found in this conversation
+    sent: set[str] = field(default_factory=set)  # chunk ids the model was given this turn
+    sent_tokens: int = 0  # their size, against TURN_MAX_TOKENS
+    searches: int = 0  # search_portfolio calls this turn; only the first is reranked
 
     @classmethod
     def from_docs(cls, conn: psycopg.Connection, docs: Sequence[Doc], **kw) -> "PortfolioContext":
@@ -115,13 +126,15 @@ def _view(hit: Hit, ctx: PortfolioContext) -> dict:
     }
 
 
-def _within_budget(hits: Sequence[Hit]) -> list[Hit]:
+def _within_budget(hits: Sequence[Hit], budget: int = MAX_TOKENS,
+                   keep_first: bool = True) -> list[Hit]:
     """Best first, until the next one would pass the budget. A chunk is never cut, because a
-    cut chunk would be cited for text the model never read. The first always stays."""
+    cut chunk would be cited for text the model never read. The first stays when keep_first
+    (the turn's first results): a search that returns nothing helps nobody."""
     kept, used = [], 0
     for hit in hits[:MAX_RESULTS]:
         tokens = count_tokens(hit.text)
-        if kept and used + tokens > MAX_TOKENS:
+        if used + tokens > budget and (kept or not keep_first):
             break
         kept.append(hit)
         used += tokens
@@ -160,7 +173,13 @@ def search_portfolio(args: SearchArgs, ctx: PortfolioContext) -> ToolResult:
     considered = len(hits)
     ranked = hits
     reranked = None
-    if method == "R3" and ctx.ranker is not None and ctx.quota is not None and len(hits) > 1:
+    can_rerank = (method == "R3" and ctx.ranker is not None and ctx.quota is not None
+                  and len(hits) > 1)
+    first_search = ctx.searches == 0
+    ctx.searches += 1
+    if can_rerank and not first_search:
+        reranked = {"model": ctx.ranker.name, "tokens": 0, "fallback": "later_search"}
+    elif can_rerank:
         started = time.perf_counter()
         outcome = rerank(hits, ctx.question or query, query, ctx.ranker, ctx.quota)
         timings["rerank"] = round((time.perf_counter() - started) * 1000)
@@ -170,7 +189,12 @@ def search_portfolio(args: SearchArgs, ctx: PortfolioContext) -> ToolResult:
         if outcome.fallback is None:
             method = "R4"
     order = {h.id: h.scores["rerank"] for h in hits if "rerank" in h.scores}
-    kept = _within_budget(hits)
+    repeated = [h.id for h in hits[:MAX_RESULTS] if h.id in ctx.sent]
+    fresh = [h for h in hits if h.id not in ctx.sent]
+    left = TURN_MAX_TOKENS - ctx.sent_tokens
+    kept = _within_budget(fresh, min(MAX_TOKENS, left), keep_first=not ctx.sent)
+    over_budget = bool(fresh) and not kept
+    _count_sent(kept, ctx)
     ctx.has_whole_record = ctx.has_whole_record or any(h.id.endswith("#all") for h in kept)
     ctx.retrieved.update(h.record_id for h in kept)
     views = [_view(h, ctx) for h in kept]
@@ -184,6 +208,8 @@ def search_portfolio(args: SearchArgs, ctx: PortfolioContext) -> ToolResult:
             for i, (v, h) in enumerate(zip(views, kept, strict=True), start=1)
         ],
         "candidates_considered": considered,
+        "already_given": repeated,
+        "turn_tokens": ctx.sent_tokens,
         # Every candidate in fused order, for the trace panel's table (US-4.2): the scores of
         # each method, and which ones went to the model. A short excerpt, not the whole chunk.
         "candidates": [
@@ -193,10 +219,17 @@ def search_portfolio(args: SearchArgs, ctx: PortfolioContext) -> ToolResult:
         ],
         "latency_ms": timings,
     }
-    model = {"query_used": query, "results": views}
-    if not views:
+    model: dict[str, Any] = {"query_used": query, "results": views}
+    if repeated:
+        model["already_given"] = repeated
+    if over_budget:
+        model["note"] = ("The tool results for this question have reached their limit. Answer "
+                         "from the results already given, and cite them.")
+    elif not views and repeated:
+        model["note"] = "Only chunks already given this turn match. Answer from them."
+    elif not views:
         model["note"] = "No matching chunks. Say the portfolio has no information on this."
-    return ToolResult(_json(model), trace, frozenset(h.id for h in kept))
+    return ToolResult(_json(model), trace, frozenset(h.id for h in kept) | frozenset(repeated))
 
 
 class ProjectArgs(BaseModel):
@@ -212,10 +245,23 @@ def get_project(args: ProjectArgs, ctx: PortfolioContext) -> ToolResult:
     ).fetchall()
     hits = [Hit(r[0], r[1], tuple(r[2]), r[3]) for r in rows]
     ctx.retrieved.update(h.record_id for h in hits)
+    # The whole record is sent even past the turn's budget: a part of it would be cited as if
+    # it were all. Chunks already given this turn are named, not repeated.
+    repeated = [h.id for h in hits if h.id in ctx.sent]
+    hits = [h for h in hits if h.id not in ctx.sent]
+    _count_sent(hits, ctx)
     views = [_view(h, ctx) for h in hits]
-    trace = {"record_id": args.id, "chunks": [v["chunk_id"] for v in views]}
-    return ToolResult(_json({"record_id": args.id, "chunks": views}), trace,
-                      frozenset(h.id for h in hits))
+    trace = {"record_id": args.id, "chunks": [v["chunk_id"] for v in views],
+             "already_given": repeated}
+    body: dict[str, Any] = {"record_id": args.id, "chunks": views}
+    if repeated:
+        body["already_given"] = repeated
+    return ToolResult(_json(body), trace, frozenset(h.id for h in hits) | frozenset(repeated))
+
+
+def _count_sent(hits: Sequence[Hit], ctx: PortfolioContext) -> None:
+    ctx.sent.update(h.id for h in hits)
+    ctx.sent_tokens += sum(count_tokens(h.text) for h in hits)
 
 
 def _json(data: dict) -> str:

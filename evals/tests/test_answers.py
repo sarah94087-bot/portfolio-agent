@@ -40,6 +40,36 @@ def test_t2_slices_cover_every_case_once(monkeypatch):
     assert sorted(seen) == sorted(every) and len(set(every)) == len(every)
 
 
+def test_overview_questions_are_judged_as_overview_only():
+    """d1-049 to d1-053 ask for detail an overview record lacks; `answer` failed the right
+    reply, "not recorded, here is the overview" (groq T1 run 12, d1-051)."""
+    items = {i.id: i for i in load_d1(cases.D1_PATH)}
+    overview = [i for i in items.values() if i.category == "overview_limit"]
+    assert len(overview) == 5
+    for item in overview:
+        rubric = next(a["value"] for a in cases.d1_case(item)["assert"]
+                      if a.get("metric") == "behavior")
+        assert rubric == cases.rubrics.behavior("overview_only"), item.id
+    other = cases.d1_case(items["d1-001"])
+    assert next(a["value"] for a in other["assert"]
+                if a.get("metric") == "behavior") == cases.rubrics.behavior("answer")
+
+
+def test_citation_expectations_are_judged_where_the_markers_show():
+    """`answer` has no [[ids]], so the judge read d2-007's cited answer as uncited (groq T1
+    run 18). judge.v3 points those cases at `answer_cited`."""
+    by_id = {c["vars"]["id"]: c for c in cases.t1() + cases.t2()}
+
+    def safe(case_id):
+        return next(a["value"] for a in by_id[case_id]["assert"]
+                    if a.get("metric") == "safe_behavior")
+
+    for case_id in ("d2-007", "d2-019"):
+        assert "answer_cited" in safe(case_id), case_id
+    assert "answer_cited" not in safe("d2-008")  # forbidden tools, not citations
+    assert by_id["d2-007"]["metadata"]["judge"] == "judge.v3"
+
+
 def test_the_judge_can_be_left_out(monkeypatch):
     monkeypatch.setenv("EVAL_JUDGE", "off")
     assert all(a["type"] == "python" for c in cases.t1() for a in c["assert"])

@@ -70,10 +70,17 @@ def _case(id_, set_, turns, lang, asserts, **meta) -> dict:
     }
 
 
+def _behavior(item) -> str:
+    """The behavior rubric. overview_limit questions stay `answer` in d1.yaml, so retrieval
+    still scores their gold chunk, but the right answer to them says the detail is not
+    recorded and gives the overview: `overview_only` (judge.v2)."""
+    return "overview_only" if item.category == "overview_limit" else item.expected_behavior
+
+
 def d1_case(item) -> dict:
     asserts = [_code(n) for n in ("no_error", "citations_valid", "language_matches",
                                   "no_private_info", "max_output")]
-    asserts.append(_judge("behavior", rubrics.behavior(item.expected_behavior)))
+    asserts.append(_judge("behavior", rubrics.behavior(_behavior(item))))
     if item.expected_behavior == "answer":
         asserts.append(_judge("grounded", rubrics.grounded()))
     if item.answer_points:
@@ -91,7 +98,9 @@ def d1_case(item) -> dict:
 def d2_case(case) -> dict:
     asserts = [_code("no_error")]
     asserts += [_code(n) for check in case.checks for n in CODE[check]]
-    asserts.append(_judge("safe_behavior", rubrics.expect(case.expect)))
+    # judge.v3: an expectation about citations is judged where the markers are visible.
+    rubric = rubrics.expect_cited if "citations" in case.checks else rubrics.expect
+    asserts.append(_judge("safe_behavior", rubric(case.expect)))
     if case.must_not:
         asserts.append(_judge("must_not", rubrics.must_not(case.must_not)))
     if case.lang == "he":

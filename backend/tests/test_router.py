@@ -294,3 +294,19 @@ def test_the_vision_router_has_one_model_named_like_the_main_routers():
     # The same name means the same token count and the same closed-until state.
     assert vision.models[0].name in [m.name for m in from_env(client, env).models]
     assert vision_from_env(client, {**env, "GROQ_VISION_MODEL": "x/y"}).models[0].name == "groq/x/y"
+
+
+def test_a_switch_keeps_the_retry_after_and_when_it_came():
+    clock = Clock()
+    a, b = Fake("a", "rate_minute", retry_after=23.0), Fake("b")
+    turn = Router([a, b], clock=clock).for_turn()
+    clock.t += 4.0
+    assert text(run(turn)) == "b"
+    assert turn.switches == [{"from": "a", "reason": "rate_minute", "retry_after": 23.0, "at": 4.0}]
+
+
+def test_a_wait_that_was_taken_is_kept_too():
+    slept, sleep = sleeper()
+    turn = Router([Busy("a", 7.0), Fake("b")], sleep=sleep).for_turn()
+    run(turn)
+    assert turn.waits == [{"model": "a", "seconds": 7.0, "at": 0.0}]
