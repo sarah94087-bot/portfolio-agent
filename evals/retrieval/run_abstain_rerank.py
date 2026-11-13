@@ -151,8 +151,9 @@ def measure(
     embed_passages: Callable[[Sequence[str]], list[list[float]]], grader: Grader,
     saved_path: Path = SAVED, model: str = "", max_tokens: int = MAX_TOKENS,
 ) -> dict:
-    """Saved grades are reused while R3 gives the same candidates; missing ones are asked for
-    until max_tokens is spent. Returns the rows, and which questions are still missing."""
+    """Saved grades are reused while R3 gives the same 10 candidates, in any order; missing
+    ones are asked for until max_tokens is spent. Returns the rows, and which questions are
+    still missing."""
     if saved_path.exists():
         saved = json.loads(saved_path.read_text(encoding="utf-8"))
     else:
@@ -178,7 +179,10 @@ def measure(
                                      RERANK_CANDIDATES, TABLE)
                 ids = [h.id for h in hits]
                 got = saved["grades"].get(item.id)
-                if got is None or got["candidates"] != ids:
+                # The same 10 can come back in another order on another machine (near-ties
+                # in R3's fusion: 35 of 39 did between runs 1 and 2); the grades are per
+                # candidate, so only the set has to match.
+                if got is None or set(got["candidates"]) != set(ids):
                     if spent >= max_tokens:
                         missing.append(item.id)
                         continue
