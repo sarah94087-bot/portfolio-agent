@@ -16,6 +16,8 @@
 #   tokens a question, 92 questions, so it takes two days of quota: each run stops at
 #   `max_tokens` and saves the grades to the branch groq/abstain-grades, and the next run
 #   resumes from there. With max_tokens 0 it only checks that the search runs.
+# - abstain_full: stage 5b part 2, the same on the whole text of each candidate, only for the
+#   questions the 150-token run graded below 2 (38). Saved next to the first file, same branch.
 #
 # One at a time: the Groq quota is per model and per day, shared by both jobs.
 name: groq
@@ -24,9 +26,9 @@ on:
   workflow_dispatch:
     inputs:
       job:
-        description: "stage4, t1, d3 or abstain"
+        description: "stage4, t1, d3, abstain or abstain_full"
         type: choice
-        options: [stage4, t1, d3, abstain]
+        options: [stage4, t1, d3, abstain, abstain_full]
         default: stage4
       run:
         description: "stage4: the run number (2 or 3)"
@@ -288,7 +290,7 @@ jobs:
         run: cat "$RUNNER_TEMP/d3.txt" >> "$GITHUB_STEP_SUMMARY" || true
 
   abstain:
-    if: inputs.job == 'abstain'
+    if: inputs.job == 'abstain' || inputs.job == 'abstain_full'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     services:
@@ -305,7 +307,8 @@ jobs:
     env:
       DATABASE_URL: postgresql://agent:agent@localhost:5432/agent
       EMBEDDING_MODEL_DIR: ${{ github.workspace }}/../models/multilingual-e5-small
-      GRADES: evals/datasets/rerank/d1-abstain-grades.json
+      GRADES_DIR: evals/datasets/rerank
+      ABSTAIN_FULL_TEXT: ${{ inputs.job == 'abstain_full' && '1' || '' }}
       BRANCH: groq/abstain-grades
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
@@ -322,8 +325,8 @@ jobs:
         run: |
           if git fetch -q --depth 1 origin "refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"; then
             git checkout -q -B "$BRANCH" "origin/$BRANCH"
-            mkdir -p "../run/$(dirname "$GRADES")"
-            cp "$GRADES" "../run/$GRADES" && echo "resuming"
+            mkdir -p "../run/$GRADES_DIR"
+            cp "$GRADES_DIR"/d1-abstain-grades*.json "../run/$GRADES_DIR/" && echo "resuming"
           else
             git checkout -q -B "$BRANCH" && echo "first run"
           fi
@@ -347,17 +350,17 @@ jobs:
         with:
           name: abstain
           path: |
-            run/${{ env.GRADES }}
+            run/${{ env.GRADES_DIR }}/d1-abstain-grades*.json
             run/evals/results/
           if-no-files-found: warn
       - name: Push the results branch
         if: always() && steps.grade.outcome != 'skipped'
         working-directory: main
         run: |
-          mkdir -p evals/results "$(dirname "$GRADES")"
-          cp "../run/$GRADES" "$GRADES" 2>/dev/null || true
-          cp ../run/evals/results/*-abstain-*-grades.json evals/results/ 2>/dev/null || true
-          git add -f "$(dirname "$GRADES")" evals/results
+          mkdir -p evals/results "$GRADES_DIR"
+          cp ../run/"$GRADES_DIR"/d1-abstain-grades*.json "$GRADES_DIR/" 2>/dev/null || true
+          cp ../run/evals/results/*-abstain-*-grades*.json evals/results/ 2>/dev/null || true
+          git add -f "$GRADES_DIR" evals/results
           if git diff --cached --quiet; then echo "nothing saved"; exit 0; fi
           git -c user.name="github-actions[bot]"               -c user.email="41898282+github-actions[bot]@users.noreply.github.com"               commit -q -m "Stage 5b grades, from groq workflow run ${{ github.run_id }}"
           git push -q origin "HEAD:refs/heads/$BRANCH"

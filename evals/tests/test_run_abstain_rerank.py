@@ -43,3 +43,36 @@ def test_summary_counts_a_fallback_as_zero_and_applies_both_cuts():
     assert s["fixed_cut"]["dev"]["negatives_caught"] == ["n1", "n2"]
     assert s["fixed_cut"]["test"]["positives_lost"] == ["p3"]
     assert s["cut_from_dev"]["test"]["cut"] == 2
+
+
+def test_part_two_regrades_every_question_the_cut_graded_below_two():
+    from retrieval.run_abstain_rerank import to_regrade
+    saved = {"grades": {"a": {"grades": {"x": 3}}, "b": {"grades": {"x": 1, "y": 0}},
+                        "c": {"grades": {"x": 2}}, "d": {"grades": {}}}}
+    assert to_regrade(saved) == {"b", "d"}
+
+
+def test_a_request_too_large_is_tried_once_more_with_each_candidate_cut(monkeypatch):
+    import httpx
+    from portfolio_agent.retrieval.lexical import Hit
+
+    from retrieval import run_abstain_rerank as m
+
+    monkeypatch.setenv("GROQ_API_KEY_EVALS", "k")
+    monkeypatch.setenv("GROQ_MODEL", "m")
+    sent = []
+
+    def handler(request):
+        body = json.loads(request.content)
+        sent.append(body["messages"][1]["content"])
+        if len(sent) == 1:
+            return httpx.Response(413, json={"error": "too large"})
+        return httpx.Response(200, json={**answer([{"id": "a", "grade": 3}]),
+                                         "usage": {"total_tokens": 9}})
+
+    long_text = " ".join(["word"] * 1000)
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        grade = m.groq_grader(client, m.NO_CUT)
+        grades, tokens, _, cut = grade("q", [Hit("a", "a", (), long_text, {})])
+    assert grades == {"a": 3} and tokens == 9 and cut == m.TOO_LARGE_CUT
+    assert len(sent) == 2 and len(sent[1]) < len(sent[0])

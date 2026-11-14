@@ -61,6 +61,15 @@ SAVED = ROOT / "evals" / "datasets" / "rerank" / "d1-abstain-grades.json"
 STRATEGY = "C4"
 TABLE = "abstain_rerank_chunks"
 MAX_TOKENS = int(os.environ.get("ABSTAIN_MAX_TOKENS", "60000"))  # per invocation
+# Stage 5b, part 2: the 150-token cut hid the fact in 19 of the 21 positives the cut lost, so
+# those 21 and the 17 negatives (every question graded below 2 with the cut) are graded again
+# on the whole text of each candidate. A question already at 2 or more keeps its grade.
+FULL_TEXT = os.environ.get("ABSTAIN_FULL_TEXT") == "1"
+SAVED_FULL = SAVED.with_name("d1-abstain-grades-full.json")
+NO_CUT = 10**6
+# Groq refuses a request over the model's per-minute limit (8,000 tokens, 413). The longest
+# 10 candidates come near it, so such a call is tried once more with each cut to 450 tokens.
+TOO_LARGE_CUT = 450
 FIXED_CUT = 2  # set before the first run: answer only when some candidate answers at least part
 GRADES = (0, 1, 2, 3)
 
@@ -73,8 +82,8 @@ SYSTEM = (
     "candidate id you are given, and only those."
 )
 
-# (question, candidates) -> (grades by id, tokens, ms spent waiting on 429)
-Grader = Callable[[str, Sequence[Hit]], tuple[dict[str, int], int, int]]
+# (question, candidates) -> (grades by id, tokens, ms spent waiting on 429, the cut used)
+Grader = Callable[[str, Sequence[Hit]], tuple[dict[str, int], int, int, int]]
 
 
 def grade_tool(ids: Sequence[str]) -> dict:
@@ -92,9 +101,16 @@ def grade_tool(ids: Sequence[str]) -> dict:
     }}
 
 
-def grade_prompt(question: str, hits: Sequence[Hit]) -> str:
+def grade_prompt(question: str, hits: Sequence[Hit], cut: int = CANDIDATE_TOKENS) -> str:
     return (f"Visitor's question: {question}\n\n"
-            f"Candidates:\n\n{candidates_block(hits, CANDIDATE_TOKENS)}")
+            f"Candidates:\n\n{candidates_block(hits, cut)}")
+
+
+def to_regrade(saved: dict) -> set[str]:
+    """The questions the cut graded below FIXED_CUT (or not at all): the ones part 2 grades
+    again on the whole text."""
+    return {qid for qid, g in saved["grades"].items()
+            if (best_grade(g["grades"]) or 0) < FIXED_CUT}
 
 
 def parse_grades(data: dict, ids: Sequence[str]) -> dict[str, int]:
@@ -121,28 +137,36 @@ def best_grade(grades: dict[str, int]) -> int | None:
     return max(grades.values()) if grades else None
 
 
-def groq_grader(client: httpx.Client) -> Grader:
+def groq_grader(client: httpx.Client, cut: int = CANDIDATE_TOKENS) -> Grader:
     headers = {"Authorization": f"Bearer {env('GROQ_API_KEY_EVALS')}"}
     model = env("GROQ_MODEL")
 
-    def grade(question: str, hits: Sequence[Hit]) -> tuple[dict[str, int], int, int]:
+    def grade(question: str, hits: Sequence[Hit]) -> tuple[dict[str, int], int, int, int]:
         ids = [h.id for h in hits]
-        body = {
-            "model": model, "tools": [grade_tool(ids)],
-            "tool_choice": {"type": "function", "function": {"name": "grade_passages"}},
-            "messages": [{"role": "system", "content": SYSTEM},
-                         {"role": "user", "content": grade_prompt(question, hits)}],
-        }
         waits: list[float] = []
-        for attempt in range(BAD_REQUEST_TRIES):
+        used_cut, bad_requests = cut, 0
+        while True:
+            body = {
+                "model": model, "tools": [grade_tool(ids)],
+                "tool_choice": {"type": "function", "function": {"name": "grade_passages"}},
+                "messages": [
+                    {"role": "system", "content": SYSTEM},
+                    {"role": "user", "content": grade_prompt(question, hits, used_cut)},
+                ],
+            }
             try:
                 data = post(client, GROQ_URL, waits=waits, headers=headers, json=body).json()
                 break
             except httpx.HTTPStatusError as e:
-                if e.response.status_code != 400 or attempt == BAD_REQUEST_TRIES - 1:
+                code = e.response.status_code
+                if code == 413 and used_cut > TOO_LARGE_CUT:
+                    used_cut = TOO_LARGE_CUT
+                    continue
+                bad_requests += 1
+                if code != 400 or bad_requests == BAD_REQUEST_TRIES:
                     raise
         return (parse_grades(data, ids), (data.get("usage") or {}).get("total_tokens", 0),
-                round(sum(waits) * 1000))
+                round(sum(waits) * 1000), used_cut)
     return grade
 
 
@@ -150,10 +174,14 @@ def measure(
     db_url: str, items: Sequence[D1Item], embed_query: Callable[[str], list[float]],
     embed_passages: Callable[[Sequence[str]], list[list[float]]], grader: Grader,
     saved_path: Path = SAVED, model: str = "", max_tokens: int = MAX_TOKENS,
+    only: set[str] | None = None, others: dict | None = None,
 ) -> dict:
     """Saved grades are reused while R3 gives the same 10 candidates, in any order; missing
     ones are asked for until max_tokens is spent. Returns the rows, and which questions are
-    still missing."""
+    still missing.
+
+    With `only`, the other questions are not graded: their grades come from `others` (part 2
+    takes them from the run with the cut), and their rows say regraded False."""
     if saved_path.exists():
         saved = json.loads(saved_path.read_text(encoding="utf-8"))
     else:
@@ -178,22 +206,29 @@ def measure(
                 hits = hybrid.search(conn, item.question, embed_query(item.question),
                                      RERANK_CANDIDATES, TABLE)
                 ids = [h.id for h in hits]
-                got = saved["grades"].get(item.id)
+                regraded = only is None or item.id in only
+                if regraded:
+                    got = saved["grades"].get(item.id)
+                else:
+                    got = (others or {}).get("grades", {}).get(item.id)
+                    if got is None:
+                        missing.append(item.id)
+                        continue
                 # The same 10 can come back in another order on another machine (near-ties
                 # in R3's fusion: 35 of 39 did between runs 1 and 2); the grades are per
                 # candidate, so only the set has to match.
-                if got is None or set(got["candidates"]) != set(ids):
+                if regraded and (got is None or set(got["candidates"]) != set(ids)):
                     if spent >= max_tokens:
                         missing.append(item.id)
                         continue
                     start = time.perf_counter()
-                    grades, used, wait_ms = grader(item.question, hits)
+                    grades, used, wait_ms, used_cut = grader(item.question, hits)
                     spent += used
                     saved["tokens"] += used
                     saved["calls"] += 1
                     got = {"candidates": ids, "grades": grades, "tokens": used,
                            "ms": round((time.perf_counter() - start) * 1000) - wait_ms,
-                           "wait_ms": wait_ms}
+                           "wait_ms": wait_ms, "cut": used_cut}
                     saved["grades"][item.id] = got
                     saved_path.parent.mkdir(parents=True, exist_ok=True)
                     saved_path.write_text(json.dumps(saved, ensure_ascii=False, indent=2)
@@ -205,6 +240,7 @@ def measure(
                     "grade": best_grade(got["grades"]),
                     "gold_in_candidates": bool(gold & {h.record_id for h in hits}),
                     "top_graded": max(got["grades"], key=got["grades"].get, default=None),
+                    "regraded": regraded,
                 })
         finally:
             conn.execute(f"drop table {TABLE}")
@@ -242,14 +278,32 @@ def main() -> int:
         print("DATABASE_URL and EMBEDDING_MODEL_DIR are required (see the module docstring)",
               file=sys.stderr)
         return 2
+    if FULL_TEXT:
+        cut_run = json.loads(SAVED.read_text(encoding="utf-8"))
+        part = {"only": to_regrade(cut_run), "others": cut_run, "saved_path": SAVED_FULL}
+        cut, name = NO_CUT, f"abstain-{STRATEGY}-R3-e5-small-Q0-grades-full"
+    else:
+        part, cut, name = {}, CANDIDATE_TOKENS, f"abstain-{STRATEGY}-R3-e5-small-Q0-grades"
     with httpx.Client(timeout=120) as client:
         out = measure(db_url, load_d1(D1_PATH), model.embed_query, model.embed_passages,
-                      groq_grader(client), model=env("GROQ_MODEL"))
+                      groq_grader(client, cut), model=env("GROQ_MODEL"), **part)
     status = {k: out[k] for k in ("missing", "spent_now", "tokens", "calls")}
     print(json.dumps(status))
     if out["missing"]:
         print(f"{len(out['missing'])} questions still to grade; run again to resume")
         return 0
+    summary = summarize(out["rows"])
+    if FULL_TEXT:
+        summary["regraded_only"] = summarize([r for r in out["rows"] if r["regraded"]])
+    print(write_results({"strategy": STRATEGY, "query": "Q0", "grader": env("GROQ_MODEL"),
+                         "full_text": FULL_TEXT, "rows": out["rows"], "summary": summary},
+                        name))
+    print(json.dumps(summary, indent=2, ensure_ascii=False))
+    for r in sorted(out["rows"], key=lambda r: (r["grade"] is None, r["grade"] or 0)):
+        mark = "+" if r["answerable"] else "-"
+        print(f"{mark} {r['id']} {r['split']:4} {r['category']:14} grade={r['grade']} "
+              f"gold_in_top10={r['gold_in_candidates']} regraded={r.get('regraded')}")
+    return 0
     summary = summarize(out["rows"])
     print(write_results({"strategy": STRATEGY, "query": "Q0", "grader": env("GROQ_MODEL"),
                          "rows": out["rows"], "summary": summary},
