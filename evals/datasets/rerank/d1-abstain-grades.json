@@ -4,8 +4,8 @@
   "system": "You grade search results for an assistant that answers questions about Sarah's work. For each candidate passage, grade whether it contains what the visitor's question asks for: 3 = it answers the question, 2 = it answers part of it, 1 = it is about the same subject but does not contain what is asked, 0 = it is unrelated. A passage about the right project or topic that lacks the specific fact asked for is a 1. Grade every candidate id you are given, and only those.",
   "candidates": 10,
   "candidate_tokens": 150,
-  "tokens": 299267,
-  "calls": 118,
+  "tokens": 390609,
+  "calls": 154,
   "grades": {
     "d1-001": {
       "candidates": [
@@ -192,7 +192,7 @@
         "claims-trust-model#all",
         "profile#all",
         "git-mcp-server#all",
-        "skills#kubernetes"
+        "skills#github-actions"
       ],
       "grades": {
         "ainsof-capital#all": 0,
@@ -204,11 +204,11 @@
         "claims-trust-model#all": 0,
         "profile#all": 0,
         "git-mcp-server#all": 0,
-        "skills#kubernetes": 0
+        "skills#github-actions": 0
       },
-      "tokens": 2189,
-      "ms": 1170,
-      "wait_ms": 15043
+      "tokens": 2267,
+      "ms": 1409,
+      "wait_ms": 0
     },
     "d1-008": {
       "candidates": [
@@ -278,8 +278,8 @@
         "postgres-rls-backbone#all",
         "faq#all",
         "clip-embeddings-kafka#all",
-        "profile#all",
-        "skills#docker"
+        "weed-detection-pipeline#all",
+        "profile#all"
       ],
       "grades": {
         "human-gated-translation#all": 3,
@@ -290,12 +290,12 @@
         "postgres-rls-backbone#all": 0,
         "faq#all": 0,
         "clip-embeddings-kafka#all": 0,
-        "profile#all": 1,
-        "skills#docker": 0
+        "weed-detection-pipeline#all": 0,
+        "profile#all": 1
       },
-      "tokens": 2488,
-      "ms": 1653,
-      "wait_ms": 17048
+      "tokens": 2674,
+      "ms": 1673,
+      "wait_ms": 0
     },
     "d1-011": {
       "candidates": [
@@ -446,30 +446,30 @@
       "candidates": [
         "preferences#all",
         "education#all",
+        "governance-center-pwa#all",
         "api-latency-582-to-40#all",
         "ainsof-capital#all",
-        "governance-center-pwa#all",
         "skills#react",
+        "faq#all",
         "this-agent#all",
         "vast-data-bootcamp#all",
-        "skills#kubernetes",
-        "skills#java"
+        "skills#kubernetes"
       ],
       "grades": {
         "preferences#all": 3,
         "education#all": 1,
+        "governance-center-pwa#all": 1,
         "api-latency-582-to-40#all": 1,
         "ainsof-capital#all": 1,
-        "governance-center-pwa#all": 1,
         "skills#react": 1,
+        "faq#all": 1,
         "this-agent#all": 1,
         "vast-data-bootcamp#all": 1,
-        "skills#kubernetes": 1,
-        "skills#java": 1
+        "skills#kubernetes": 1
       },
-      "tokens": 2100,
-      "ms": 1317,
-      "wait_ms": 14107
+      "tokens": 2198,
+      "ms": 1571,
+      "wait_ms": 0
     },
     "d1-017": {
       "candidates": [
@@ -563,58 +563,58 @@
         "skills#mcp",
         "git-mcp-server#all",
         "faq#all",
-        "this-agent#all",
         "vast-data-bootcamp#all",
+        "this-agent#all",
         "ainsof-capital#all",
         "governance-center-pwa#all",
-        "skills#docker",
         "clip-embeddings-kafka#all",
-        "plant-health-classification#all"
+        "skills#docker",
+        "weed-detection-pipeline#all"
       ],
       "grades": {
-        "skills#mcp": 0,
-        "git-mcp-server#all": 0,
+        "skills#mcp": 1,
+        "git-mcp-server#all": 1,
         "faq#all": 0,
-        "this-agent#all": 0,
         "vast-data-bootcamp#all": 0,
+        "this-agent#all": 0,
         "ainsof-capital#all": 0,
         "governance-center-pwa#all": 0,
-        "skills#docker": 0,
         "clip-embeddings-kafka#all": 0,
-        "plant-health-classification#all": 0
+        "skills#docker": 0,
+        "weed-detection-pipeline#all": 0
       },
-      "tokens": 2358,
-      "ms": 1544,
-      "wait_ms": 18049
+      "tokens": 2363,
+      "ms": 1549,
+      "wait_ms": 6046
     },
     "d1-021": {
       "candidates": [
         "human-gated-translation#all",
-        "ainsof-capital#all",
         "this-agent#all",
         "faq#all",
-        "claims-trust-model#all",
-        "education#all",
+        "ainsof-capital#all",
         "skills#claude-api",
+        "profile#all",
+        "education#all",
+        "claims-trust-model#all",
         "skills#github-actions",
-        "git-mcp-server#all",
-        "skills#java"
+        "git-mcp-server#all"
       ],
       "grades": {
-        "human-gated-translation#all": 0,
+        "human-gated-translation#all": 1,
+        "this-agent#all": 1,
+        "faq#all": 1,
         "ainsof-capital#all": 1,
-        "this-agent#all": 0,
-        "faq#all": 0,
-        "claims-trust-model#all": 1,
-        "education#all": 0,
         "skills#claude-api": 0,
+        "profile#all": 3,
+        "education#all": 0,
+        "claims-trust-model#all": 1,
         "skills#github-actions": 0,
-        "git-mcp-server#all": 3,
-        "skills#java": 0
+        "git-mcp-server#all": 3
       },
-      "tokens": 2434,
-      "ms": 1987,
-      "wait_ms": 14052
+      "tokens": 2487,
+      "ms": 2015,
+      "wait_ms": 15043
     },
     "d1-022": {
       "candidates": [
@@ -656,23 +656,23 @@
         "governance-center-pwa#all",
         "claims-trust-model#all",
         "skills#docker",
-        "skills#kubernetes"
+        "api-latency-582-to-40#all"
       ],
       "grades": {
         "weed-detection-pipeline#all": 1,
         "vast-data-bootcamp#all": 2,
         "plant-health-classification#all": 2,
-        "ainsof-capital#all": 1,
-        "clip-embeddings-kafka#all": 1,
-        "this-agent#all": 1,
-        "governance-center-pwa#all": 1,
-        "claims-trust-model#all": 1,
+        "ainsof-capital#all": 0,
+        "clip-embeddings-kafka#all": 0,
+        "this-agent#all": 0,
+        "governance-center-pwa#all": 0,
+        "claims-trust-model#all": 0,
         "skills#docker": 2,
-        "skills#kubernetes": 1
+        "api-latency-582-to-40#all": 0
       },
-      "tokens": 2604,
-      "ms": 1859,
-      "wait_ms": 18051
+      "tokens": 2995,
+      "ms": 2459,
+      "wait_ms": 19043
     },
     "d1-024": {
       "candidates": [
@@ -1746,6 +1746,875 @@
       "tokens": 1951,
       "ms": 1565,
       "wait_ms": 10089
+    },
+    "d1-061": {
+      "candidates": [
+        "faq#all",
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "api-latency-582-to-40#all",
+        "claims-trust-model#all",
+        "human-gated-translation#all",
+        "postgres-rls-backbone#all",
+        "this-agent#all",
+        "git-mcp-server#all",
+        "education#all"
+      ],
+      "grades": {
+        "faq#all": 1,
+        "ainsof-capital#all": 1,
+        "governance-center-pwa#all": 1,
+        "api-latency-582-to-40#all": 1,
+        "claims-trust-model#all": 1,
+        "human-gated-translation#all": 1,
+        "postgres-rls-backbone#all": 1,
+        "this-agent#all": 1,
+        "git-mcp-server#all": 1,
+        "education#all": 1
+      },
+      "tokens": 2621,
+      "ms": 1878,
+      "wait_ms": 21096
+    },
+    "d1-062": {
+      "candidates": [
+        "plant-health-classification#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all",
+        "weed-detection-pipeline#all",
+        "claims-trust-model#all",
+        "faq#all",
+        "governance-center-pwa#all",
+        "this-agent#all",
+        "ainsof-capital#all",
+        "skills#docker"
+      ],
+      "grades": {
+        "plant-health-classification#all": 1,
+        "clip-embeddings-kafka#all": 1,
+        "vast-data-bootcamp#all": 1,
+        "weed-detection-pipeline#all": 1,
+        "claims-trust-model#all": 0,
+        "faq#all": 0,
+        "governance-center-pwa#all": 0,
+        "this-agent#all": 0,
+        "ainsof-capital#all": 0,
+        "skills#docker": 0
+      },
+      "tokens": 2494,
+      "ms": 1574,
+      "wait_ms": 17045
+    },
+    "d1-063": {
+      "candidates": [
+        "ainsof-capital#all",
+        "faq#all",
+        "claims-trust-model#all",
+        "profile#all",
+        "preferences#all",
+        "this-agent#all",
+        "governance-center-pwa#all",
+        "vast-data-bootcamp#all",
+        "api-latency-582-to-40#all",
+        "skills#minio"
+      ],
+      "grades": {
+        "ainsof-capital#all": 1,
+        "faq#all": 1,
+        "claims-trust-model#all": 1,
+        "profile#all": 1,
+        "preferences#all": 0,
+        "this-agent#all": 0,
+        "governance-center-pwa#all": 1,
+        "vast-data-bootcamp#all": 0,
+        "api-latency-582-to-40#all": 1,
+        "skills#minio": 0
+      },
+      "tokens": 2484,
+      "ms": 1942,
+      "wait_ms": 16096
+    },
+    "d1-064": {
+      "candidates": [
+        "human-gated-translation#all",
+        "education#all",
+        "faq#all",
+        "ainsof-capital#all",
+        "api-latency-582-to-40#all",
+        "profile#all",
+        "vast-data-bootcamp#all",
+        "skills#react",
+        "skills#java",
+        "skills#mysql"
+      ],
+      "grades": {
+        "human-gated-translation#all": 1,
+        "education#all": 1,
+        "faq#all": 1,
+        "ainsof-capital#all": 1,
+        "api-latency-582-to-40#all": 1,
+        "profile#all": 1,
+        "vast-data-bootcamp#all": 1,
+        "skills#react": 1,
+        "skills#java": 1,
+        "skills#mysql": 1
+      },
+      "tokens": 2126,
+      "ms": 1460,
+      "wait_ms": 12182
+    },
+    "d1-065": {
+      "candidates": [
+        "faq#all",
+        "ainsof-capital#all",
+        "vast-data-bootcamp#all",
+        "governance-center-pwa#all",
+        "preferences#all",
+        "human-gated-translation#all",
+        "api-latency-582-to-40#all",
+        "profile#all",
+        "this-agent#all",
+        "plant-health-classification#all"
+      ],
+      "grades": {
+        "faq#all": 1,
+        "ainsof-capital#all": 1,
+        "vast-data-bootcamp#all": 1,
+        "governance-center-pwa#all": 1,
+        "preferences#all": 1,
+        "human-gated-translation#all": 1,
+        "api-latency-582-to-40#all": 1,
+        "profile#all": 1,
+        "this-agent#all": 1,
+        "plant-health-classification#all": 1
+      },
+      "tokens": 2494,
+      "ms": 1556,
+      "wait_ms": 20098
+    },
+    "d1-066": {
+      "candidates": [
+        "this-agent#all",
+        "git-mcp-server#all",
+        "clip-embeddings-kafka#all",
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "postgres-rls-backbone#all",
+        "weed-detection-pipeline#all",
+        "vast-data-bootcamp#all",
+        "claims-trust-model#all",
+        "skills#python"
+      ],
+      "grades": {
+        "this-agent#all": 0,
+        "git-mcp-server#all": 0,
+        "clip-embeddings-kafka#all": 0,
+        "ainsof-capital#all": 0,
+        "governance-center-pwa#all": 0,
+        "postgres-rls-backbone#all": 0,
+        "weed-detection-pipeline#all": 0,
+        "vast-data-bootcamp#all": 0,
+        "claims-trust-model#all": 0,
+        "skills#python": 0
+      },
+      "tokens": 2412,
+      "ms": 1355,
+      "wait_ms": 18096
+    },
+    "d1-067": {
+      "candidates": [
+        "ainsof-capital#all",
+        "faq#all",
+        "skills#kafka",
+        "plant-health-classification#all",
+        "skills#fastapi",
+        "api-latency-582-to-40#all",
+        "claims-trust-model#all",
+        "skills#github-actions",
+        "human-gated-translation#all",
+        "this-agent#all"
+      ],
+      "grades": {
+        "ainsof-capital#all": 0,
+        "faq#all": 0,
+        "skills#kafka": 0,
+        "plant-health-classification#all": 0,
+        "skills#fastapi": 0,
+        "api-latency-582-to-40#all": 0,
+        "claims-trust-model#all": 0,
+        "skills#github-actions": 0,
+        "human-gated-translation#all": 0,
+        "this-agent#all": 0
+      },
+      "tokens": 1913,
+      "ms": 982,
+      "wait_ms": 14043
+    },
+    "d1-068": {
+      "candidates": [
+        "education#all",
+        "vast-data-bootcamp#all",
+        "faq#all",
+        "governance-center-pwa#all",
+        "skills#github-actions",
+        "skills#claude-api",
+        "ainsof-capital#all",
+        "skills#react",
+        "weed-detection-pipeline#all",
+        "human-gated-translation#all"
+      ],
+      "grades": {
+        "education#all": 0,
+        "vast-data-bootcamp#all": 0,
+        "faq#all": 0,
+        "governance-center-pwa#all": 0,
+        "skills#github-actions": 0,
+        "skills#claude-api": 0,
+        "ainsof-capital#all": 0,
+        "skills#react": 0,
+        "weed-detection-pipeline#all": 0,
+        "human-gated-translation#all": 0
+      },
+      "tokens": 2077,
+      "ms": 1363,
+      "wait_ms": 13281
+    },
+    "d1-069": {
+      "candidates": [
+        "ainsof-capital#all",
+        "vast-data-bootcamp#all",
+        "education#all",
+        "weed-detection-pipeline#all",
+        "profile#all",
+        "faq#all",
+        "governance-center-pwa#all",
+        "plant-health-classification#all",
+        "clip-embeddings-kafka#all",
+        "preferences#all"
+      ],
+      "grades": {
+        "ainsof-capital#all": 0,
+        "vast-data-bootcamp#all": 0,
+        "education#all": 0,
+        "weed-detection-pipeline#all": 0,
+        "profile#all": 0,
+        "faq#all": 0,
+        "governance-center-pwa#all": 0,
+        "plant-health-classification#all": 0,
+        "clip-embeddings-kafka#all": 0,
+        "preferences#all": 0
+      },
+      "tokens": 2311,
+      "ms": 1141,
+      "wait_ms": 16043
+    },
+    "d1-070": {
+      "candidates": [
+        "claims-trust-model#all",
+        "education#all",
+        "skills#react",
+        "clip-embeddings-kafka#all",
+        "skills#github-actions",
+        "skills#java",
+        "weed-detection-pipeline#all",
+        "this-agent#all",
+        "vast-data-bootcamp#all",
+        "ainsof-capital#all"
+      ],
+      "grades": {
+        "claims-trust-model#all": 0,
+        "education#all": 0,
+        "skills#react": 0,
+        "clip-embeddings-kafka#all": 0,
+        "skills#github-actions": 0,
+        "skills#java": 0,
+        "weed-detection-pipeline#all": 0,
+        "this-agent#all": 0,
+        "vast-data-bootcamp#all": 0,
+        "ainsof-capital#all": 0
+      },
+      "tokens": 2149,
+      "ms": 1816,
+      "wait_ms": 14045
+    },
+    "d1-071": {
+      "candidates": [
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "claims-trust-model#all",
+        "vast-data-bootcamp#all",
+        "faq#all",
+        "plant-health-classification#all",
+        "this-agent#all",
+        "ainsof-capital#all",
+        "human-gated-translation#all",
+        "education#all"
+      ],
+      "grades": {
+        "clip-embeddings-kafka#all": 1,
+        "weed-detection-pipeline#all": 2,
+        "claims-trust-model#all": 0,
+        "vast-data-bootcamp#all": 3,
+        "faq#all": 0,
+        "plant-health-classification#all": 0,
+        "this-agent#all": 0,
+        "ainsof-capital#all": 0,
+        "human-gated-translation#all": 0,
+        "education#all": 0
+      },
+      "tokens": 2744,
+      "ms": 1856,
+      "wait_ms": 17097
+    },
+    "d1-072": {
+      "candidates": [
+        "git-mcp-server#all",
+        "skills#git",
+        "governance-center-pwa#all",
+        "human-gated-translation#all",
+        "ainsof-capital#all",
+        "skills#github-actions",
+        "claims-trust-model#all",
+        "this-agent#all",
+        "profile#all",
+        "weed-detection-pipeline#all"
+      ],
+      "grades": {
+        "git-mcp-server#all": 3,
+        "skills#git": 1,
+        "governance-center-pwa#all": 0,
+        "human-gated-translation#all": 0,
+        "ainsof-capital#all": 0,
+        "skills#github-actions": 0,
+        "claims-trust-model#all": 0,
+        "this-agent#all": 0,
+        "profile#all": 0,
+        "weed-detection-pipeline#all": 0
+      },
+      "tokens": 2535,
+      "ms": 2139,
+      "wait_ms": 15043
+    },
+    "d1-073": {
+      "candidates": [
+        "ainsof-capital#all",
+        "faq#all",
+        "vast-data-bootcamp#all",
+        "clip-embeddings-kafka#all",
+        "plant-health-classification#all",
+        "this-agent#all",
+        "skills#docker",
+        "skills#github-actions",
+        "claims-trust-model#all",
+        "skills#react"
+      ],
+      "grades": {
+        "ainsof-capital#all": 0,
+        "faq#all": 0,
+        "vast-data-bootcamp#all": 0,
+        "clip-embeddings-kafka#all": 0,
+        "plant-health-classification#all": 0,
+        "this-agent#all": 0,
+        "skills#docker": 0,
+        "skills#github-actions": 1,
+        "claims-trust-model#all": 0,
+        "skills#react": 0
+      },
+      "tokens": 2346,
+      "ms": 1728,
+      "wait_ms": 16101
+    },
+    "d1-074": {
+      "candidates": [
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "api-latency-582-to-40#all",
+        "faq#all",
+        "clip-embeddings-kafka#all",
+        "governance-center-pwa#all",
+        "human-gated-translation#all",
+        "postgres-rls-backbone#all",
+        "vast-data-bootcamp#all",
+        "this-agent#all"
+      ],
+      "grades": {
+        "ainsof-capital#all": 3,
+        "claims-trust-model#all": 3,
+        "api-latency-582-to-40#all": 0,
+        "faq#all": 3,
+        "clip-embeddings-kafka#all": 0,
+        "governance-center-pwa#all": 0,
+        "human-gated-translation#all": 0,
+        "postgres-rls-backbone#all": 0,
+        "vast-data-bootcamp#all": 0,
+        "this-agent#all": 2
+      },
+      "tokens": 2917,
+      "ms": 3381,
+      "wait_ms": 19045
+    },
+    "d1-075": {
+      "candidates": [
+        "this-agent#all",
+        "faq#all",
+        "ainsof-capital#all",
+        "postgres-rls-backbone#all",
+        "governance-center-pwa#all",
+        "claims-trust-model#all",
+        "api-latency-582-to-40#all",
+        "human-gated-translation#all",
+        "clip-embeddings-kafka#all",
+        "vast-data-bootcamp#all"
+      ],
+      "grades": {
+        "this-agent#all": 0,
+        "faq#all": 1,
+        "ainsof-capital#all": 1,
+        "postgres-rls-backbone#all": 3,
+        "governance-center-pwa#all": 2,
+        "claims-trust-model#all": 1,
+        "api-latency-582-to-40#all": 0,
+        "human-gated-translation#all": 0,
+        "clip-embeddings-kafka#all": 0,
+        "vast-data-bootcamp#all": 0
+      },
+      "tokens": 2944,
+      "ms": 2041,
+      "wait_ms": 18140
+    },
+    "d1-076": {
+      "candidates": [
+        "api-latency-582-to-40#all",
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "skills#claude-api",
+        "skills#fastapi",
+        "claims-trust-model#all",
+        "this-agent#all",
+        "plant-health-classification#all",
+        "human-gated-translation#all",
+        "postgres-rls-backbone#all"
+      ],
+      "grades": {
+        "api-latency-582-to-40#all": 3,
+        "ainsof-capital#all": 1,
+        "governance-center-pwa#all": 1,
+        "skills#claude-api": 0,
+        "skills#fastapi": 0,
+        "claims-trust-model#all": 0,
+        "this-agent#all": 0,
+        "plant-health-classification#all": 0,
+        "human-gated-translation#all": 0,
+        "postgres-rls-backbone#all": 0
+      },
+      "tokens": 2576,
+      "ms": 1935,
+      "wait_ms": 18097
+    },
+    "d1-077": {
+      "candidates": [
+        "governance-center-pwa#all",
+        "human-gated-translation#all",
+        "this-agent#all",
+        "git-mcp-server#all",
+        "claims-trust-model#all",
+        "api-latency-582-to-40#all",
+        "faq#all",
+        "ainsof-capital#all",
+        "skills#react",
+        "clip-embeddings-kafka#all"
+      ],
+      "grades": {
+        "governance-center-pwa#all": 3,
+        "human-gated-translation#all": 0,
+        "this-agent#all": 0,
+        "git-mcp-server#all": 0,
+        "claims-trust-model#all": 0,
+        "api-latency-582-to-40#all": 0,
+        "faq#all": 0,
+        "ainsof-capital#all": 0,
+        "skills#react": 0,
+        "clip-embeddings-kafka#all": 0
+      },
+      "tokens": 2353,
+      "ms": 1158,
+      "wait_ms": 17043
+    },
+    "d1-078": {
+      "candidates": [
+        "clip-embeddings-kafka#all",
+        "this-agent#all",
+        "weed-detection-pipeline#all",
+        "preferences#all",
+        "vast-data-bootcamp#all",
+        "claims-trust-model#all",
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all",
+        "human-gated-translation#all",
+        "faq#all"
+      ],
+      "grades": {
+        "clip-embeddings-kafka#all": 3,
+        "this-agent#all": 0,
+        "weed-detection-pipeline#all": 1,
+        "preferences#all": 0,
+        "vast-data-bootcamp#all": 1,
+        "claims-trust-model#all": 0,
+        "api-latency-582-to-40#all": 0,
+        "governance-center-pwa#all": 0,
+        "human-gated-translation#all": 0,
+        "faq#all": 0
+      },
+      "tokens": 2556,
+      "ms": 1996,
+      "wait_ms": 16044
+    },
+    "d1-079": {
+      "candidates": [
+        "faq#all",
+        "human-gated-translation#all",
+        "this-agent#all",
+        "governance-center-pwa#all",
+        "ainsof-capital#all",
+        "skills#next-js",
+        "skills#github-actions",
+        "skills#react",
+        "skills#supabase",
+        "skills#vercel"
+      ],
+      "grades": {
+        "faq#all": 0,
+        "human-gated-translation#all": 3,
+        "this-agent#all": 0,
+        "governance-center-pwa#all": 0,
+        "ainsof-capital#all": 0,
+        "skills#next-js": 0,
+        "skills#github-actions": 0,
+        "skills#react": 0,
+        "skills#supabase": 0,
+        "skills#vercel": 0
+      },
+      "tokens": 2028,
+      "ms": 1577,
+      "wait_ms": 11044
+    },
+    "d1-080": {
+      "candidates": [
+        "weed-detection-pipeline#all",
+        "claims-trust-model#all",
+        "governance-center-pwa#all",
+        "vast-data-bootcamp#all",
+        "clip-embeddings-kafka#all",
+        "faq#all",
+        "ainsof-capital#all",
+        "human-gated-translation#all",
+        "this-agent#all",
+        "postgres-rls-backbone#all"
+      ],
+      "grades": {
+        "weed-detection-pipeline#all": 1,
+        "claims-trust-model#all": 0,
+        "governance-center-pwa#all": 0,
+        "vast-data-bootcamp#all": 1,
+        "clip-embeddings-kafka#all": 1,
+        "faq#all": 0,
+        "ainsof-capital#all": 0,
+        "human-gated-translation#all": 0,
+        "this-agent#all": 0,
+        "postgres-rls-backbone#all": 0
+      },
+      "tokens": 2733,
+      "ms": 1853,
+      "wait_ms": 19045
+    },
+    "d1-081": {
+      "candidates": [
+        "governance-center-pwa#all",
+        "git-mcp-server#all",
+        "ainsof-capital#all",
+        "api-latency-582-to-40#all",
+        "faq#all",
+        "postgres-rls-backbone#all",
+        "human-gated-translation#all",
+        "claims-trust-model#all",
+        "plant-health-classification#all",
+        "vast-data-bootcamp#all"
+      ],
+      "grades": {
+        "governance-center-pwa#all": 1,
+        "git-mcp-server#all": 0,
+        "ainsof-capital#all": 0,
+        "api-latency-582-to-40#all": 0,
+        "faq#all": 0,
+        "postgres-rls-backbone#all": 0,
+        "human-gated-translation#all": 0,
+        "claims-trust-model#all": 0,
+        "plant-health-classification#all": 0,
+        "vast-data-bootcamp#all": 0
+      },
+      "tokens": 2738,
+      "ms": 1681,
+      "wait_ms": 18044
+    },
+    "d1-082": {
+      "candidates": [
+        "plant-health-classification#all",
+        "clip-embeddings-kafka#all",
+        "weed-detection-pipeline#all",
+        "claims-trust-model#all",
+        "this-agent#all",
+        "vast-data-bootcamp#all",
+        "faq#all",
+        "governance-center-pwa#all",
+        "preferences#all",
+        "ainsof-capital#all"
+      ],
+      "grades": {
+        "plant-health-classification#all": 3,
+        "clip-embeddings-kafka#all": 0,
+        "weed-detection-pipeline#all": 0,
+        "claims-trust-model#all": 0,
+        "this-agent#all": 0,
+        "vast-data-bootcamp#all": 1,
+        "faq#all": 0,
+        "governance-center-pwa#all": 0,
+        "preferences#all": 0,
+        "ainsof-capital#all": 0
+      },
+      "tokens": 2705,
+      "ms": 2007,
+      "wait_ms": 20144
+    },
+    "d1-083": {
+      "candidates": [
+        "claims-trust-model#all",
+        "ainsof-capital#all",
+        "vast-data-bootcamp#all",
+        "api-latency-582-to-40#all",
+        "faq#all",
+        "this-agent#all",
+        "clip-embeddings-kafka#all",
+        "postgres-rls-backbone#all",
+        "weed-detection-pipeline#all",
+        "plant-health-classification#all"
+      ],
+      "grades": {
+        "claims-trust-model#all": 0,
+        "ainsof-capital#all": 0,
+        "vast-data-bootcamp#all": 0,
+        "api-latency-582-to-40#all": 0,
+        "faq#all": 0,
+        "this-agent#all": 0,
+        "clip-embeddings-kafka#all": 0,
+        "postgres-rls-backbone#all": 3,
+        "weed-detection-pipeline#all": 0,
+        "plant-health-classification#all": 0
+      },
+      "tokens": 2754,
+      "ms": 1663,
+      "wait_ms": 19100
+    },
+    "d1-084": {
+      "candidates": [
+        "human-gated-translation#all",
+        "skills#git",
+        "skills#github-actions",
+        "git-mcp-server#all",
+        "ainsof-capital#all",
+        "governance-center-pwa#all",
+        "weed-detection-pipeline#all",
+        "vast-data-bootcamp#all",
+        "api-latency-582-to-40#all",
+        "faq#all"
+      ],
+      "grades": {
+        "human-gated-translation#all": 0,
+        "skills#git": 0,
+        "skills#github-actions": 0,
+        "git-mcp-server#all": 1,
+        "ainsof-capital#all": 0,
+        "governance-center-pwa#all": 0,
+        "weed-detection-pipeline#all": 0,
+        "vast-data-bootcamp#all": 0,
+        "api-latency-582-to-40#all": 0,
+        "faq#all": 0
+      },
+      "tokens": 2695,
+      "ms": 2181,
+      "wait_ms": 17044
+    },
+    "d1-085": {
+      "candidates": [
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "vast-data-bootcamp#all",
+        "human-gated-translation#all",
+        "faq#all",
+        "api-latency-582-to-40#all",
+        "governance-center-pwa#all",
+        "postgres-rls-backbone#all",
+        "this-agent#all",
+        "clip-embeddings-kafka#all"
+      ],
+      "grades": {
+        "ainsof-capital#all": 3,
+        "claims-trust-model#all": 3,
+        "vast-data-bootcamp#all": 0,
+        "human-gated-translation#all": 0,
+        "faq#all": 3,
+        "api-latency-582-to-40#all": 1,
+        "governance-center-pwa#all": 2,
+        "postgres-rls-backbone#all": 2,
+        "this-agent#all": 1,
+        "clip-embeddings-kafka#all": 0
+      },
+      "tokens": 2884,
+      "ms": 1875,
+      "wait_ms": 18044
+    },
+    "d1-092": {
+      "candidates": [
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "api-latency-582-to-40#all",
+        "postgres-rls-backbone#all",
+        "governance-center-pwa#all",
+        "human-gated-translation#all",
+        "faq#all",
+        "this-agent#all",
+        "profile#all",
+        "skills#typescript"
+      ],
+      "grades": {
+        "ainsof-capital#all": 1,
+        "claims-trust-model#all": 1,
+        "api-latency-582-to-40#all": 1,
+        "postgres-rls-backbone#all": 1,
+        "governance-center-pwa#all": 1,
+        "human-gated-translation#all": 1,
+        "faq#all": 1,
+        "this-agent#all": 1,
+        "profile#all": 3
+      },
+      "tokens": 2689,
+      "ms": 2041,
+      "wait_ms": 18043
+    },
+    "d1-093": {
+      "candidates": [
+        "ainsof-capital#all",
+        "postgres-rls-backbone#all",
+        "profile#all",
+        "this-agent#all",
+        "claims-trust-model#all",
+        "vast-data-bootcamp#all",
+        "git-mcp-server#all",
+        "faq#all",
+        "governance-center-pwa#all",
+        "api-latency-582-to-40#all"
+      ],
+      "grades": {
+        "ainsof-capital#all": 1,
+        "postgres-rls-backbone#all": 1,
+        "profile#all": 2,
+        "this-agent#all": 0,
+        "claims-trust-model#all": 1,
+        "vast-data-bootcamp#all": 0,
+        "git-mcp-server#all": 0,
+        "faq#all": 0,
+        "governance-center-pwa#all": 0,
+        "api-latency-582-to-40#all": 0
+      },
+      "tokens": 2876,
+      "ms": 2167,
+      "wait_ms": 21100
+    },
+    "d1-094": {
+      "candidates": [
+        "governance-center-pwa#all",
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "api-latency-582-to-40#all",
+        "human-gated-translation#all",
+        "this-agent#all",
+        "faq#all",
+        "postgres-rls-backbone#all",
+        "plant-health-classification#all",
+        "weed-detection-pipeline#all"
+      ],
+      "grades": {
+        "governance-center-pwa#all": 1,
+        "ainsof-capital#all": 1,
+        "claims-trust-model#all": 1,
+        "api-latency-582-to-40#all": 1,
+        "human-gated-translation#all": 0,
+        "this-agent#all": 0,
+        "faq#all": 1,
+        "postgres-rls-backbone#all": 1,
+        "plant-health-classification#all": 0,
+        "weed-detection-pipeline#all": 0
+      },
+      "tokens": 2589,
+      "ms": 1498,
+      "wait_ms": 17049
+    },
+    "d1-095": {
+      "candidates": [
+        "ainsof-capital#all",
+        "claims-trust-model#all",
+        "vast-data-bootcamp#all",
+        "governance-center-pwa#all",
+        "human-gated-translation#all",
+        "faq#all",
+        "postgres-rls-backbone#all",
+        "api-latency-582-to-40#all",
+        "this-agent#all",
+        "preferences#all"
+      ],
+      "grades": {
+        "ainsof-capital#all": 1,
+        "claims-trust-model#all": 1,
+        "vast-data-bootcamp#all": 0,
+        "governance-center-pwa#all": 1,
+        "human-gated-translation#all": 1,
+        "faq#all": 1,
+        "postgres-rls-backbone#all": 1,
+        "api-latency-582-to-40#all": 1,
+        "this-agent#all": 1,
+        "preferences#all": 0
+      },
+      "tokens": 2707,
+      "ms": 1621,
+      "wait_ms": 19235
+    },
+    "d1-096": {
+      "candidates": [
+        "ainsof-capital#all",
+        "postgres-rls-backbone#all",
+        "this-agent#all",
+        "skills#postgresql",
+        "profile#all",
+        "governance-center-pwa#all",
+        "api-latency-582-to-40#all",
+        "claims-trust-model#all",
+        "clip-embeddings-kafka#all",
+        "human-gated-translation#all"
+      ],
+      "grades": {
+        "ainsof-capital#all": 1,
+        "postgres-rls-backbone#all": 1,
+        "this-agent#all": 0,
+        "skills#postgresql": 0,
+        "profile#all": 1,
+        "governance-center-pwa#all": 1,
+        "api-latency-582-to-40#all": 1,
+        "claims-trust-model#all": 1,
+        "clip-embeddings-kafka#all": 0,
+        "human-gated-translation#all": 0
+      },
+      "tokens": 2908,
+      "ms": 2320,
+      "wait_ms": 18043
     }
   }
 }
