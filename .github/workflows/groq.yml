@@ -16,6 +16,9 @@
 #   tokens a question, 92 questions, so it takes two days of quota: each run stops at
 #   `max_tokens` and saves the grades to the branch groq/abstain-grades, and the next run
 #   resumes from there. With max_tokens 0 it only checks that the search runs.
+# - neg: the t1 job on the 17 D1 questions with no answer in the portfolio (refuse_no_info and
+#   off-topic, dev and test), live with the judge: does the answer model already refuse where it
+#   should (stage 5b, ADR-0023)? About 100,000 tokens. Results in promptfoo-neg-latest.json.
 # - abstain_full: stage 5b part 2, the same on the whole text of each candidate, only for the
 #   questions the 150-token run graded below 2 (38). Saved next to the first file, same branch.
 #
@@ -26,9 +29,9 @@ on:
   workflow_dispatch:
     inputs:
       job:
-        description: "stage4, t1, d3, abstain or abstain_full"
+        description: "stage4, t1, neg, d3, abstain or abstain_full"
         type: choice
-        options: [stage4, t1, d3, abstain, abstain_full]
+        options: [stage4, t1, neg, d3, abstain, abstain_full]
         default: stage4
       run:
         description: "stage4: the run number (2 or 3)"
@@ -164,7 +167,7 @@ jobs:
         run: cat "$RUNNER_TEMP/stage4.txt" >> "$GITHUB_STEP_SUMMARY" || true
 
   t1:
-    if: inputs.job == 't1'
+    if: inputs.job == 't1' || inputs.job == 'neg'
     runs-on: ubuntu-latest
     # Results are written only at the end, so the limit must clear the longest run: the first
     # live run hit 90 minutes and saved nothing.
@@ -183,6 +186,7 @@ jobs:
     env:
       DATABASE_URL: postgresql://agent:agent@localhost:5432/agent
       EVAL_DATABASE_URL: postgresql://agent:agent@localhost:5432/agent
+      TIER: ${{ inputs.job == 'neg' && 'neg' || 't1' }}
       EMBEDDING_MODEL_DIR: ${{ github.workspace }}/../models/multilingual-e5-small
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
@@ -224,20 +228,20 @@ jobs:
         shell: bash
         # A minute between cases: one heavy question nearly fills Groq's 8,000 tokens a minute, and
         # the next one would fall back to another model and measure that one instead.
-        run: node answers/run.mjs t1 --no-cache --delay 60000 ${FILTER:+--filter-pattern "$FILTER"}
+        run: node answers/run.mjs "$TIER" --no-cache --delay 60000 ${FILTER:+--filter-pattern "$FILTER"}
       - name: Keep what the run saved
         if: always() && steps.t1.outcome != 'skipped'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: t1
-          path: evals/results/promptfoo-t1-latest.json
+          name: ${{ env.TIER }}
+          path: evals/results/promptfoo-${{ env.TIER }}-latest.json
           if-no-files-found: warn
       - name: Push the results branch
         if: always() && steps.t1.outcome != 'skipped'
         env:
-          BRANCH: groq/t1-${{ github.run_id }}
+          BRANCH: groq/${{ env.TIER }}-${{ github.run_id }}
         run: |
-          git add -f evals/results/promptfoo-t1-latest.json || true
+          git add -f "evals/results/promptfoo-$TIER-latest.json" || true
           if git diff --cached --quiet; then echo "nothing saved"; exit 0; fi
           git -c user.name="github-actions[bot]" \
               -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
