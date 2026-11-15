@@ -1,0 +1,1211 @@
+{
+  "config": "abstain-C4-R3-e5-small-Q0-grades-full",
+  "commit": "25a5c21",
+  "date": "2026-11-15",
+  "strategy": "C4",
+  "query": "Q0",
+  "grader": "openai/gpt-oss-120b",
+  "full_text": true,
+  "rows": [
+    {
+      "id": "d1-001",
+      "split": "dev",
+      "lang": "en",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "human-gated-translation#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-002",
+      "split": "dev",
+      "lang": "en",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "api-latency-582-to-40#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-003",
+      "split": "test",
+      "lang": "en",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 2,
+      "gold_in_candidates": true,
+      "top_graded": "postgres-rls-backbone#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-004",
+      "split": "dev",
+      "lang": "en",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "weed-detection-pipeline#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-005",
+      "split": "dev",
+      "lang": "en",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "weed-detection-pipeline#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-006",
+      "split": "test",
+      "lang": "en",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "git-mcp-server#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-007",
+      "split": "dev",
+      "lang": "en",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "preferences#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-008",
+      "split": "dev",
+      "lang": "en",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "education#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-009",
+      "split": "test",
+      "lang": "en",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "governance-center-pwa#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-010",
+      "split": "dev",
+      "lang": "en",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "human-gated-translation#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-011",
+      "split": "dev",
+      "lang": "he",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "governance-center-pwa#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-012",
+      "split": "dev",
+      "lang": "he",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "claims-trust-model#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-013",
+      "split": "test",
+      "lang": "he",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "claims-trust-model#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-014",
+      "split": "dev",
+      "lang": "he",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "weed-detection-pipeline#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-015",
+      "split": "dev",
+      "lang": "he",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "plant-health-classification#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-016",
+      "split": "test",
+      "lang": "he",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "preferences#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-017",
+      "split": "dev",
+      "lang": "he",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "governance-center-pwa#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-018",
+      "split": "dev",
+      "lang": "he",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": false,
+      "top_graded": "ainsof-capital#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-019",
+      "split": "dev",
+      "lang": "he",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "clip-embeddings-kafka#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-020",
+      "split": "test",
+      "lang": "he",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "git-mcp-server#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-021",
+      "split": "dev",
+      "lang": "en",
+      "category": "multi_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "profile#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-022",
+      "split": "test",
+      "lang": "en",
+      "category": "multi_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "vast-data-bootcamp#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-023",
+      "split": "dev",
+      "lang": "en",
+      "category": "multi_hop",
+      "answerable": true,
+      "grade": 2,
+      "gold_in_candidates": true,
+      "top_graded": "vast-data-bootcamp#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-024",
+      "split": "dev",
+      "lang": "en",
+      "category": "multi_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "claims-trust-model#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-025",
+      "split": "dev",
+      "lang": "en",
+      "category": "multi_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "weed-detection-pipeline#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-026",
+      "split": "test",
+      "lang": "en",
+      "category": "multi_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "git-mcp-server#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-027",
+      "split": "dev",
+      "lang": "he",
+      "category": "multi_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "human-gated-translation#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-028",
+      "split": "dev",
+      "lang": "he",
+      "category": "multi_hop",
+      "answerable": true,
+      "grade": 2,
+      "gold_in_candidates": true,
+      "top_graded": "ainsof-capital#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-029",
+      "split": "test",
+      "lang": "he",
+      "category": "multi_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "api-latency-582-to-40#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-030",
+      "split": "dev",
+      "lang": "he",
+      "category": "multi_hop",
+      "answerable": true,
+      "grade": 2,
+      "gold_in_candidates": true,
+      "top_graded": "skills#postgresql",
+      "regraded": false
+    },
+    {
+      "id": "d1-031",
+      "split": "dev",
+      "lang": "he",
+      "category": "multi_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "git-mcp-server#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-032",
+      "split": "dev",
+      "lang": "he",
+      "category": "multi_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "governance-center-pwa#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-033",
+      "split": "dev",
+      "lang": "en",
+      "category": "comparative",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "ainsof-capital#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-034",
+      "split": "test",
+      "lang": "en",
+      "category": "comparative",
+      "answerable": true,
+      "grade": 2,
+      "gold_in_candidates": true,
+      "top_graded": "faq#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-035",
+      "split": "dev",
+      "lang": "en",
+      "category": "comparative",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "preferences#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-036",
+      "split": "dev",
+      "lang": "he",
+      "category": "comparative",
+      "answerable": true,
+      "grade": 2,
+      "gold_in_candidates": true,
+      "top_graded": "plant-health-classification#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-037",
+      "split": "dev",
+      "lang": "he",
+      "category": "comparative",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "ainsof-capital#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-038",
+      "split": "test",
+      "lang": "he",
+      "category": "comparative",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "clip-embeddings-kafka#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-039",
+      "split": "dev",
+      "lang": "en",
+      "category": "skill_level",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "skills#kubernetes",
+      "regraded": false
+    },
+    {
+      "id": "d1-040",
+      "split": "dev",
+      "lang": "en",
+      "category": "skill_level",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "skills#kafka",
+      "regraded": false
+    },
+    {
+      "id": "d1-041",
+      "split": "test",
+      "lang": "en",
+      "category": "skill_level",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "skills#java",
+      "regraded": false
+    },
+    {
+      "id": "d1-042",
+      "split": "dev",
+      "lang": "en",
+      "category": "skill_level",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "plant-health-classification#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-043",
+      "split": "dev",
+      "lang": "en",
+      "category": "skill_level",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "skills#mongodb",
+      "regraded": false
+    },
+    {
+      "id": "d1-044",
+      "split": "dev",
+      "lang": "he",
+      "category": "skill_level",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "skills#csharp",
+      "regraded": false
+    },
+    {
+      "id": "d1-045",
+      "split": "dev",
+      "lang": "he",
+      "category": "skill_level",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "skills#playwright",
+      "regraded": false
+    },
+    {
+      "id": "d1-046",
+      "split": "test",
+      "lang": "he",
+      "category": "skill_level",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "plant-health-classification#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-047",
+      "split": "dev",
+      "lang": "he",
+      "category": "skill_level",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "skills#docker",
+      "regraded": false
+    },
+    {
+      "id": "d1-048",
+      "split": "dev",
+      "lang": "he",
+      "category": "skill_level",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "skills#sql-server",
+      "regraded": false
+    },
+    {
+      "id": "d1-049",
+      "split": "dev",
+      "lang": "en",
+      "category": "overview_limit",
+      "answerable": true,
+      "grade": 1,
+      "gold_in_candidates": true,
+      "top_graded": "plant-health-classification#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-050",
+      "split": "test",
+      "lang": "en",
+      "category": "overview_limit",
+      "answerable": true,
+      "grade": 1,
+      "gold_in_candidates": true,
+      "top_graded": "plant-health-classification#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-051",
+      "split": "dev",
+      "lang": "he",
+      "category": "overview_limit",
+      "answerable": true,
+      "grade": 1,
+      "gold_in_candidates": true,
+      "top_graded": "plant-health-classification#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-052",
+      "split": "dev",
+      "lang": "he",
+      "category": "overview_limit",
+      "answerable": true,
+      "grade": 2,
+      "gold_in_candidates": true,
+      "top_graded": "plant-health-classification#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-053",
+      "split": "dev",
+      "lang": "he",
+      "category": "overview_limit",
+      "answerable": true,
+      "grade": 2,
+      "gold_in_candidates": true,
+      "top_graded": "plant-health-classification#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-054",
+      "split": "dev",
+      "lang": "en",
+      "category": "unanswerable",
+      "answerable": false,
+      "grade": 1,
+      "gold_in_candidates": false,
+      "top_graded": "skills#docker",
+      "regraded": true
+    },
+    {
+      "id": "d1-055",
+      "split": "dev",
+      "lang": "en",
+      "category": "unanswerable",
+      "answerable": false,
+      "grade": 1,
+      "gold_in_candidates": false,
+      "top_graded": "ainsof-capital#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-056",
+      "split": "test",
+      "lang": "en",
+      "category": "unanswerable",
+      "answerable": false,
+      "grade": 1,
+      "gold_in_candidates": false,
+      "top_graded": "vast-data-bootcamp#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-057",
+      "split": "dev",
+      "lang": "en",
+      "category": "unanswerable",
+      "answerable": false,
+      "grade": 0,
+      "gold_in_candidates": false,
+      "top_graded": "this-agent#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-058",
+      "split": "dev",
+      "lang": "en",
+      "category": "unanswerable",
+      "answerable": false,
+      "grade": 1,
+      "gold_in_candidates": false,
+      "top_graded": "education#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-059",
+      "split": "test",
+      "lang": "en",
+      "category": "unanswerable",
+      "answerable": false,
+      "grade": 1,
+      "gold_in_candidates": false,
+      "top_graded": "ainsof-capital#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-060",
+      "split": "dev",
+      "lang": "he",
+      "category": "unanswerable",
+      "answerable": false,
+      "grade": 1,
+      "gold_in_candidates": false,
+      "top_graded": "faq#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-061",
+      "split": "dev",
+      "lang": "he",
+      "category": "unanswerable",
+      "answerable": false,
+      "grade": 1,
+      "gold_in_candidates": false,
+      "top_graded": "ainsof-capital#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-062",
+      "split": "dev",
+      "lang": "he",
+      "category": "unanswerable",
+      "answerable": false,
+      "grade": 1,
+      "gold_in_candidates": false,
+      "top_graded": "plant-health-classification#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-063",
+      "split": "test",
+      "lang": "he",
+      "category": "unanswerable",
+      "answerable": false,
+      "grade": 1,
+      "gold_in_candidates": false,
+      "top_graded": "ainsof-capital#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-064",
+      "split": "dev",
+      "lang": "he",
+      "category": "unanswerable",
+      "answerable": false,
+      "grade": 1,
+      "gold_in_candidates": false,
+      "top_graded": "human-gated-translation#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-065",
+      "split": "dev",
+      "lang": "he",
+      "category": "unanswerable",
+      "answerable": false,
+      "grade": 1,
+      "gold_in_candidates": false,
+      "top_graded": "faq#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-066",
+      "split": "dev",
+      "lang": "en",
+      "category": "off_topic",
+      "answerable": false,
+      "grade": 0,
+      "gold_in_candidates": false,
+      "top_graded": "this-agent#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-067",
+      "split": "dev",
+      "lang": "en",
+      "category": "off_topic",
+      "answerable": false,
+      "grade": 0,
+      "gold_in_candidates": false,
+      "top_graded": "ainsof-capital#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-068",
+      "split": "test",
+      "lang": "he",
+      "category": "off_topic",
+      "answerable": false,
+      "grade": 0,
+      "gold_in_candidates": false,
+      "top_graded": "education#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-069",
+      "split": "dev",
+      "lang": "he",
+      "category": "off_topic",
+      "answerable": false,
+      "grade": 0,
+      "gold_in_candidates": false,
+      "top_graded": "ainsof-capital#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-070",
+      "split": "dev",
+      "lang": "he",
+      "category": "off_topic",
+      "answerable": false,
+      "grade": 0,
+      "gold_in_candidates": false,
+      "top_graded": "claims-trust-model#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-071",
+      "split": "dev",
+      "lang": "he",
+      "category": "cross_lingual",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "vast-data-bootcamp#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-072",
+      "split": "dev",
+      "lang": "he",
+      "category": "cross_lingual",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "git-mcp-server#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-073",
+      "split": "test",
+      "lang": "he",
+      "category": "cross_lingual",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "git-mcp-server#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-074",
+      "split": "dev",
+      "lang": "he",
+      "category": "cross_lingual",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "ainsof-capital#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-075",
+      "split": "dev",
+      "lang": "he",
+      "category": "cross_lingual",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "postgres-rls-backbone#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-076",
+      "split": "test",
+      "lang": "he",
+      "category": "cross_lingual",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "api-latency-582-to-40#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-077",
+      "split": "dev",
+      "lang": "he",
+      "category": "cross_lingual",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "governance-center-pwa#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-078",
+      "split": "dev",
+      "lang": "he",
+      "category": "cross_lingual",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "clip-embeddings-kafka#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-079",
+      "split": "dev",
+      "lang": "he",
+      "category": "cross_lingual",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "human-gated-translation#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-080",
+      "split": "test",
+      "lang": "he",
+      "category": "cross_lingual",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "weed-detection-pipeline#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-081",
+      "split": "dev",
+      "lang": "he",
+      "category": "cross_lingual",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "governance-center-pwa#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-082",
+      "split": "dev",
+      "lang": "he",
+      "category": "cross_lingual",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "plant-health-classification#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-083",
+      "split": "dev",
+      "lang": "he",
+      "category": "cross_lingual",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "postgres-rls-backbone#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-084",
+      "split": "test",
+      "lang": "he",
+      "category": "cross_lingual",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "git-mcp-server#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-085",
+      "split": "dev",
+      "lang": "he",
+      "category": "cross_lingual",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "ainsof-capital#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-092",
+      "split": "dev",
+      "lang": "en",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "profile#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-093",
+      "split": "dev",
+      "lang": "he",
+      "category": "cross_lingual",
+      "answerable": true,
+      "grade": 2,
+      "gold_in_candidates": true,
+      "top_graded": "profile#all",
+      "regraded": false
+    },
+    {
+      "id": "d1-094",
+      "split": "dev",
+      "lang": "en",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "governance-center-pwa#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-095",
+      "split": "test",
+      "lang": "he",
+      "category": "cross_lingual",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "governance-center-pwa#all",
+      "regraded": true
+    },
+    {
+      "id": "d1-096",
+      "split": "dev",
+      "lang": "en",
+      "category": "single_hop",
+      "answerable": true,
+      "grade": 3,
+      "gold_in_candidates": true,
+      "top_graded": "ainsof-capital#all",
+      "regraded": true
+    }
+  ],
+  "summary": {
+    "fallbacks": [],
+    "dev": {
+      "positives": 54,
+      "negatives": 13,
+      "auc": 0.989,
+      "grade_counts": {
+        "positives": {
+          "0": 0,
+          "1": 2,
+          "2": 7,
+          "3": 45
+        },
+        "negatives": {
+          "0": 5,
+          "1": 8,
+          "2": 0,
+          "3": 0
+        }
+      }
+    },
+    "test": {
+      "positives": 19,
+      "negatives": 4,
+      "auc": 0.98,
+      "grade_counts": {
+        "positives": {
+          "0": 0,
+          "1": 1,
+          "2": 2,
+          "3": 16
+        },
+        "negatives": {
+          "0": 1,
+          "1": 3,
+          "2": 0,
+          "3": 0
+        }
+      }
+    },
+    "fixed_cut": {
+      "dev": {
+        "cut": 2,
+        "positives_lost": [
+          "d1-049",
+          "d1-051"
+        ],
+        "negatives_caught": [
+          "d1-054",
+          "d1-055",
+          "d1-057",
+          "d1-058",
+          "d1-060",
+          "d1-061",
+          "d1-062",
+          "d1-064",
+          "d1-065",
+          "d1-066",
+          "d1-067",
+          "d1-069",
+          "d1-070"
+        ],
+        "positives": 54,
+        "negatives": 13
+      },
+      "test": {
+        "cut": 2,
+        "positives_lost": [
+          "d1-050"
+        ],
+        "negatives_caught": [
+          "d1-056",
+          "d1-059",
+          "d1-063",
+          "d1-068"
+        ],
+        "positives": 19,
+        "negatives": 4
+      }
+    },
+    "cut_from_dev": {
+      "dev": {
+        "cut": 1,
+        "positives_lost": [],
+        "negatives_caught": [
+          "d1-057",
+          "d1-066",
+          "d1-067",
+          "d1-069",
+          "d1-070"
+        ],
+        "positives": 54,
+        "negatives": 13
+      },
+      "test": {
+        "cut": 1,
+        "positives_lost": [],
+        "negatives_caught": [
+          "d1-068"
+        ],
+        "positives": 19,
+        "negatives": 4
+      }
+    },
+    "regraded_only": {
+      "fallbacks": [],
+      "dev": {
+        "positives": 10,
+        "negatives": 13,
+        "auc": 0.938,
+        "grade_counts": {
+          "positives": {
+            "0": 0,
+            "1": 2,
+            "2": 2,
+            "3": 6
+          },
+          "negatives": {
+            "0": 5,
+            "1": 8,
+            "2": 0,
+            "3": 0
+          }
+        }
+      },
+      "test": {
+        "positives": 11,
+        "negatives": 4,
+        "auc": 0.966,
+        "grade_counts": {
+          "positives": {
+            "0": 0,
+            "1": 1,
+            "2": 1,
+            "3": 9
+          },
+          "negatives": {
+            "0": 1,
+            "1": 3,
+            "2": 0,
+            "3": 0
+          }
+        }
+      },
+      "fixed_cut": {
+        "dev": {
+          "cut": 2,
+          "positives_lost": [
+            "d1-049",
+            "d1-051"
+          ],
+          "negatives_caught": [
+            "d1-054",
+            "d1-055",
+            "d1-057",
+            "d1-058",
+            "d1-060",
+            "d1-061",
+            "d1-062",
+            "d1-064",
+            "d1-065",
+            "d1-066",
+            "d1-067",
+            "d1-069",
+            "d1-070"
+          ],
+          "positives": 10,
+          "negatives": 13
+        },
+        "test": {
+          "cut": 2,
+          "positives_lost": [
+            "d1-050"
+          ],
+          "negatives_caught": [
+            "d1-056",
+            "d1-059",
+            "d1-063",
+            "d1-068"
+          ],
+          "positives": 11,
+          "negatives": 4
+        }
+      },
+      "cut_from_dev": {
+        "dev": {
+          "cut": 1,
+          "positives_lost": [],
+          "negatives_caught": [
+            "d1-057",
+            "d1-066",
+            "d1-067",
+            "d1-069",
+            "d1-070"
+          ],
+          "positives": 10,
+          "negatives": 13
+        },
+        "test": {
+          "cut": 1,
+          "positives_lost": [],
+          "negatives_caught": [
+            "d1-068"
+          ],
+          "positives": 11,
+          "negatives": 4
+        }
+      }
+    }
+  }
+}
