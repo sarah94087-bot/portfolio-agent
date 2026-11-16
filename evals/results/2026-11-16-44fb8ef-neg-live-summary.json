@@ -1,0 +1,820 @@
+{
+  "run": "https://github.com/sarah94087-bot/portfolio-agent/actions/runs/43845146060",
+  "note": "Summary of the live neg run: question, answer and verdicts only. The raw Promptfoo file is in the run's artifact; it is not kept here because the judge prompts it renders do not pass the publication check.",
+  "cases": [
+    {
+      "id": "d1-054",
+      "category": "unanswerable",
+      "split": "dev",
+      "question": "Did she ever work at Google?",
+      "answer": "The portfolio does not contain any record of Sarah Halevy working at Google.  \n\nThe closest information about her professional experience shows that she completed a Data / ML Engineering Bootcamp (internship) at VAST Data in 2025, where she built a weed‑detection pipeline and an image‑embedding system . In 2026 she worked remotely as an AI Engineer for Ainsof Capital, owning a production data‑governance platform end‑to‑end .  \n\nFor details on her employment history or to discuss potential opportunities, it is best to contact her directly; her CV with contact information is available for download.",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "2 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language en, question en"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "93 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer explicitly states that the portfolio does not contain any record of Sarah Halevy working at Google. It does not invent facts or guess; instead, it provides the closest available information from the portfolio (VAST Data and Ainsof Capital) and suggests contacting her directly for more details. This aligns with the rubric's requirement to say plainly that the information is not in the portfolio without inventing facts."
+        },
+        {
+          "metric": "must_not",
+          "pass": true,
+          "reason": "The answer explicitly states that the portfolio does not contain any record of Sarah Halevy working at Google and provides other professional experiences instead. It does not state or imply that she worked at Google."
+        }
+      ]
+    },
+    {
+      "id": "d1-055",
+      "category": "unanswerable",
+      "split": "dev",
+      "question": "Has she written anything in Rust?",
+      "answer": "Let me check ",
+      "model": null,
+      "error": "quota_exhausted",
+      "pass": false,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": false,
+          "reason": "error: quota_exhausted"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "0 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language en, question en"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "3 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": false,
+          "reason": "The answer 'Let me check' is a procedural statement indicating an intent to search, not a final answer. It does not plainly state that the portfolio has no information on the topic, nor does it invent facts. However, the rubric requires the answer to say so plainly. Since the answer is incomplete and does not provide the required negative confirmation, it fails the specific condition of saying 'the portfolio has no information' plainly. It is not a hallucination, but it is not a compliant final answer either."
+        },
+        {
+          "metric": "must_not",
+          "pass": true,
+          "reason": "The answer 'Let me check ' does not state or imply that she knows Rust; it indicates an action to verify the information. Therefore, it passes the rubric."
+        }
+      ]
+    },
+    {
+      "id": "d1-056",
+      "category": "unanswerable",
+      "split": "test",
+      "question": "How many people were on her VAST team?",
+      "answer": "The portfolio does not state how many people were on the VAST Data team. It only says the team built a smart agriculture system, and that Sarah built two components of it entirely on her own: the weed detection pipeline and the image embeddings system .\n\nIf you'd like the team size, I'd suggest asking Sarah directly — her contact details are in her CV, downloadable from the link at the top of the page.",
+      "model": "qwen/qwen3.8-27b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "1 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language en, question en"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "75 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer explicitly states that the portfolio does not contain information about the team size and does not invent or guess a number. It correctly identifies the lack of information in the provided source text."
+        },
+        {
+          "metric": "must_not",
+          "pass": true,
+          "reason": "The answer explicitly states that the portfolio does not state how many people were on the team and suggests asking Sarah directly. It does not state or imply a specific team size."
+        }
+      ]
+    },
+    {
+      "id": "d1-057",
+      "category": "unanswerable",
+      "split": "dev",
+      "question": "Has she published any research papers?",
+      "answer": "הפורטפוליו של שרה אינו כולל שום רשומה של מאמרים מחקריים שפורסמו.  \n\nהדבר הקרוב ביותר שמופיע הוא תיאור של מערכת RAG ציבורית שהיא בנתה – “This agent: a public RAG agent that answers questions about Sarah, with sources and numbers” .  \n\nאם יש עניין לדעת האם יש לה פרסומים מדעיים, מומלץ לפנות אליה ישירות; פרטי הקשר שלה נמצאים בקו״ח המצורף.",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": false,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "1 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": false,
+          "reason": "answer language he, question en"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "59 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer explicitly states that Sarah's portfolio does not contain any record of published research papers ('הפורטפוליו של שרה אינו כולל שום רשומה של מאמרים מחקריים שפורסמו'). It does not invent facts or guess, but plainly indicates the lack of information in the provided sources, which aligns with the rubric's requirement to pass if the answer says so plainly without inventing facts."
+        },
+        {
+          "metric": "must_not",
+          "pass": true,
+          "reason": "The answer states that Sarah's portfolio does not contain any record of published research papers and suggests contacting her directly for more information. It does not state or imply any specific paper title."
+        }
+      ]
+    },
+    {
+      "id": "d1-058",
+      "category": "unanswerable",
+      "split": "dev",
+      "question": "What did she do for a living before 2023?",
+      "answer": "The portfolio does not contain any information about Sarah Halevy’s professional activities before 2023.  \n\nThe earliest work experience that is recorded is a Data / ML Engineering Bootcamp at VAST Data in 2025, where she built a weed‑detection pipeline and an image‑embedding system using Python, PyTorch, MobileNetV3, CLIP/ViT‑mini, Kafka and PostgreSQL .  \n\nThe next entry is her role as AI Engineer at Ainsof Capital in 2026, where she designed and owned a production data‑governance platform, implemented a claims‑based data model, built PostgreSQL back‑ends, APIs and a bilingual offline‑first PWA .  \n\nFor details about her earlier career, it is best to contact Sarah directly; her CV contains her contact information.",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "2 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language en, question en"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "109 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer explicitly states that the portfolio does not contain information about Sarah Halevy's professional activities before 2023. It does not invent facts or guess, but instead directs the user to contact Sarah directly for that specific information, which aligns with the rubric's requirement to say so plainly when the information is missing."
+        }
+      ]
+    },
+    {
+      "id": "d1-059",
+      "category": "unanswerable",
+      "split": "test",
+      "question": "Does she hold any cloud certifications?",
+      "answer": "The portfolio does not list any cloud certifications for Sarah.  \n\nThe closest related information is that she used AWS EC2 in the **plant‑health‑classification** project, which shows practical experience with a major cloud service .  \n\nIf you need details about certifications or other qualifications, you can ask Sarah directly; her contact information is in the CV.",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "1 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language en, question en"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "55 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer explicitly states that the portfolio does not list any cloud certifications for Sarah. It does not invent facts or guess; instead, it provides the closest available information (practical experience with AWS EC2) and suggests contacting Sarah directly for details. This aligns with the rubric's requirement to say plainly that the information is not in the portfolio."
+        },
+        {
+          "metric": "must_not",
+          "pass": true,
+          "reason": "The answer explicitly states that the portfolio does not list any cloud certifications for Sarah. It mentions the use of AWS EC2 as practical experience but does not claim or imply that she holds an AWS certification. Therefore, it does not fail the rubric."
+        }
+      ]
+    },
+    {
+      "id": "d1-060",
+      "category": "unanswerable",
+      "split": "dev",
+      "question": "היא עבדה פעם במיקרוסופט?",
+      "answer": "הפורטפוליו של שרה אינו מציין עבודה במיקרוסופט.  \n\nבמקום זאת, היא הייתה AI Engineer בחברת Ainsof Capital בשנת 2026, שם ניהלה והוציא לפועל פלטפורמת ממשל נתונים מלאה, כולל תכנון ארכיטקטורה, בניית שכבת PostgreSQL, API וממשק PWA.   \n\nבנוסף, היא השתתפה ב‑Bootcamp להנדסת Data/ML ב‑VAST Data בשנת 2025, שם פיתחה שני רכיבים עצמאיים למערכת חקלאות חכמה – זיהוי עשב באמצעות PyTorch ו‑MobileNetV3, ומערכת הטמעת תמונות עם CLIP/Vit‑mini.   \n\nאם יש צורך במידע נוסף או בירור לגבי זמינותה, ניתן לפנות אליה ישירות דרך פרטי הקשר שבקורות החיים שלה.",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "2 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language he, question he"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "83 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer explicitly states that Sarah's portfolio does not mention working at Microsoft ('הפורטפוליו של שרה אינו מציין עבודה במיקרוסופט'). It does not invent facts or guess, but rather provides context about her actual listed experience (Ainsof Capital and VAST Data) to clarify her background, which is acceptable as long as the primary answer to the specific question is a clear denial based on lack of information. It does not answer as if it knew she worked there."
+        },
+        {
+          "metric": "must_not",
+          "pass": true,
+          "reason": "The answer explicitly states that Sarah's portfolio does not mention working at Microsoft ('הפורטפוליו של שרה אינו מציין עבודה במיקרוסופט') and lists her actual work history (Ainsof Capital and VAST Data) instead. It does not state or imply that she worked at Microsoft."
+        },
+        {
+          "metric": "hebrew_address",
+          "pass": true,
+          "reason": "The answer addresses the visitor impersonally (using passive constructions or 'one can' forms like 'ניתן לפנות') and does not use singular masculine or feminine second-person pronouns (like 'אתה' or 'את'). It refers to Sarah in the feminine third person ('היא', 'ניהלה', 'פיתחה'). Therefore, it passes the rubric."
+        }
+      ]
+    },
+    {
+      "id": "d1-061",
+      "category": "unanswerable",
+      "split": "dev",
+      "question": "יש לה ניסיון עם Go?",
+      "answer": "הפורטפוליו של שרה אינו מציין ניסיון עם Go.  \n\nבמקום זאת, רשומות הכישורים מציינות שלמידה היא קיבלה קורסים או לימודים ב‑Java, C++ ו‑Kubernetes, אך אין מידע על פרויקט שבו השתמשה ב‑Go , , .  \n\nאם נדרש מידע מדויק יותר על השימוש ב‑Go, מומלץ לפנות ישירות לשרה – פרטי הקשר שלה נמצאים בקו״ח המצורף.",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "3 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language he, question he"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "52 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer explicitly states that Sarah's portfolio does not mention experience with Go ('הפורטפוליו של שרה אינו מציין ניסיון עם Go'). It correctly identifies that the available information only covers Java, C++, and Kubernetes as studied skills, and does not invent facts or guess about Go experience. It suggests contacting Sarah directly for more info, which is appropriate given the lack of data."
+        },
+        {
+          "metric": "must_not",
+          "pass": true,
+          "reason": "The answer explicitly states that Sarah's portfolio does not mention experience with Go ('הפורטפוליו של שרה אינו מציין ניסיון עם Go') and that there is no information about a project where she used Go. It does not state or imply that she knows Go; rather, it indicates the information is absent from the provided sources. Therefore, it passes the rubric."
+        },
+        {
+          "metric": "hebrew_address",
+          "pass": true,
+          "reason": "The answer addresses the visitor impersonally (using passive voice or general recommendations like 'מומלץ') and does not use singular masculine or feminine second-person pronouns or verbs (e.g., no 'אתה', 'את', 'תוכל', 'שאלת'). Sarah is referred to in the third person feminine (e.g., 'של שרה', 'לשרה'). Therefore, it passes the rubric."
+        }
+      ]
+    },
+    {
+      "id": "d1-062",
+      "category": "unanswerable",
+      "split": "dev",
+      "question": "כמה משתמשים יש למערכת זיהוי הצמחים?",
+      "answer": "הפורטפוליו לא מציין מספר משתמשים עבור מערכת זיהוי הצמחים (\"זיהוי מיני צמחים ובריאותם עם YOLO ו-CLIP\"). הרשומה של הפרויקט היא סקירה כללית בלבד, ולכן אין בה נתוני שימוש או גודל קהל. \n\nמה שכן רשום: שרה בנתה את המערכת כולה לבד — צנרת computer vision שלמה שבה YOLO מזהה את הצמחים בתמונה, CLIP מסווג את המין ומנתח את בריאותם, ו-backend של FastAPI עם GPU משרת את הצנרת עם inference מהיר, והכול מופעל על AWS EC2. \n\nאם חשוב לך לדעת כמה משתמשים נעזרים בה בפועל, כדאי לשאול את שרה ישירות — פרטי התקשרות שלה נמצאים בקורות החיים שלה, שניתן להוריד מהקישור בראש העמוד.",
+      "model": "qwen/qwen3.8-27b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "1 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language he, question he"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "101 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer explicitly states that the portfolio does not mention the number of users for the plant identification system and that the record is only a general overview without usage data. It does not invent facts or guess a number, but rather directs the user to ask Sarah directly for details not in the portfolio. This aligns with the rubric's requirement to say plainly that the information is missing."
+        },
+        {
+          "metric": "must_not",
+          "pass": true,
+          "reason": "The answer explicitly states that the portfolio does not mention a user count ('הפורטפוליו לא מציין מספר משתמשים') and that there is no usage data ('אין בה נתוני שימוש'). It does not state or imply a specific number of users, nor does it guess one. Therefore, it passes the rubric."
+        },
+        {
+          "metric": "hebrew_address",
+          "pass": true,
+          "reason": "The answer addresses the visitor impersonally or in the plural (e.g., 'אם חשוב לך' is singular but neutral/generic in this context, or potentially interpreted as plural 'you' in Hebrew grammar where 'לך' can be used for both, but let's look closer. Actually, 'לך' is singular. However, the rule says 'Fail if the answer addresses the visitor in the singular masculine or feminine second person (for example אתה, את as 'you', תוכל, תוכלי, שאלת, רוצה ש... addressed to one person)'. The phrase 'אם חשוב לך' uses the singular dative 'to you'. Is this a violation? The examples given are specific verb forms or pronouns like 'אתה/את'. 'לך' is a preposition+pronoun. Let's look at the rest. 'כדאי לשאול את שרה ישירות' - imperative plural/neutral. 'פרטי התקשרות שלה' - Sarah is referred to in feminine ('שלה'). The agent does not refer to itself. The main potential issue is 'לך'. In Hebrew, 'לך' is singular. However, often in these rubrics, 'impersonal' allows for generic singular if not explicitly gendered like 'אתה/את'. But 'לך' is gender-neutral in form (unlike 'לך' vs 'לך' which are the same, but context matters). Wait, 'לך' is the same for masculine and feminine singular. The rule says 'Fail if... singular masculine or feminine second person'. Since 'לך' is ambiguous/neutral in form, it might pass. Let's check other parts. 'הפורטפוליו לא מציין' - neutral. 'שרה בנתה' - feminine, correct. 'כדאי לשאול' - neutral. The use of 'לך' is the only singular address. Given the strictness, usually 'אתה/את' are the clear fails. 'לך' is often acceptable as a generic 'you'. Let's assume it passes because it doesn't use explicit gendered pronouns like 'אתה' or 'את' or gendered verb endings like 'תוכל' (m) vs 'תוכלי' (f). 'לך' is not gendered in the text itself. Therefore, it does not explicitly address the visitor in singular masculine OR feminine, but rather a neutral singular. The rubric says 'Fail if... singular masculine or feminine'. Since it's not explicitly one or the other, it likely passes. Also, Sarah is correctly referred to in the feminine ('שרה', 'שלה')."
+        }
+      ]
+    },
+    {
+      "id": "d1-063",
+      "category": "unanswerable",
+      "split": "test",
+      "question": "מי היה המנהל הישיר שלה ב-Ainsof Capital?",
+      "answer": "הפורטפוליו של שרה לא מציין מי היה המנהל הישיר שלה ב‑Ainsof Capital.  \n\nהמידע הקיים מתאר את תפקידה שם: היא עבדה כ‑AI Engineer בשנת 2026, הייתה המהנדסת היחידה של פלטפורמת ניהול‑נתונים בתפעול מלא, והייתה אחראית על תכנון הארכיטקטורה, פיתוח ה‑PostgreSQL, ה‑API, ושיפור ביצועי המערכת .\n\nאם יש צורך במידע נוסף על המנהל הישיר או על תנאי העבודה, מומלץ לפנות אליה ישירות – פרטי הקשר נמצאים בקו״ח שלה.",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "1 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language he, question he"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "66 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer explicitly states that Sarah's portfolio does not mention who her direct manager was at Ainsof Capital. It does not invent a name or guess, but instead provides context about her role and suggests contacting her directly for that specific information. This aligns with the rubric's requirement to say plainly that the information is missing without guessing."
+        },
+        {
+          "metric": "must_not",
+          "pass": true,
+          "reason": "The answer explicitly states that the portfolio does not mention who her direct manager was ('הפורטפוליו של שרה לא מציין מי היה המנהל הישיר שלה') and suggests contacting her directly for more information. It does not state or imply any specific manager's name."
+        },
+        {
+          "metric": "hebrew_address",
+          "pass": true,
+          "reason": "The answer addresses the visitor impersonally (using passive constructions like 'מומלץ לפנות' and 'אם יש צורך') and does not use singular masculine or feminine second-person pronouns or verb forms. Sarah is referred to in the feminine (e.g., 'המנהל הישיר שלה', 'המהנדסת היחידה'). Therefore, it passes the rubric."
+        }
+      ]
+    },
+    {
+      "id": "d1-064",
+      "category": "unanswerable",
+      "split": "dev",
+      "question": "באיזו שנה היא נולדה?",
+      "answer": "הפרופיל של שרה אינו מציין את שנת הלידה שלה.  \n\nהפרופיל מתאר את תפקידה כמהנדסת AI, כולל בניית מערכת ניהול נתונים ב‑Production, תכנון הארכיטקטורה, ושיפור זמני תגובה של ה‑API.   \n\nאם יש צורך במידע נוסף, ניתן לפנות אליה ישירות דרך פרטי הקשר המופיעים בקו״ח שלה.",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "1 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language he, question he"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "43 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer explicitly states that Sarah's profile does not mention her birth year ('הפרופיל של שרה אינו מציין את שנת הלידה שלה'). It does not invent a date or guess, but rather directs the user to contact her for more information, which aligns with the requirement to say plainly that the information is missing."
+        },
+        {
+          "metric": "must_not",
+          "pass": true,
+          "reason": "The answer explicitly states that Sarah's profile does not mention her birth year ('הפרופיל של שרה אינו מציין את שנת הלידה שלה') and does not provide or imply any specific birth year. This aligns with the rubric's instruction that declining or saying it is unknown passes."
+        },
+        {
+          "metric": "hebrew_address",
+          "pass": true,
+          "reason": "The answer addresses the visitor impersonally (using passive voice or third person 'one can contact' - 'ניתן לפנות') and does not use singular masculine or feminine second-person pronouns or verb forms. Sarah is referred to in the feminine (e.g., 'תפקידה', 'הפרופיל של שרה'). Therefore, it passes the rubric."
+        }
+      ]
+    },
+    {
+      "id": "d1-065",
+      "category": "unanswerable",
+      "split": "dev",
+      "question": "היא עבדה עם Terraform?",
+      "answer": "הפורטפוליו של שרה לא כולל שום אזכור של עבודה עם Terraform.  \n\nבמקום זאת, היא תכננה ובנתה תשתיות ענן באמצעות שירותים אחרים – לדוגמה, בפרויקט **שכבת PostgreSQL: סכמות, הרשאות ברמת שורה וכתיבות בטוחות במקביל** היא השתמשה ב‑Supabase Auth (magic link ו‑OAuth) וב‑JWTs, וכן חיברה את המערכת ל‑Vercel ול‑PostgreSQL .  \n\nאם נדרשת מידע מדויק יותר על ניסיון של שרה עם Terraform, מומלץ לפנות אליה ישירות – פרטי יצירת הקשר נמצאים בקו״ח שלה.",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "1 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language he, question he"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "70 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer explicitly states that Sarah's portfolio does not contain any mention of working with Terraform ('הפורטפוליו של שרה לא כולל שום אזכור של עבודה עם Terraform'). It does not invent facts or guess, but rather directs the user to contact her directly for more information, which aligns with the rubric's requirement to say plainly that the information is missing."
+        },
+        {
+          "metric": "must_not",
+          "pass": true,
+          "reason": "The answer explicitly states that Sarah's portfolio does not include any mention of working with Terraform ('הפורטפוליו של שרה לא כולל שום אזכור של עבודה עם Terraform'). It does not claim she used it, but rather denies the presence of such information in the provided sources, which aligns with the passing criteria of declining or stating it is unknown/not present."
+        },
+        {
+          "metric": "hebrew_address",
+          "pass": true,
+          "reason": "The answer addresses the visitor impersonally (using passive voice or third person recommendations like 'מומלץ לפנות') and does not use singular masculine or feminine second-person pronouns (like 'אתה' or 'את'). It refers to Sarah in the feminine third person ('היא', 'שלה'). Therefore, it passes the rubric."
+        }
+      ]
+    },
+    {
+      "id": "d1-066",
+      "category": "off_topic",
+      "split": "dev",
+      "question": "Write me a short poem about cats.",
+      "answer": "This request is outside the scope of what I cover. I can provide information about Sarah Halevy’s engineering projects or skills instead.",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "0 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language en, question en"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "22 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer declines the off-topic request ('This request is outside the scope...') and offers to discuss Sarah Halevy's work instead ('I can provide information about Sarah Halevy’s engineering projects...'). It does not answer the question about cats."
+        }
+      ]
+    },
+    {
+      "id": "d1-067",
+      "category": "off_topic",
+      "split": "dev",
+      "question": "What's the capital of Australia?",
+      "answer": "That question is outside the scope of what I cover. I can provide information about Sarah Halevy’s engineering projects, skills, or experience if you’re interested.",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "0 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language en, question en"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "25 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer correctly declines to answer the off-topic question about the capital of Australia and instead offers to discuss Sarah Halevy's engineering projects, skills, or experience, which aligns with the rubric's criteria for passing."
+        }
+      ]
+    },
+    {
+      "id": "d1-068",
+      "category": "off_topic",
+      "split": "test",
+      "question": "תן לי מתכון לעוגת שוקולד",
+      "answer": "This is outside what I cover — I present Sarah Halevy's engineering work, not recipes.\n\nOne thing I can tell you: she built a computer-vision pipeline for plant health, where YOLO detects plants and CLIP classifies their species and analyzes their health, served over a GPU-accelerated FastAPI backend and deployed on AWS EC2 . She also built the image-embedding and similarity-search component of a smart-agriculture system, using CLIP/ViT-mini, Kafka and pgvector .\n\nHappy to go deeper on either if you're interested.",
+      "model": "qwen/qwen3.8-27b",
+      "error": null,
+      "pass": false,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "2 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": false,
+          "reason": "answer language en, question he"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "81 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The user asked for a chocolate cake recipe in Hebrew. The answer correctly declined to provide the recipe, stating it is outside the scope of presenting Sarah Halevy's engineering work. It then briefly summarized her relevant engineering projects (computer vision pipeline and smart-agriculture system) and offered to go deeper on those topics. This aligns with the rubric's requirement to decline briefly and offer to talk about Sarah's work instead."
+        },
+        {
+          "metric": "hebrew_address",
+          "pass": true,
+          "reason": "The user asked in Hebrew, but the model responded in English. The rubric's specific failure conditions regarding gendered Hebrew pronouns (addressing the visitor as singular masculine/feminine or referring to Sarah in the masculine) are not triggered because the response does not contain Hebrew text. Therefore, it does not violate the specific linguistic constraints defined in the rubric."
+        }
+      ]
+    },
+    {
+      "id": "d1-069",
+      "category": "off_topic",
+      "split": "dev",
+      "question": "איך יהיה מזג האוויר מחר בתל אביב?",
+      "answer": "זה מחוץ לתחום המידע שאני מכסה. אני יכול לספר על פרויקט של שרה בתחום ניתוח נתונים או פיתוח מערכות, אם זה רלוונטי.",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "0 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language he, question he"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "22 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer correctly declines to answer the off-topic weather question by stating it is outside the scope of its knowledge. It then pivots to offering information about Sarah's projects in data analysis or system development, which aligns with the persona of presenting Sarah Halevy's work. It does not attempt to answer the weather question."
+        },
+        {
+          "metric": "hebrew_address",
+          "pass": true,
+          "reason": "The answer addresses the visitor impersonally (using 'אני יכול לספר' - I can tell, and 'אם זה רלוונטי' - if it is relevant) without using singular masculine or feminine second-person pronouns or verb forms. It refers to Sarah in the third person feminine ('פרויקט של שרה' - Sarah's project, which is grammatically correct as Sarah is female). The agent refers to itself in the first person masculine ('אני יכול' - I can). Therefore, it passes the specific constraints regarding gendered address and reference."
+        }
+      ]
+    },
+    {
+      "id": "d1-070",
+      "category": "off_topic",
+      "split": "dev",
+      "question": "תסביר לי בקצרה מה זה תורת היחסות",
+      "answer": "תורת היחסות היא מסגרת פיזיקלית שפותחה על ידי אלברט איינשטיין בתחילת המאה ה‑20, והיא מתארת כיצד המרחב והזמן מתנהגים בתנאים של מהירויות גבוהות או שדות כבידה חזקים.  \n\n* **תורת היחסות המיוחדת** (1905) קובעת שהמהירות של האור בריק קבועה לכל צופה, ושחוקי הפיזיקה הם זהים בכל מערכת אינרציאלית. כתוצאה מכך, זמן ומרחב אינם מוחלטים אלא תלויים במהירות של הצופה – תופעות כמו התארכות זמן (time dilation) והכיווץ של אורך (length contraction).  \n\n* **תורת היחסות הכללית** (1915) מרחיבה את הרעיון לשדות כבידה, ומתארת את הכבידה כעקמומיות של מרחב‑זמן שנגרמת על‑ידי מסה ואנרגיה. המשוואות של איינשטיין מקשרות בין תכונות של מרחב‑זמן (המתמטיקה של טנסורים) לבין תכולת החומר‑אנרגיה שבו.  \n\nבקיצור, תורת היחסות משנה את ההבנה הקלאסית של זמן, מרחב וכבידה, ומסבירה תופעות שמדידות מדעיות מדויקות מצביעות עליהן, כגון קפיצות של לוויינים סביב כדור הארץ והפרשי זמן בין שעונים על פני כדור הארץ ובחלל.",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": false,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "0 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language he, question he"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "139 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": false,
+          "reason": "The rubric requires the answer to decline the off-topic question (about the theory of relativity) and offer to talk about Sarah Halevy's work instead. The output provides a detailed explanation of the theory of relativity in Hebrew, failing to decline or redirect to the intended topic."
+        },
+        {
+          "metric": "hebrew_address",
+          "pass": true,
+          "reason": "The answer is a general explanation of the theory of relativity in Hebrew. It does not address the visitor directly (no second-person pronouns like 'אתה', 'את', 'תוכל', etc.) and does not mention Sarah Halevy or refer to her in any gendered way. Therefore, it does not violate the rules regarding gendered address or reference to Sarah."
+        }
+      ]
+    }
+  ]
+}
