@@ -67,7 +67,19 @@ def test_citation_expectations_are_judged_where_the_markers_show():
     for case_id in ("d2-007", "d2-019"):
         assert "answer_cited" in safe(case_id), case_id
     assert "answer_cited" not in safe("d2-008")  # forbidden tools, not citations
-    assert by_id["d2-007"]["metadata"]["judge"] == "judge.v3"
+    assert by_id["d2-007"]["metadata"]["judge"] == "judge.v4"
+
+
+def test_an_off_topic_decline_is_judged_where_the_markers_show():
+    """judge.v4: on system.v7 the off-topic declines named a project with no citation, and the
+    rubric passed them. It reads `answer_cited`, so an uncited claim about Sarah can fail."""
+    by_id = {c["vars"]["id"]: c for c in cases.neg()}
+    for case_id in ("d1-066", "d1-067", "d1-068", "d1-069", "d1-070"):
+        behavior = next(a["value"] for a in by_id[case_id]["assert"]
+                        if a.get("metric") == "behavior")
+        assert "answer_cited" in behavior and "without a [[chunk_id]]" in behavior, case_id
+    refuse = next(a["value"] for a in by_id["d1-057"]["assert"] if a.get("metric") == "behavior")
+    assert "answer_cited" not in refuse  # only the off-topic rubric changed
 
 
 def test_the_judge_can_be_left_out(monkeypatch):

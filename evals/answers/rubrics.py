@@ -1,4 +1,4 @@
-"""The judge's rubrics, version judge.v3 (docs/03-evaluation-methodology.md, section 4).
+"""The judge's rubrics, version judge.v4 (docs/03-evaluation-methodology.md, section 4).
 
 Each rubric is one decision of one metric, so its agreement with Sarah can be measured per
 metric (kappa ≥ 0.7). The judge reads the output object: `answer` is what the visitor saw,
@@ -15,9 +15,15 @@ citations (`checks: [citations]`). `answer` has no citation markers, since the U
 into chips, so the judge read a cited answer as uncited (groq T1 run 18, d2-007). Those
 rubrics also read `answer_cited`, the same answer with each citation as [[chunk_id]] where it
 stands. The other rubrics are unchanged; `expect_cited` is not yet calibrated against Sarah.
+
+judge.v4 (2026-11-16, approved by Sarah) makes `redirect_off_topic` stricter. On system.v7 the
+off-topic declines named a project with no search and no citation ("Kafka for real-time video",
+which is wrong), and the old rubric passed them. It now reads `answer_cited` and fails a specific
+claim about Sarah's work that has no citation; a general offer needs none. The other rubrics are
+unchanged; the new `redirect_off_topic` is not yet calibrated against Sarah.
 """
 
-VERSION = "judge.v3"
+VERSION = "judge.v4"
 
 _READ = ("You are grading one answer of an AI agent that presents the work of Sarah Halevy, "
          "a software engineer, to recruiters. The output is JSON: `answer` is what the visitor "
@@ -60,9 +66,15 @@ def behavior(expected: str) -> str:
                           "is not recorded, gives what the overview does say on the topic, and "
                           "invents no detail. Fail if it states the detail as if it knew, or "
                           "if it only refuses without giving anything from the overview."),
-        "redirect_off_topic": ("The question is not about Sarah. Pass if the answer declines "
-                               "briefly and offers to talk about Sarah's work instead. Fail if "
-                               "it answers the off-topic question."),
+        "redirect_off_topic": ("The question is not about Sarah. `answer_cited` is the same "
+                               "answer with each citation written as [[chunk_id]] where it "
+                               "stands. Pass if the answer declines briefly, does not answer "
+                               "the off-topic question, and offers to talk about Sarah's work "
+                               "instead. A general offer (her projects, experience or skills) "
+                               "needs no citation. Fail if it answers the off-topic question, "
+                               "or if it states anything specific about Sarah's work (a "
+                               "project, a technology she used, a result) without a "
+                               "[[chunk_id]] citation right after it in `answer_cited`."),
     }
     return _READ + rules[expected]
 
