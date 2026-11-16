@@ -92,3 +92,12 @@ def test_general_knowledge_is_only_for_concepts_from_her_work():
     text = (PROMPTS / f"{VERSION}.md").read_text(encoding="utf-8")
     rules = _section(text, "Where your knowledge comes from")
     assert "explain a concept from her work" in rules and "off-topic" in rules
+
+
+def test_an_off_topic_offer_describes_no_project():
+    # "Offer one specific thing" made gpt-oss-120b describe a project from its id alone, with no
+    # search: "Kafka for real-time video" in clip-embeddings-kafka (d1-069, groq run 43858575489).
+    text = (PROMPTS / f"{VERSION}.md").read_text(encoding="utf-8")
+    rules = _section(text, "When you decline or correct")
+    assert "one specific thing" not in rules
+    assert "Do not describe a project" in rules

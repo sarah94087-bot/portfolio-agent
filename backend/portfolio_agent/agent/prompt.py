@@ -11,7 +11,7 @@ from functools import cache
 from pathlib import Path
 
 PROMPTS = Path(__file__).parent / "prompts"
-VERSION = "system.v7"
+VERSION = "system.v8"
 PLACEHOLDER = "{canary}"
 
 
