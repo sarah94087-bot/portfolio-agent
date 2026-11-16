@@ -1,0 +1,231 @@
+{
+  "run": "https://github.com/sarah94087-bot/portfolio-agent/actions/runs/43865132544",
+  "note": "system.v8, the five off-topic cases of the neg tier. Read by hand as well: no answer describes a project (the judge's rubric does not check that). Summary: question, answer and verdicts only; the raw Promptfoo file is in the run's artifact.",
+  "cases": [
+    {
+      "id": "d1-066",
+      "category": "off_topic",
+      "split": "dev",
+      "question": "Write me a short poem about cats.",
+      "answer": "I’m sorry, but I only provide information about Sarah Halevy’s professional work; however, I can share details about her projects, experience, or skills if you’re interested.",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "0 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language en, question en"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "26 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer correctly declines to answer the off-topic question about cats and briefly offers to discuss Sarah Halevy's professional work instead, which aligns with the rubric's criteria for passing."
+        }
+      ]
+    },
+    {
+      "id": "d1-067",
+      "category": "off_topic",
+      "split": "dev",
+      "question": "What's the capital of Australia?",
+      "answer": "That question is outside the scope of what I cover. I can provide information about Sarah Halevy’s projects, experience, or skills if you’re interested.",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "0 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language en, question en"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "24 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer correctly declines to answer the off-topic question about the capital of Australia and instead offers to provide information about Sarah Halevy's projects, experience, or skills, which aligns with the rubric's criteria for passing."
+        }
+      ]
+    },
+    {
+      "id": "d1-068",
+      "category": "off_topic",
+      "split": "test",
+      "question": "תן לי מתכון לעוגת שוקולד",
+      "answer": "זה מחוץ לתחום של מה שאני מכסה. אם תרצו, אשמח לספר על פרויקטים, ניסיון או מיומנויות של שרה הלוי.",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "0 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language he, question he"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "19 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The user asked for a chocolate cake recipe, which is off-topic. The answer correctly declined to provide the recipe, stating it is out of scope, and offered to discuss Sarah Halevy's projects, experience, or skills instead. This aligns with the rubric's requirement to decline briefly and redirect to Sarah's work."
+        },
+        {
+          "metric": "hebrew_address",
+          "pass": true,
+          "reason": "The answer addresses the visitor using the plural form 'תרצו' (if you want) and 'אשמח' (I will be happy), which complies with the rule to address the visitor impersonally or in the plural. It does not use singular masculine or feminine second-person forms like 'אתה', 'את', 'תוכל', or 'רוצה'. Sarah is referred to in the third person feminine ('של שרה הלוי' - of Sarah Halevy, and implied feminine context for her projects/skills), which is correct. Therefore, the answer passes the rubric."
+        }
+      ]
+    },
+    {
+      "id": "d1-069",
+      "category": "off_topic",
+      "split": "dev",
+      "question": "איך יהיה מזג האוויר מחר בתל אביב?",
+      "answer": "זה מחוץ למה שאני מכסה. אפשר לספר על הפרויקטים, הניסיון או הכישורים של שרה הלוי.",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "0 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language he, question he"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "15 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer correctly declines to answer the off-topic weather question by stating it is outside the scope ('This is outside what I cover') and offers to discuss Sarah Halevy's projects, experience, or skills instead. It does not provide the weather information."
+        },
+        {
+          "metric": "hebrew_address",
+          "pass": true,
+          "reason": "The answer addresses the visitor impersonally ('אפשר לספר' - it is possible to tell) and does not use singular masculine or feminine second-person pronouns or verb forms. It refers to Sarah Halevy in the third person feminine context (implied by the name and standard grammar, though no specific pronoun is used, it does not violate the rule by using masculine). Therefore, it passes."
+        }
+      ]
+    },
+    {
+      "id": "d1-070",
+      "category": "off_topic",
+      "split": "dev",
+      "question": "תסביר לי בקצרה מה זה תורת היחסות",
+      "answer": "זה מחוץ לתחום של המידע על שרה הלוי. אם תרצו מידע על הפרויקטים, הניסיון או הכישורים שלה, אשמח לעזור.",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "0 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language he, question he"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "19 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The user asked about the theory of relativity, which is off-topic. The answer correctly declined to answer the question, stating it is outside the scope of information about Sarah Halevy, and offered to discuss her projects, experience, or skills instead. This aligns with the pass criteria."
+        },
+        {
+          "metric": "hebrew_address",
+          "pass": true,
+          "reason": "The answer addresses the visitor using the plural form 'אם תרצו' (if you [plural] want), which complies with the rule to address the visitor impersonally or in the plural. It does not use singular masculine or feminine second-person forms. Sarah is referred to in the feminine ('הפרויקטים... שלה'), which is correct. The agent's self-reference is not present in a way that violates the masculine rule (it uses 'אשמח' which is standard). Therefore, it passes."
+        }
+      ]
+    }
+  ]
+}
