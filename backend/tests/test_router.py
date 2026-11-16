@@ -121,13 +121,22 @@ def test_a_model_is_waited_for_once_in_a_call():
 
 def test_the_waits_of_one_turn_are_capped_together():
     slept, sleep = sleeper()
-    a, b, c = Busy("a", 7.0), Busy("b", 7.0), Fake("c")
+    a, b, c = Busy("a", 20.0), Busy("b", 20.0), Fake("c")
     turn = Router([a, b, c], sleep=sleep).for_turn()
-    assert text(run(turn)) == "a" and slept == [7.0]
+    assert text(run(turn)) == "a" and slept == [20.0]
     a.calls, a.times = 0, 1
-    # A second 7 seconds would pass the cap: a is left at once, and b does not wait either.
+    # A second 20 seconds would pass the cap: a is left at once, and b does not wait either.
     b.times = 0
-    assert text(run(turn)) == "b" and slept == [7.0]
+    assert text(run(turn)) == "b" and slept == [20.0]
+
+
+def test_the_retry_after_of_t1_runs_18_and_19_is_waited_out():
+    # d2-007: gpt-oss-120b asked for 22 s (run 18) and 16 s (run 19); both keep the first model.
+    for pause in (22.0, 16.0):
+        slept, sleep = sleeper()
+        a, b = Busy("a", pause), Fake("b")
+        turn = Router([a, b], sleep=sleep).for_turn()
+        assert text(run(turn)) == "a" and b.calls == 0 and slept == [pause]
 
 
 def test_a_limit_after_text_was_sent_does_not_wait():
