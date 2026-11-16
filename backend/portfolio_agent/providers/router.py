@@ -35,7 +35,9 @@ from portfolio_agent.providers.openai_compat import Endpoint, OpenAICompatible, 
 MINUTE = 60.0
 DAY_FALLBACK = 3600.0  # when a day limit gives no Retry-After, look again in an hour
 UNAVAILABLE_PAUSE = 10.0  # a 5xx or timeout: a short pause, not a long one
-MAX_MINUTE_WAIT = 10.0  # seconds one turn may wait for a minute limit before switching model
+MAX_MINUTE_WAIT = 30.0  # seconds one turn may wait for a minute limit before switching model
+# Was 10 until 2026-11-16: T1 runs 18 and 19 (d2-007) asked for 22 s and 16 s, so 120b was left
+# for a weaker model that followed an injection. Sarah chose 30 s: a slower answer, the best model.
 GROQ_BASE = "https://api.groq.com/openai/v1"
 
 
