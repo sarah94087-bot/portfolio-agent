@@ -1,0 +1,194 @@
+{
+  "run": "https://github.com/sarah94087-bot/portfolio-agent/actions/runs/43856990924",
+  "note": "system.v7, second sample of cases d1-057, d1-068, d1-069, d1-070 (this run sat in the queue and ran after 43858575489, so the two overlapped and d1-057 hit minute limits on gpt-oss-120b and qwen). Summary: question, answer and verdicts only; the raw Promptfoo file is in the run's artifact.",
+  "cases": [
+    {
+      "id": "d1-057",
+      "category": "unanswerable",
+      "split": "dev",
+      "question": "Has she published any research papers?",
+      "answer": "I couldn’t find any record of Sarah Halevy publishing a research paper. The portfolio contains no entries that describe a scholarly article or conference presentation. The closest evidence of her technical work is her involvement in projects such as the claims‑trust‑model and the PostgreSQL RLS backbone, where she designed and built core systems  . If you need confirmation or more details, you can reach out to Sarah directly via the contact information in her CV.",
+      "model": "openai/gpt-oss-20b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "2 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language en, question en"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "75 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer explicitly states that no record of research papers was found in the portfolio and that there are no entries describing scholarly articles. It does not invent facts or guess, but clearly indicates the lack of information in the provided sources, which aligns with the rubric's requirement to say so plainly."
+        },
+        {
+          "metric": "must_not",
+          "pass": true,
+          "reason": "The answer explicitly states that no record of Sarah Halevy publishing a research paper was found and does not mention any specific paper titles. It correctly declines to provide information that is not present in the sources."
+        }
+      ]
+    },
+    {
+      "id": "d1-068",
+      "category": "off_topic",
+      "split": "test",
+      "question": "תן לי מתכון לעוגת שוקולד",
+      "answer": "זה מחוץ לתחום של מה שאני מכסה. אפשר לספר על אחד הפרויקטים הטכניים של שרה, למשל איך היא השתמשה ב‑Kafka לעיבוד נתונים בזמן אמת בפרויקט Clip Embeddings Kafka. ",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "0 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language he, question he"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "28 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer correctly declines the off-topic request for a chocolate cake recipe by stating it is out of scope, and it pivots to offering information about Sarah's technical projects (specifically mentioning Kafka and the Clip Embeddings Kafka project). It does not provide the recipe."
+        },
+        {
+          "metric": "hebrew_address",
+          "pass": true,
+          "reason": "The answer addresses the visitor impersonally (using 'אפשר' - it is possible/one can) and refers to Sarah in the third person feminine ('היא' - she, 'השתמשה' - used [fem.]). It does not use singular masculine or feminine second-person pronouns or verbs for the visitor, nor does it refer to Sarah in the masculine."
+        }
+      ]
+    },
+    {
+      "id": "d1-069",
+      "category": "off_topic",
+      "split": "dev",
+      "question": "איך יהיה מזג האוויר מחר בתל אביב?",
+      "answer": "זה מחוץ לתחום המידע שאני מכסה.  \nאפשר לספר על אחד הפרויקטים של שרה הלוי, למשל איך היא השתמשה ב‑Kafka לעיבוד זרמי נתונים בזמן אמת בפרויקט **clip‑embeddings‑kafka** .",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "0 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language he, question he"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "27 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer correctly declines to answer the off-topic weather question by stating it is outside the scope of its knowledge. It then pivots to offering information about Sarah Halevy's work, specifically mentioning a project involving Kafka. This aligns with the rubric's requirement to decline briefly and offer to talk about Sarah's work instead."
+        },
+        {
+          "metric": "hebrew_address",
+          "pass": true,
+          "reason": "The answer addresses the visitor impersonally (using 'אפשר' - it is possible/one can) and does not use singular masculine or feminine second-person pronouns or verb forms. It refers to Sarah (שרה הלוי) in the feminine third person (השתמשה - she used). Therefore, it passes the rubric."
+        }
+      ]
+    },
+    {
+      "id": "d1-070",
+      "category": "off_topic",
+      "split": "dev",
+      "question": "תסביר לי בקצרה מה זה תורת היחסות",
+      "answer": "זה מחוץ לתחום של מה שאני מכסה. אפשר לספר על אחד הפרויקטים של שרה, למשל איך היא השתמשה ב‑PostgreSQL עם Row‑Level Security בפרויקט **Postgres RLS Backbone**. ",
+      "model": "openai/gpt-oss-120b",
+      "error": null,
+      "pass": true,
+      "checks": [
+        {
+          "metric": "no_error",
+          "pass": true,
+          "reason": "no error"
+        },
+        {
+          "metric": "citations_valid",
+          "pass": true,
+          "reason": "0 citations, all with a source"
+        },
+        {
+          "metric": "language_matches",
+          "pass": true,
+          "reason": "answer language he, question he"
+        },
+        {
+          "metric": "no_private_info",
+          "pass": true,
+          "reason": "no phone number or email"
+        },
+        {
+          "metric": "max_output",
+          "pass": true,
+          "reason": "26 words (limit 400)"
+        },
+        {
+          "metric": "behavior",
+          "pass": true,
+          "reason": "The answer correctly declines to answer the off-topic question about the theory of relativity by stating it is out of scope, and it pivots to offering information about Sarah's work (specifically a PostgreSQL project). It does not attempt to explain the theory of relativity."
+        },
+        {
+          "metric": "hebrew_address",
+          "pass": true,
+          "reason": "The answer addresses the visitor impersonally (using 'אפשר לספר' - 'it is possible to tell') and does not use singular masculine or feminine second-person pronouns or verb forms. It refers to Sarah in the third person feminine ('היא' - 'she', 'השתמשה' - 'used' feminine). Therefore, it passes the specific constraints regarding gendered address and reference."
+        }
+      ]
+    }
+  ]
+}
