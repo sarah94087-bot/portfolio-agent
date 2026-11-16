@@ -11,6 +11,16 @@
 #   with R3 search: the embedding model is fetched by hash and the knowledge base loaded.
 # - d3: the job match set (evals/jobmatch/run.py) on the branch it is started from. About 7,000
 #   tokens a job, at most `max_tokens`. Its results stay in the run: the summary and an artifact.
+# - abstain: stage 5b, the reranker's model grades R3's first 10 for every D1 question
+#   (evals/retrieval/run_abstain_rerank.py), on the branch it is started from. About 2,300
+#   tokens a question, 92 questions, so it takes two days of quota: each run stops at
+#   `max_tokens` and saves the grades to the branch groq/abstain-grades, and the next run
+#   resumes from there. With max_tokens 0 it only checks that the search runs.
+# - neg: the t1 job on the 17 D1 questions with no answer in the portfolio (refuse_no_info and
+#   off-topic, dev and test), live with the judge: does the answer model already refuse where it
+#   should (stage 5b, ADR-0023)? About 100,000 tokens. Results in promptfoo-neg-latest.json.
+# - abstain_full: stage 5b part 2, the same on the whole text of each candidate, only for the
+#   questions the 150-token run graded below 2 (38). Saved next to the first file, same branch.
 #
 # One at a time: the Groq quota is per model and per day, shared by both jobs.
 name: groq
@@ -19,15 +29,15 @@ on:
   workflow_dispatch:
     inputs:
       job:
-        description: "stage4, t1 or d3"
+        description: "stage4, t1, neg, d3, abstain or abstain_full"
         type: choice
-        options: [stage4, t1, d3]
+        options: [stage4, t1, neg, d3, abstain, abstain_full]
         default: stage4
       run:
         description: "stage4: the run number (2 or 3)"
         default: "2"
       max_tokens:
-        description: "stage4 and d3: Groq tokens this invocation may spend"
+        description: "stage4, d3 and abstain: Groq tokens this invocation may spend"
         default: "60000"
       ref:
         description: "stage4: the full commit SHA to run on (run 1's corpus)"
@@ -157,7 +167,7 @@ jobs:
         run: cat "$RUNNER_TEMP/stage4.txt" >> "$GITHUB_STEP_SUMMARY" || true
 
   t1:
-    if: inputs.job == 't1'
+    if: inputs.job == 't1' || inputs.job == 'neg'
     runs-on: ubuntu-latest
     # Results are written only at the end, so the limit must clear the longest run: the first
     # live run hit 90 minutes and saved nothing.
@@ -176,6 +186,7 @@ jobs:
     env:
       DATABASE_URL: postgresql://agent:agent@localhost:5432/agent
       EVAL_DATABASE_URL: postgresql://agent:agent@localhost:5432/agent
+      TIER: ${{ inputs.job == 'neg' && 'neg' || 't1' }}
       EMBEDDING_MODEL_DIR: ${{ github.workspace }}/../models/multilingual-e5-small
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
@@ -217,20 +228,20 @@ jobs:
         shell: bash
         # A minute between cases: one heavy question nearly fills Groq's 8,000 tokens a minute, and
         # the next one would fall back to another model and measure that one instead.
-        run: node answers/run.mjs t1 --no-cache --delay 60000 ${FILTER:+--filter-pattern "$FILTER"}
+        run: node answers/run.mjs "$TIER" --no-cache --delay 60000 ${FILTER:+--filter-pattern "$FILTER"}
       - name: Keep what the run saved
         if: always() && steps.t1.outcome != 'skipped'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: t1
-          path: evals/results/promptfoo-t1-latest.json
+          name: ${{ env.TIER }}
+          path: evals/results/promptfoo-${{ env.TIER }}-latest.json
           if-no-files-found: warn
       - name: Push the results branch
         if: always() && steps.t1.outcome != 'skipped'
         env:
-          BRANCH: groq/t1-${{ github.run_id }}
+          BRANCH: groq/${{ env.TIER }}-${{ github.run_id }}
         run: |
-          git add -f evals/results/promptfoo-t1-latest.json || true
+          git add -f "evals/results/promptfoo-$TIER-latest.json" || true
           if git diff --cached --quiet; then echo "nothing saved"; exit 0; fi
           git -c user.name="github-actions[bot]" \
               -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
@@ -281,3 +292,82 @@ jobs:
           if-no-files-found: warn
       - if: always()
         run: cat "$RUNNER_TEMP/d3.txt" >> "$GITHUB_STEP_SUMMARY" || true
+
+  abstain:
+    if: inputs.job == 'abstain' || inputs.job == 'abstain_full'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    services:
+      db:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: agent
+          POSTGRES_PASSWORD: agent
+          POSTGRES_DB: agent
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U agent -d agent"
+          --health-interval 2s --health-timeout 3s --health-retries 20
+    env:
+      DATABASE_URL: postgresql://agent:agent@localhost:5432/agent
+      EMBEDDING_MODEL_DIR: ${{ github.workspace }}/../models/multilingual-e5-small
+      GRADES_DIR: evals/datasets/rerank
+      ABSTAIN_FULL_TEXT: ${{ inputs.job == 'abstain_full' && '1' || '' }}
+      BRANCH: groq/abstain-grades
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          path: run
+      # The results branch starts from main (a branch whose workflow files differ from main's
+      # is refused to this token), and carries the grades from one run to the next.
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          ref: main
+          path: main
+      - name: Resume from the saved grades
+        working-directory: main
+        run: |
+          if git fetch -q --depth 1 origin "refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"; then
+            git checkout -q -B "$BRANCH" "origin/$BRANCH"
+            mkdir -p "../run/$GRADES_DIR"
+            cp "$GRADES_DIR"/d1-abstain-grades*.json "../run/$GRADES_DIR/" && echo "resuming"
+          else
+            git checkout -q -B "$BRANCH" && echo "first run"
+          fi
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+      - run: pip install -e "run/backend[dev]"
+      - run: python -m portfolio_agent.retrieval.fetch_model
+        working-directory: run
+      - name: Grade
+        id: grade
+        working-directory: run/evals
+        env:
+          GROQ_API_KEY_EVALS: ${{ secrets.GROQ_API_KEY_EVALS }}
+          ABSTAIN_MAX_TOKENS: ${{ inputs.max_tokens }}
+        shell: bash  # with pipefail, so that tee does not hide a failure
+        run: python -m retrieval.run_abstain_rerank 2>&1 | tee "$RUNNER_TEMP/abstain.txt"
+      - name: Keep what the run saved
+        if: always() && steps.grade.outcome != 'skipped'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: abstain
+          path: |
+            run/${{ env.GRADES_DIR }}/d1-abstain-grades*.json
+            run/evals/results/
+          if-no-files-found: warn
+      - name: Push the results branch
+        if: always() && steps.grade.outcome != 'skipped'
+        working-directory: main
+        run: |
+          mkdir -p evals/results "$GRADES_DIR"
+          cp ../run/"$GRADES_DIR"/d1-abstain-grades*.json "$GRADES_DIR/" 2>/dev/null || true
+          cp ../run/evals/results/*-abstain-*-grades*.json evals/results/ 2>/dev/null || true
+          git add -f "$GRADES_DIR" evals/results
+          if git diff --cached --quiet; then echo "nothing saved"; exit 0; fi
+          git -c user.name="github-actions[bot]"               -c user.email="41898282+github-actions[bot]@users.noreply.github.com"               commit -q -m "Stage 5b grades, from groq workflow run ${{ github.run_id }}"
+          git push -q origin "HEAD:refs/heads/$BRANCH"
+          echo "pushed $BRANCH"
+      - if: always()
+        run: cat "$RUNNER_TEMP/abstain.txt" >> "$GITHUB_STEP_SUMMARY" || true

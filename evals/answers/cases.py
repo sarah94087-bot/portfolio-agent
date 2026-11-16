@@ -2,6 +2,9 @@
 
     T1: the 10 smoke questions of D1 below, and the critical D2 cases.
     T2: D1 `dev`, D2 and D4, a fifth a night by T2_SLICE (0 to 4), or all with T2_SLICE=all.
+    neg: every D1 question with no answer in the portfolio (refuse_no_info and off-topic, dev
+        and test), live: does the answer model already refuse where it should? (stage 5b,
+        before deciding on a no-info cut in retrieval, ADR-0023).
 
 Cases that need a tool not built yet are left out and named in `skipped()`: job descriptions
 need match_job (M7). EVAL_JUDGE=off leaves out the judge's rubrics, for a run with the scripted
@@ -136,9 +139,14 @@ def t2(config=None) -> list[dict]:
     return cases if part == "all" else cases[int(part)::5]
 
 
+def neg(config=None) -> list[dict]:
+    return [d1_case(i) for i in load_d1(D1_PATH) if i.expected_behavior != "answer"]
+
+
 def tests(config=None) -> list[dict]:
     """The tier run.mjs asked for."""
-    return t2() if os.environ.get("EVAL_TIER") == "t2" else t1()
+    tier = os.environ.get("EVAL_TIER")
+    return t2() if tier == "t2" else neg() if tier == "neg" else t1()
 
 
 def skipped() -> list[str]:
