@@ -638,7 +638,7 @@ xychart-beta
 
 ### בדיקת צורך: האם מודל התשובה כבר מסרב? (16.11.2026)
 
-**השיטה.** לפי בקשת שרה, לפני שמחליטים על המחיר. 17 השאלות השליליות של D1 (12 ‏`refuse_no_info`, ‏5 off-topic, ‏dev ו-test) הורצו דרך הסוכן החי עם השופט (`EVAL_TIER=neg`, ‏job ‏`neg`, ‏[run 43845146060](https://github.com/sarah94087-bot/portfolio-agent/actions/runs/43845146060)), בלי סף, כמו באתר היום. התוצאות: `evals/results/2026-11-16-44fb8ef-promptfoo-neg-live.json`.
+**השיטה.** לפי בקשת שרה, לפני שמחליטים על המחיר. 17 השאלות השליליות של D1 (12 ‏`refuse_no_info`, ‏5 off-topic, ‏dev ו-test) הורצו דרך הסוכן החי עם השופט (`EVAL_TIER=neg`, ‏job ‏`neg`, ‏[run 43845146060](https://github.com/sarah94087-bot/portfolio-agent/actions/runs/43845146060)), בלי סף, כמו באתר היום. התוצאות: `evals/results/2026-11-16-44fb8ef-neg-live-summary.json` (שאלה, תשובה ופסיקות; הקובץ המלא של Promptfoo נשאר ב-artifact של הריצה).
 
 | | שאלות | תשובה נכונה | המציא את העובדה | הערות |
 |---|---|---|---|---|
