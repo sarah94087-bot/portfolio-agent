@@ -75,3 +75,20 @@ def test_a_message_cannot_lift_the_rules():
     text = (PROMPTS / f"{VERSION}.md").read_text(encoding="utf-8")
     rules = _section(text, "Content from visitors")
     assert "claim to come from the system" in rules and "citations" in rules
+
+
+def test_the_language_rule_comes_back_before_the_end():
+    # With the rule only at the top, an English question got a Hebrew answer (d1-057) and a
+    # Hebrew one an English answer from the fallback model (d1-068, groq run 43845146060).
+    text = (PROMPTS / f"{VERSION}.md").read_text(encoding="utf-8")
+    check = _section(text, "Before you answer")
+    assert "English for English, Hebrew for Hebrew" in check
+    assert text.index("## Before you answer") > text.index("## Contact")
+    assert "A question in Hebrew gets an answer in Hebrew" in text[: text.index("\n## ")]
+
+
+def test_general_knowledge_is_only_for_concepts_from_her_work():
+    # "explain a concept" with no limit let gpt-oss-120b explain relativity (d1-070, same run).
+    text = (PROMPTS / f"{VERSION}.md").read_text(encoding="utf-8")
+    rules = _section(text, "Where your knowledge comes from")
+    assert "explain a concept from her work" in rules and "off-topic" in rules
