@@ -42,6 +42,9 @@ on:
       ref:
         description: "stage4: the full commit SHA to run on (run 1's corpus)"
         default: dca88926c45bea3f08af8fad8e666c275e297a41  # checkout needs all 40 characters
+      model:
+        description: "stage4: the reranker's model; empty is the measured gpt-oss-120b. Use a new run number for another model"
+        default: ""
       cases:
         description: "t1: only these case ids, comma-separated (e.g. d1-054,d2-017); empty runs all 22"
         default: ""
@@ -131,6 +134,7 @@ jobs:
           EMBEDDING_MODELS_DIR: ${{ env.MODELS_DIR }}
           RERANK_MAX_TOKENS: ${{ inputs.max_tokens }}
           GROQ_API_KEY_EVALS: ${{ secrets.GROQ_API_KEY_EVALS }}
+          GROQ_MODEL: ${{ inputs.model || 'openai/gpt-oss-120b' }}
           RUN_NO: ${{ inputs.run }}
         run: python -m retrieval.run_stage4 "$RUN_NO" | tee "$RUNNER_TEMP/stage4.txt"
       # Kept first as an artifact, so a failed push loses nothing (run 2's first rankings were

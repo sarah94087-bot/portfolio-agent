@@ -1,6 +1,9 @@
 """R4: R3, then a language model reorders its first candidates (docs/04-retrieval-design.md,
 axis B), adopted in ADR-0014. The model, the prompt and the cut below are what stage 4 measured;
 changing one means measuring again, so the model is pinned here and not read from GROQ_MODEL.
+RERANK_MODEL in the environment may name another model, which has its own per-minute budget
+(Groq counts tokens per model) and leaves the answer model's budget to the answers. It is
+unset in production until that model has been measured.
 
 A failure never fails the search: the hits keep R3's order, and the trace says why.
 
@@ -155,8 +158,10 @@ class GroqRanker:
 
 def from_env(client: httpx.Client, env: dict[str, str] | None = None) -> GroqRanker | None:
     """None without a key: the search then stays R3."""
-    key = (dict(os.environ) if env is None else env).get("GROQ_API_KEY")
-    return GroqRanker(client, key) if key else None
+    env = dict(os.environ) if env is None else env
+    key = env.get("GROQ_API_KEY")
+    model = (env.get("RERANK_MODEL") or "").strip() or RERANK_MODEL
+    return GroqRanker(client, key, model) if key else None
 
 
 @dataclass(frozen=True)

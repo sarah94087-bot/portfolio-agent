@@ -119,6 +119,13 @@ def test_no_key_means_no_ranker():
     assert from_env(httpx.Client(), {"GROQ_API_KEY": "k"}).name == f"groq/{RERANK_MODEL}"
 
 
+def test_the_rerank_model_can_be_set_apart_from_the_answer_model():
+    env = {"GROQ_API_KEY": "k", "GROQ_MODEL": "openai/gpt-oss-120b",
+           "RERANK_MODEL": "openai/gpt-oss-20b"}
+    assert from_env(httpx.Client(), env).name == "groq/openai/gpt-oss-20b"
+    assert from_env(httpx.Client(), {**env, "RERANK_MODEL": " "}).name == f"groq/{RERANK_MODEL}"
+
+
 class FakeQuota:
     def __init__(self, closed=()):
         self.shut = {m: (9e9, "rate_day") for m in closed}
