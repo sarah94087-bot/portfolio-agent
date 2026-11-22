@@ -4,8 +4,8 @@ import type { ReactNode } from "react";
 
 import { StatsBoard, type StatsCopy } from "@/components/StatsBoard";
 import { DocPage, Ext, Section, repoFile } from "@/components/ui/DocPage";
-import { getDictionary, hasLocale, type Locale } from "../dictionaries";
-import { alternates } from "@/lib/site";
+import { hasLocale, type Locale } from "../dictionaries";
+import { pageMetadata } from "../page-metadata";
 
 // S10 (US-9.3). The numbers are never in this file: they come from GET /api/stats, which applies
 // the threshold and the rounding. docs/08-transparency.md, section 4.
@@ -13,6 +13,7 @@ import { alternates } from "@/lib/site";
 type Copy = {
   eyebrow: string;
   title: string;
+  description: string;
   lede: string;
   board: StatsCopy;
   rulesTitle: string;
@@ -30,6 +31,7 @@ const copy: Record<Locale, Copy> = {
   he: {
     eyebrow: "איך הסוכן מתנהג מול מבקרים",
     title: "מדדים",
+    description: "מהירות ואיכות של הסוכן של שרה הלוי בפרודקשן, מחושבות פעם ביום מהתשובות עצמן. בלי מספרי שיחות ומבקרים.",
     lede: "מהירות ואיכות של הסוכן בפרודקשן, מחושבות פעם ביום מהתשובות עצמן. בלי מספרי שיחות ובלי מספרי מבקרים.",
     board: {
       columns: { measure: "מדד", model: "מודל", windows: { "7": "7 ימים", "30": "30 יום" } },
@@ -88,6 +90,7 @@ const copy: Record<Locale, Copy> = {
   en: {
     eyebrow: "How the agent behaves with real visitors",
     title: "Metrics",
+    description: "Speed and quality of Sarah Halevy's AI agent in production, computed daily from the answers themselves. No conversation or visitor counts.",
     lede: "The agent's speed and quality in production, computed once a day from the answers themselves. No conversation counts and no visitor counts.",
     board: {
       columns: { measure: "Measure", model: "Model", windows: { "7": "7 days", "30": "30 days" } },
@@ -148,10 +151,7 @@ const copy: Record<Locale, Copy> = {
 export async function generateMetadata({ params }: PageProps<"/[lang]/stats">): Promise<Metadata> {
   const { lang } = await params;
   if (!hasLocale(lang)) return {};
-  return {
-    title: `${copy[lang].title} · ${getDictionary(lang).meta.title}`,
-    alternates: alternates(lang, "/stats"),
-  };
+  return pageMetadata(lang, "/stats", copy[lang]);
 }
 
 const List = ({ items }: { items: ReactNode[] }) => (

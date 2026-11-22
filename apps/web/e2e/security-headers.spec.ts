@@ -40,7 +40,8 @@ for (const path of pages) {
     expect(headers["referrer-policy"]).toBe("strict-origin-when-cross-origin");
     expect(headers["permissions-policy"]).toBe("camera=(), microphone=(), geolocation=()");
 
-    await expect(page.locator("script:not([nonce])")).toHaveCount(0);
+    // A JSON-LD block is data the browser never runs, so the policy does not ask it for a nonce.
+    await expect(page.locator('script:not([nonce]):not([type="application/ld+json"])')).toHaveCount(0);
     expect(await violations(page)).toEqual([]);
   });
 }

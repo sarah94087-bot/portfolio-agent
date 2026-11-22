@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 
 import { Chat } from "@/components/chat/Chat";
 import { Header } from "@/components/ui/Header";
+import { JsonLd } from "@/components/ui/JsonLd";
+import { SITE_URL } from "@/lib/site";
 import { getDictionary, hasLocale } from "./dictionaries";
 
 // S1, the welcome screen (Claude Design boards "Main", "S1-EN", "S1-Mobile-EN-Dark"), which
@@ -13,8 +15,28 @@ export default async function ChatPage({ params }: PageProps<"/[lang]">) {
   const t = getDictionary(lang);
   const w = t.welcome;
 
+  // Only what the page already says: the site's name, its language and whom it is about.
+  // No profile links, until Sarah decides which ones to publish.
+  const person = { "@type": "Person", "@id": `${SITE_URL}/#sarah-halevy`, name: "Sarah Halevy" };
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/${lang}#website`,
+        url: `${SITE_URL}/${lang}`,
+        name: t.meta.title,
+        description: t.meta.description,
+        inLanguage: lang,
+        about: { "@id": person["@id"] },
+      },
+      person,
+    ],
+  };
+
   return (
     <>
+      <JsonLd data={structuredData} />
       <Header lang={lang} t={t.header} />
       <main className="flex flex-1 flex-col px-4 pt-6 md:items-center md:pt-10">
         <div className="mx-auto flex w-full max-w-measure flex-1 flex-col">
