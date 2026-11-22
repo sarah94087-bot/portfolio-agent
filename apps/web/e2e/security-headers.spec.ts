@@ -7,7 +7,7 @@ import type { Page } from "@playwright/test";
 import { ask, expect, openChat, test } from "./support/fixtures";
 import { onlyDiagram, TEXT } from "./support/recordings";
 
-const pages = ["/he", "/en", "/he/how-it-works", "/he/quality", "/he/privacy", "/he/stats"];
+const pages = ["/he", "/en", "/he/about", "/he/how-it-works", "/he/quality", "/he/privacy", "/he/stats"];
 
 type Watched = Window & { violations: string[]; injected?: boolean };
 
