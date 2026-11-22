@@ -21,6 +21,7 @@ function Mark() {
 
 export function Header({ lang, t }: { lang: Locale; t: Dictionary["header"] }) {
   const links = [
+    { href: `/${lang}/about`, label: t.about },
     { href: `/${lang}/how-it-works`, label: t.howItWorks },
     { href: `/${lang}/quality`, label: t.quality },
     { href: `/${lang}/stats`, label: t.stats },
