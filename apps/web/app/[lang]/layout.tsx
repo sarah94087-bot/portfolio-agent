@@ -35,7 +35,9 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
   const image = { url: `/og/${lang}.png`, width: 1200, height: 630, alt: meta.shareAlt };
   return {
     metadataBase: new URL(SITE_URL),
-    title: meta.title,
+    // The page title carries her full name, the one people search for. The short name stays the
+    // site name and the suffix of the inner pages' titles.
+    title: meta.shareTitle,
     description: meta.description,
     alternates: alternates(lang, ""),
     openGraph: {
