@@ -37,7 +37,7 @@ test("robots.txt keeps crawlers out of the API and points at the sitemap", async
 test("the sitemap lists every page in both languages", async ({ request }) => {
   const text = await (await request.get("/sitemap.xml")).text();
   for (const lang of ["he", "en"]) {
-    for (const path of ["", "/how-it-works", "/quality", "/stats", "/privacy"]) {
+    for (const path of ["", "/about", "/how-it-works", "/quality", "/stats", "/privacy"]) {
       expect(text).toContain(`<loc>${SITE}/${lang}${path}</loc>`);
     }
   }
