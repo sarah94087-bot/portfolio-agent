@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { Callout, DocPage, Ext, Section, Term, adrUrl, repoFile, repoUrl } from "@/components/ui/DocPage";
-import { getDictionary, hasLocale, type Locale } from "../dictionaries";
-import { alternates } from "@/lib/site";
+import { hasLocale, type Locale } from "../dictionaries";
+import { pageMetadata } from "../page-metadata";
 
 // S13 (US-9.4, US-9.5, US-9.6). The text describes the system as built, not as first planned.
 
@@ -32,6 +32,7 @@ const adr = {
 const copy: Record<Locale, {
   eyebrow: string;
   title: string;
+  description: string;
   lede: string;
   diagramTitle: string;
   diagramAlt: string;
@@ -52,6 +53,7 @@ const copy: Record<Locale, {
   he: {
     eyebrow: "הקוד, ההחלטות והבדיקות פתוחים",
     title: "איך הסוכן עובד",
+    description: "איך הסוכן של שרה הלוי עונה: הוא מחפש בתיק העבודות, כותב תשובה, והשרת בודק כל ציטוט לפני שהוא מגיע אליך.",
     lede: "הסוכן עונה רק מתוך תיק העבודות של שרה. הוא מחפש בתיק, כותב תשובה, והשרת בודק כל ציטוט לפני שהוא מגיע למסך.",
     diagramTitle: "הדרך של שאלה אחת",
     diagramAlt:
@@ -114,6 +116,7 @@ const copy: Record<Locale, {
   en: {
     eyebrow: "The code, the decisions and the tests are open",
     title: "How the agent works",
+    description: "How Sarah Halevy's AI agent answers: it searches her portfolio, writes a reply, and the server checks every citation before you see it.",
     lede: "The agent answers only from Sarah's portfolio. It searches the portfolio, writes an answer, and the server checks every citation before it reaches the screen.",
     diagramTitle: "The path of one question",
     diagramAlt:
@@ -227,10 +230,7 @@ function Diagram({ title, alt }: { title: string; alt: string }) {
 export async function generateMetadata({ params }: PageProps<"/[lang]/how-it-works">): Promise<Metadata> {
   const { lang } = await params;
   if (!hasLocale(lang)) return {};
-  return {
-    title: `${copy[lang].title} · ${getDictionary(lang).meta.title}`,
-    alternates: alternates(lang, "/how-it-works"),
-  };
+  return pageMetadata(lang, "/how-it-works", copy[lang]);
 }
 
 export default async function HowItWorksPage({ params }: PageProps<"/[lang]/how-it-works">) {

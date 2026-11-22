@@ -5,8 +5,8 @@ import type { ReactNode } from "react";
 import data from "@/data/quality.json";
 import { Callout, DocPage, Ext, Section, TableFrame, Term, adrUrl, repoFile, td, th } from "@/components/ui/DocPage";
 import { interval, num, parseQuality, signed, signedFine, type Experiment, type Quality, type Score } from "@/lib/quality";
-import { getDictionary, hasLocale, type Locale } from "../dictionaries";
-import { alternates } from "@/lib/site";
+import { hasLocale, type Locale } from "../dictionaries";
+import { pageMetadata } from "../page-metadata";
 
 // S9 (US-9.1, US-9.2). Every number comes from data/quality.json, built from evals/results.
 const quality = parseQuality(data);
@@ -14,6 +14,7 @@ const quality = parseQuality(data);
 type Copy = {
   eyebrow: string;
   title: string;
+  description: string;
   lede: string;
   statusTitle: string;
   status: (q: Quality) => ReactNode;
@@ -51,6 +52,7 @@ const copy: Record<Locale, Copy> = {
   he: {
     eyebrow: "כמה הסוכן טוב, ואיך זה נמדד",
     title: "איכות",
+    description: "איכות הסוכן של שרה הלוי: כל מספר מחושב מקבצי התוצאות ב-repo, כולל מה שעוד לא נמדד ומה שלא טוב מספיק.",
     lede: "כל מספר כאן מחושב מקבצי התוצאות שב-repo. גם מה שעוד לא נמדד, ומה שלא טוב מספיק, מופיע כאן.",
     statusTitle: "עדיין אין ציון רשמי",
     status: (q) => (
@@ -127,6 +129,7 @@ const copy: Record<Locale, Copy> = {
   en: {
     eyebrow: "How good the agent is, and how that is measured",
     title: "Quality",
+    description: "Measured quality of Sarah Halevy's AI agent. Every number is computed from the result files in the repo, including what isn't good enough yet.",
     lede: "Every number here is computed from the result files in the repo. What has not been measured yet, and what is not good enough, is shown too.",
     statusTitle: "No official score yet",
     status: (q) => (
@@ -241,10 +244,7 @@ function ExperimentTable({ e, c, label }: { e: Experiment; c: Copy; label: strin
 export async function generateMetadata({ params }: PageProps<"/[lang]/quality">): Promise<Metadata> {
   const { lang } = await params;
   if (!hasLocale(lang)) return {};
-  return {
-    title: `${copy[lang].title} · ${getDictionary(lang).meta.title}`,
-    alternates: alternates(lang, "/quality"),
-  };
+  return pageMetadata(lang, "/quality", copy[lang]);
 }
 
 export default async function QualityPage({ params }: PageProps<"/[lang]/quality">) {

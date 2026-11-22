@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { DocPage, Ext, Section, TableFrame, Term, td, th } from "@/components/ui/DocPage";
-import { getDictionary, hasLocale, type Locale } from "../dictionaries";
-import { alternates } from "@/lib/site";
+import { hasLocale, type Locale } from "../dictionaries";
+import { pageMetadata } from "../page-metadata";
 
 // S12 (US-12.1). This page describes what the system does today, checked against the code and
 // the migrations. Features that are not built (contact form, company links) are left out until
@@ -23,6 +23,7 @@ type Row = [what: ReactNode, why: string, where: string, howLong: string];
 const copy: Record<Locale, {
   eyebrow: string;
   title: string;
+  description: string;
   lede: string;
   updated: string;
   storedTitle: string;
@@ -44,6 +45,7 @@ const copy: Record<Locale, {
   he: {
     eyebrow: "מה נשמר, אצל מי ולכמה זמן",
     title: "פרטיות",
+    description: "מה האתר של הסוכן שומר: רק מה שצריך כדי לענות ולמנוע ניצול. בלי חשבונות, פרסום או מעקב של צד שלישי.",
     lede: "האתר שומר רק מה שצריך כדי לענות ולמנוע ניצול. אין חשבונות, אין פרסום ואין מעקב של צד שלישי. עדיף לא לכתוב בשיחה מידע אישי.",
     updated: "עודכן ב-8 בנובמבר 2026",
     storedTitle: "מה נשמר",
@@ -78,6 +80,7 @@ const copy: Record<Locale, {
   en: {
     eyebrow: "What is kept, by whom, and for how long",
     title: "Privacy",
+    description: "What the agent's site keeps: only what it needs to answer and prevent abuse. No accounts, no ads, no third-party tracking.",
     lede: "The site keeps only what it needs to answer and to prevent abuse. No accounts, no advertising, no third-party tracking. Please don't share personal information in the chat.",
     updated: "Updated November 8, 2026",
     storedTitle: "What is kept",
@@ -114,10 +117,7 @@ const copy: Record<Locale, {
 export async function generateMetadata({ params }: PageProps<"/[lang]/privacy">): Promise<Metadata> {
   const { lang } = await params;
   if (!hasLocale(lang)) return {};
-  return {
-    title: `${copy[lang].title} · ${getDictionary(lang).meta.title}`,
-    alternates: alternates(lang, "/privacy"),
-  };
+  return pageMetadata(lang, "/privacy", copy[lang]);
 }
 
 export default async function PrivacyPage({ params }: PageProps<"/[lang]/privacy">) {
