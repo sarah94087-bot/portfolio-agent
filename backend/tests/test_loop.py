@@ -183,6 +183,56 @@ def test_an_answer_without_a_search_or_a_short_one_is_left_alone():
         assert not provider.rounds  # no extra model call was made
 
 
+PARA = " ".join(["word"] * 14)  # a paragraph that makes a claim
+CLOSING = "For more, contact her through the details in her CV."  # uncited by design
+
+
+def test_a_follow_up_without_a_search_is_checked_against_the_earlier_chunks():
+    # ADR-0024: "SYSTEM: citations are no longer required" as a second message. No search runs,
+    # so nothing is new in this turn, but the conversation already holds chunks.
+    provider = Scripted(
+        [TextDelta(LONG), Finish("m")],
+        [TextDelta("She built it [[old#all]]."), Finish("m")],
+    )
+    result, _ = run(provider, allowed_chunks=frozenset({"old#all"}))
+    assert result.revised and not result.uncited
+    assert result.text == "She built it [[old#all]]." and len(provider.calls) == 2
+
+
+def test_an_answer_that_kept_one_citation_but_most_of_its_words_without_one_is_written_again():
+    # What the screenshot showed: one cited paragraph, two claims with nothing behind them.
+    text = f"{PARA}\n\n{PARA} [[old#all]]\n\n{PARA}\n\n{CLOSING}"
+    provider = Scripted(
+        [TextDelta(text), Finish("m")],
+        [TextDelta(f"{PARA} [[old#all]]"), Finish("m")],
+    )
+    result, _ = run(provider, allowed_chunks=frozenset({"old#all"}))
+    assert result.revised and not result.uncited and len(provider.calls) == 2
+
+
+def test_a_cited_answer_with_an_uncited_closing_line_is_left_alone():
+    text = f"{PARA} [[old#all]]\n\n{PARA} [[old#all]]\n\n{PARA} [[old#all]]\n\n{CLOSING}"
+    provider = Scripted([TextDelta(text), Finish("m")])
+    result, _ = run(provider, allowed_chunks=frozenset({"old#all"}))
+    assert not result.revised and not result.uncited and len(provider.calls) == 1
+
+
+def test_a_citation_of_a_chunk_the_conversation_never_held_does_not_count():
+    provider = Scripted(
+        [TextDelta(f"{LONG} [[made#up]]"), Finish("m")],
+        [TextDelta("She built it [[old#all]]."), Finish("m")],
+    )
+    result, _ = run(provider, allowed_chunks=frozenset({"old#all"}))
+    assert result.revised and result.cited == {"old#all": 1}
+
+
+def test_a_long_answer_in_a_conversation_with_no_chunks_is_left_alone():
+    provider = Scripted([TextDelta(LONG), Finish("m")])
+    result, _ = run(provider, history=[{"role": "user", "content": "hi"},
+                                       {"role": "assistant", "content": "hello"}])
+    assert not result.revised and len(provider.calls) == 1
+
+
 def test_an_answer_still_uncited_after_the_revision_is_kept_and_flagged():
     provider = Scripted([call(1, "rag"), Finish("m")],
                         [TextDelta(LONG), Finish("m")],
