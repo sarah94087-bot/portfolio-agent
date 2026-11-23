@@ -301,6 +301,22 @@ def test_a_failed_revision_gives_the_first_answer_back_instead_of_an_error(error
     assert cut and cut[0]["summary"]["replace_from"] == 0
 
 
+def test_an_empty_revision_gives_the_first_answer_back_instead_of_a_blank_one():
+    from portfolio_agent.agent.transcript import Transcript
+
+    provider = Scripted([call(1, "rag"), Finish("m")], [TextDelta(LONG), Finish("m")],
+                        [Finish("m", {"output_tokens": 0})])
+    result, events = run(provider)
+    assert result.text == LONG and result.uncited and not result.revised
+    seen = Transcript()
+    for e, d in events:
+        seen.record(e, d)
+    assert seen.text == LONG  # what the visitor sees and what is saved
+    cut = [d for e, d in events if e == "step" and (d.get("summary") or {}).get("reason")
+           == "revision_failed"]
+    assert cut and cut[0]["summary"]["error"] == "empty_revision"
+
+
 def test_a_failure_outside_a_revision_still_raises():
     from portfolio_agent.providers.openai_compat import ProviderError
 

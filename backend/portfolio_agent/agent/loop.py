@@ -205,6 +205,10 @@ async def run_turn(
                     for key, value in event.usage.items():
                         usage[key] = usage.get(key, 0) + value
                         round_usage[key] = round_usage.get(key, 0) + value
+            if revising is not None and not "".join(round_text).strip():
+                # An empty revision is a failed one: it would replace the first answer with
+                # nothing, and the visitor would get a blank answer (a Hebrew injection did).
+                raise ProviderError("empty_revision", "the revision came back empty")
         except (ProviderError, AllModelsFailed, NeedsFallback) as e:
             if revising is None or original is None:
                 raise
