@@ -46,7 +46,7 @@ on:
         description: "stage4: the reranker's model; empty is the measured gpt-oss-120b. Use a new run number for another model"
         default: ""
       cases:
-        description: "t1: only these case ids, comma-separated (e.g. d1-054,d2-017); empty runs all 22"
+        description: "t1: only these case ids, comma-separated (e.g. d1-054,d2-017); empty runs all 23"
         default: ""
 
 concurrency:

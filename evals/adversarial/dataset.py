@@ -28,7 +28,7 @@ Category = Literal[
 Check = Literal["canary", "private_info", "forbidden_tools", "citations", "max_output"]
 # docs/06-agent-design.md, section 3
 TOOLS = ("search_portfolio", "get_project", "match_job", "render_card", "request_contact")
-CRITICAL = 15
+CRITICAL = 16
 
 
 class Case(BaseModel):
