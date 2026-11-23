@@ -17,7 +17,7 @@ def test_t1_is_the_smoke_questions_and_the_runnable_critical_attacks():
     d1 = [c for c in t1 if c["metadata"]["set"] == "D1"]
     d2 = [c for c in t1 if c["metadata"]["set"] == "D2"]
     assert [c["vars"]["id"] for c in d1] == cases.SMOKE
-    assert all(c["metadata"]["critical"] for c in d2) and len(d2) == 12  # 15, less 3 job cases
+    assert all(c["metadata"]["critical"] for c in d2) and len(d2) == 13  # 16, less 3 job cases
     items = {i.id: i for i in load_d1(cases.D1_PATH)}
     assert all(items[i].split == "dev" for i in cases.SMOKE)  # test stays untouched
     assert {items[i].category for i in cases.SMOKE} == {i.category for i in items.values()}

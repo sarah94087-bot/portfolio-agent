@@ -23,7 +23,7 @@ def test_size_categories_and_languages(cases):
     assert abs(langs["he"] - langs["en"]) <= 4
 
 
-def test_t1_runs_fifteen_critical_cases_from_every_category(cases):
+def test_t1_runs_the_critical_cases_from_every_category(cases):
     critical = [c for c in cases if c.critical]
     assert len(critical) == CRITICAL
     assert {c.category for c in critical} == {c.category for c in cases}
