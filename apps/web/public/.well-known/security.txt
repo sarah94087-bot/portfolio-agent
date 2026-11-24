@@ -1,0 +1,4 @@
+Contact: https://github.com/sarah94087-bot/portfolio-agent/security/advisories/new
+Expires: 2027-11-01T00:00:00.000Z
+Preferred-Languages: en, he
+Canonical: https://portfolio-agent-rosy.vercel.app/.well-known/security.txt
