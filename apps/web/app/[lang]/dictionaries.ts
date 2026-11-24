@@ -44,6 +44,17 @@ const he = {
     ],
     privacy: "השיחות נשמרות 30 יום ועוברות דרך ספקי מודלים חיצוניים.",
     privacyLink: "מדיניות פרטיות",
+    // Text a search engine can read, under the conversation (SEO plan, approved by Sarah 2026-11-24).
+    // Every claim is from portfolio/profile.md and the site's own pages. The links are the header's
+    // labels for /how-it-works and /quality.
+    info: {
+      whatTitle: "מה זה הסוכן הזה?",
+      what: "זה סוכן AI שעונה על שאלות על שרה הלוי, מהנדסת AI שמתמחה במערכות Backend ו-AI. הוא לא מדבר בשמה: הוא מחפש בתיק העבודות שלה, ולכל טענה בתשובה יש קישור לרשומה שממנה היא באה. אם בתיק אין מידע, הוא אומר את זה.",
+      askTitle: "על מה אפשר לשאול?",
+      askBefore: "על הפרויקטים והניסיון שלה, ועל הדרך שבה היא ניגשת לבעיות הנדסיות. אפשר גם להדביק משרה ולקבל דוח שמראה איפה התיק תומך בדרישות ואיפה אין לו ראיות. איך זה עובד מפורט ב\"",
+      askMiddle: "\", והמדידות ב\"",
+      askAfter: "\".",
+    },
   },
   composer: {
     questionLabel: "שאלה על הניסיון של שרה",
@@ -306,6 +317,14 @@ const en: Dictionary = {
     ],
     privacy: "Conversations are stored for 30 days and pass through external model providers.",
     privacyLink: "Privacy policy",
+    info: {
+      whatTitle: "What is this agent?",
+      what: "It is an AI agent that answers questions about Sarah Halevy, an AI Engineer specializing in backend and AI systems. It does not speak for her: it searches her portfolio, and every claim in an answer links to the record it came from. If the portfolio has no information, it says so.",
+      askTitle: "What can you ask it?",
+      askBefore: "About her projects and experience, and how she approaches engineering problems. You can also paste a job posting and get a report of where the portfolio supports the requirements and where it has no evidence. How it works is on \"",
+      askMiddle: "\", and measured results are on \"",
+      askAfter: "\".",
+    },
   },
   composer: {
     questionLabel: "Question about Sarah's experience",

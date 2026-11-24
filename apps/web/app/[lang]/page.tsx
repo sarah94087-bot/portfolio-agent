@@ -72,6 +72,26 @@ export default async function ChatPage({ params }: PageProps<"/[lang]">) {
           />
         </div>
       </main>
+      <section aria-labelledby="home-info" className="px-4 pb-16 pt-10 md:pt-14">
+        <div className="mx-auto w-full max-w-measure">
+          <h2 id="home-info" className="text-[20px] font-extrabold leading-[1.3] md:text-[22px]">
+            {t.welcome.info.whatTitle}
+          </h2>
+          <p className="mt-2 text-[16px] leading-[1.7] text-text-muted">{t.welcome.info.what}</p>
+          <h2 className="mt-8 text-[20px] font-extrabold leading-[1.3] md:text-[22px]">{t.welcome.info.askTitle}</h2>
+          <p className="mt-2 text-[16px] leading-[1.7] text-text-muted">
+            {t.welcome.info.askBefore}
+            <Link href={`/${lang}/how-it-works`} className="text-accent underline underline-offset-3">
+              {t.header.howItWorks}
+            </Link>
+            {t.welcome.info.askMiddle}
+            <Link href={`/${lang}/quality`} className="text-accent underline underline-offset-3">
+              {t.header.quality}
+            </Link>
+            {t.welcome.info.askAfter}
+          </p>
+        </div>
+      </section>
     </>
   );
 }

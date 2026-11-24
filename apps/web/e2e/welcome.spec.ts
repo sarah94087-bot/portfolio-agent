@@ -59,6 +59,22 @@ test("US-1.4 the privacy line says what happens to conversations and links to th
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 });
 
+test("the home page has text under the chat that says what the agent is, with links to the pages that prove it", async ({ page }) => {
+  for (const [lang, what, how, quality] of [
+    ["he", "מה זה הסוכן הזה?", "איך זה עובד", "איכות"],
+    ["en", "What is this agent?", "How it works", "Quality"],
+  ] as const) {
+    await openChat(page, lang);
+    const info = page.getByRole("region", { name: what });
+    await expect(info.getByRole("heading", { level: 2 })).toHaveCount(2);
+    await info.getByRole("link", { name: how }).click();
+    await expect(page).toHaveURL(new RegExp(`/${lang}/how-it-works$`));
+    await openChat(page, lang);
+    await page.getByRole("region", { name: what }).getByRole("link", { name: quality }).click();
+    await expect(page).toHaveURL(new RegExp(`/${lang}/quality$`));
+  }
+});
+
 test("the page warms the backend while the visitor reads", async ({ page, api }) => {
   await openChat(page);
   await expect.poll(() => api.health).toEqual(["/api/health?warm=1"]);
