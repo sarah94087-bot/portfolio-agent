@@ -1,0 +1,17 @@
+# Sarah Halevy's AI agent
+
+> An AI agent that answers questions about Sarah Halevy's experience, with a source for every claim. It is not Sarah: it answers only from her portfolio, and says so when the portfolio has no information.
+
+The site is available in Hebrew (/he) and English (/en). The conversation itself is not meant for crawlers; the pages below are the readable parts.
+
+## Pages
+
+- [About Sarah](https://portfolio-agent-rosy.vercel.app/en/about): Sarah Halevy is an AI Engineer specializing in backend and AI systems, who built a live data-management system on her own, from architecture to launch.
+- [How it works](https://portfolio-agent-rosy.vercel.app/en/how-it-works): how the agent answers: it searches her portfolio, writes a reply, and the server checks every citation before you see it.
+- [Quality](https://portfolio-agent-rosy.vercel.app/en/quality): measured quality of the agent; every number is computed from the result files in the repo, including what isn't good enough yet.
+- [Metrics](https://portfolio-agent-rosy.vercel.app/en/stats): speed and quality in production, computed daily from the answers themselves.
+- [Privacy](https://portfolio-agent-rosy.vercel.app/en/privacy): what the site keeps: only what it needs to answer and prevent abuse. No accounts, no ads, no third-party tracking.
+
+## Source
+
+- [Repository](https://github.com/sarah94087-bot/portfolio-agent): the code, the knowledge base and the evaluation results.

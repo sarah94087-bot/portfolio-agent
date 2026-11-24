@@ -42,3 +42,21 @@ test("the sitemap lists every page in both languages", async ({ request }) => {
     }
   }
 });
+
+test("llms.txt and security.txt are served as plain text", async ({ request }) => {
+  const llms = await request.get("/llms.txt");
+  expect(llms.status()).toBe(200);
+  const text = await llms.text();
+  expect(text).toMatch(/^# Sarah Halevy's AI agent/);
+  for (const path of ["/about", "/how-it-works", "/quality", "/stats", "/privacy"]) {
+    expect(text).toContain(`${SITE}/en${path}`);
+  }
+
+  const security = await request.get("/.well-known/security.txt");
+  expect(security.status()).toBe(200);
+  const body = await security.text();
+  expect(body).toContain("Contact: ");
+  expect(body).toContain(`Canonical: ${SITE}/.well-known/security.txt`);
+  const expires = /^Expires: (.+)$/m.exec(body)?.[1];
+  expect(new Date(expires ?? "").getTime()).toBeGreaterThan(Date.now());
+});
